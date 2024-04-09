@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.com.android.library)
     alias(libs.plugins.org.jetbrains.kotlin.android)
@@ -5,6 +7,10 @@ plugins {
     id("kotlin-kapt")
     alias(libs.plugins.kotlin.serialization)
 }
+
+val properties = Properties()
+val localPropertiesFile = project.rootProject.file("local.properties")
+properties.load(localPropertiesFile.inputStream())
 
 android {
     namespace = "com.comst.data"
@@ -15,6 +21,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        buildConfigField("String", "BASE_URL", "${properties.getProperty("base_url")}")
     }
 
     buildTypes {
@@ -32,6 +40,9 @@ android {
     }
     kotlinOptions {
         jvmTarget = "17"
+    }
+    buildFeatures{
+        buildConfig = true
     }
 }
 
