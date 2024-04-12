@@ -20,11 +20,11 @@ private val ColorScheme = lightColorScheme(
     primary = primary,
     onPrimary = Color.White,
     primaryContainer = primaryContainer,
-    onPrimaryContainer = Color.White,
-    surface = Color.Black,
-    onSurface = Color.White,
+    onPrimaryContainer = Color.Black,
+    surface = Color.White,
+    onSurface = Color.Black,
     background = background,
-    onBackground = Color.White
+    onBackground = Color.Black
 )
 
 @Composable

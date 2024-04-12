@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.comst.domain.usecase.login.GetTokenUseCase
-import com.comst.presentation.auth.LoginActivity
+import com.comst.presentation.auth.AuthActivity
 import com.comst.presentation.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -34,7 +34,7 @@ class SplashActivity : AppCompatActivity() {
             }else{
                 startActivity(
                     Intent(
-                        this@SplashActivity, LoginActivity::class.java
+                        this@SplashActivity, AuthActivity::class.java
                     ).apply {
                         flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                     }

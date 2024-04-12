@@ -7,14 +7,14 @@ import com.comst.presentation.ui.theme.PlanDingTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class LoginActivity : AppCompatActivity() {
+class AuthActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent{
             PlanDingTheme {
-//                LoginNavHost()
+                LoginNavHost()
             }
         }
     }
