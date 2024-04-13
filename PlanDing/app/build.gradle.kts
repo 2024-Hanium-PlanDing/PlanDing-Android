@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.com.android.application)
     alias(libs.plugins.org.jetbrains.kotlin.android)
@@ -5,6 +7,10 @@ plugins {
     id("kotlin-kapt")
     alias(libs.plugins.hilt)
 }
+
+val properties = Properties()
+val localPropertiesFile = project.rootProject.file("local.properties")
+properties.load(localPropertiesFile.inputStream())
 
 android {
     namespace = "com.comst.planding"
@@ -21,6 +27,9 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "${properties.getProperty("kakao_native_app_key")}")
+
     }
 
     buildTypes {
@@ -41,6 +50,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.3"
@@ -84,5 +94,8 @@ dependencies {
 
     implementation(libs.hilt)
     kapt(libs.hilt.compiler)
+
+    // kakao login
+    implementation("com.kakao.sdk:v2-user:2.13.0")
 
 }

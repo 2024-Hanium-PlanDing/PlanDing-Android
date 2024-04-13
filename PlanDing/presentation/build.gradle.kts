@@ -1,9 +1,15 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.com.android.library)
     alias(libs.plugins.org.jetbrains.kotlin.android)
     id("kotlin-kapt")
     alias(libs.plugins.hilt)
 }
+
+val properties = Properties()
+val localPropertiesFile = project.rootProject.file("local.properties")
+properties.load(localPropertiesFile.inputStream())
 
 android {
     namespace = "com.comst.presentation"
@@ -14,6 +20,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = properties["kakao_native_app_key_no_quotes"] as String
     }
 
     buildTypes {
@@ -78,4 +86,7 @@ dependencies {
     // coil
     implementation(libs.coil)
     implementation(libs.coil.compose)
+
+    // kakao login
+    implementation("com.kakao.sdk:v2-user:2.13.0")
 }

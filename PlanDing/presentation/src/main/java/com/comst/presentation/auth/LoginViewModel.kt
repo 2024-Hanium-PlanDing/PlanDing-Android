@@ -1,7 +1,10 @@
 package com.comst.presentation.auth
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.comst.domain.model.SocialLoginInfo
 import com.comst.domain.usecase.login.SetTokenUseCase
+import com.comst.domain.usecase.login.SocialLoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
@@ -16,8 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-//    private val loginUseCase: LoginUseCase,
-    private val setTokenUseCase : SetTokenUseCase
+    private val setTokenUseCase : SetTokenUseCase,
+    private val socialLoginUseCase: SocialLoginUseCase
 ) : ViewModel(), ContainerHost<LoginState,LoginSideEffect> {
 
     override val container: Container<LoginState, LoginSideEffect> = container(
@@ -34,10 +37,7 @@ class LoginViewModel @Inject constructor(
     fun onLoginClick() = intent{
         val id = state.id
         val password = state.password
-//        val token = loginUseCase(id,password).getOrThrow()
-//        postSideEffect(LoginSideEffect.Toast(message = "token = $token"))
-//        setTokenUseCase(token)
-        postSideEffect(LoginSideEffect.NavigateToMainActivity)
+        //postSideEffect(LoginSideEffect.NavigateToMainActivity)
     }
 
     fun onIdChange(id: String) = blockingIntent{
@@ -52,6 +52,11 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    fun socialLogin(accountInfo: SocialLoginInfo) = intent{
+        val tokens = socialLoginUseCase(accountInfo).getOrThrow()
+        setTokenUseCase(tokens.accessToken, tokens.refreshToken)
+        postSideEffect(LoginSideEffect.NavigateToMainActivity)
+    }
 
 }
 

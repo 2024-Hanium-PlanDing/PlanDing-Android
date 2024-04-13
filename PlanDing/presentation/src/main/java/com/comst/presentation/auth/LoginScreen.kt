@@ -1,6 +1,8 @@
 package com.comst.presentation.auth
 
+import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -27,11 +29,16 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.comst.domain.model.SocialLoginInfo
 import com.comst.presentation.R
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDTextFiledOutLine
 import com.comst.presentation.main.MainActivity
 import com.comst.presentation.ui.theme.PlanDingTheme
+import com.kakao.sdk.auth.model.OAuthToken
+import com.kakao.sdk.common.model.ClientError
+import com.kakao.sdk.common.model.ClientErrorCause
+import com.kakao.sdk.user.UserApiClient
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
@@ -39,7 +46,7 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
     onNavigateToSignUpScreen: () -> Unit
-){
+) {
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
 
@@ -63,13 +70,29 @@ fun LoginScreen(
         }
     }
 
+    val kakaoCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
+        when {
+            error != null -> {
+                Log.e("Kakao", "카카오 계정 로그인 실패", error)
+            }
+
+            token != null -> {
+                getKakaoUserInfo(viewModel)
+            }
+        }
+    }
+
+    val onKaKaoLoginClick = { loginKakao(context, kakaoCallback) }
+
+
     LoginScreen(
         id = state.id,
         password = state.password,
         onIdChange = viewModel::onIdChange,
         onPasswordChange = viewModel::onPasswordChange,
         onNavigateToSignUpScreen = onNavigateToSignUpScreen,
-        onLoginClick = viewModel::onLoginClick
+        onLoginClick = viewModel::onLoginClick,
+        onKaKaoLoginClick = onKaKaoLoginClick
     )
 }
 
@@ -80,7 +103,8 @@ private fun LoginScreen(
     onIdChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onNavigateToSignUpScreen: () -> Unit,
-    onLoginClick: () -> Unit
+    onLoginClick: () -> Unit,
+    onKaKaoLoginClick: () -> Unit,
 ) {
     Surface {
         Column(
@@ -94,7 +118,9 @@ private fun LoginScreen(
             Image(
                 painter = painterResource(id = R.drawable.app_icon),
                 contentDescription = "앱 로고",
-                modifier = Modifier.size(150.dp).padding()
+                modifier = Modifier
+                    .size(150.dp)
+                    .padding()
             )
 
             Spacer(Modifier.height(60.dp))
@@ -134,7 +160,11 @@ private fun LoginScreen(
                 horizontalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 Image(
-                    modifier = Modifier.size(50.dp),
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clickable {
+                            onKaKaoLoginClick()
+                        },
                     painter = painterResource(id = R.drawable.login_kakao),
                     contentDescription = "카카오 로그인 버튼",
                     contentScale = ContentScale.Fit
@@ -175,15 +205,57 @@ private fun LoginScreen(
 
 @Preview
 @Composable
-private fun LoginScreenPreview(){
+private fun LoginScreenPreview() {
     PlanDingTheme {
         LoginScreen(
-            onNavigateToSignUpScreen = {},
-            id = "felis",
-            password = "partiendo",
+            id = "",
+            password = "",
             onIdChange = {},
             onPasswordChange = {},
-            onLoginClick = {}
+            onNavigateToSignUpScreen = {},
+            onLoginClick = {},
+            onKaKaoLoginClick = {}
         )
     }
+}
+
+private fun getKakaoUserInfo(viewModel: LoginViewModel) {
+    UserApiClient.instance.me { user, error ->
+        when {
+            error != null -> {
+                Log.e("Kakao", "사용저 정보 실패", error)
+            }
+
+            user != null -> {
+                viewModel.socialLogin(
+                    SocialLoginInfo(
+                        profileNickname = user.kakaoAccount?.name.toString(),
+                        accountEmail = user.kakaoAccount?.email ?: "",
+                        profileImage = user.kakaoAccount?.profile?.thumbnailImageUrl ?: "",
+                        socialId = user.id.toString(),
+                        type = SocialLoginInfo.Type.KAKAO
+
+                    )
+                )
+            }
+        }
+    }
+}
+
+private fun loginKakao(context: Context, kakaoCallback: (OAuthToken?, Throwable?) -> Unit) {
+    if (UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
+        UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
+            if (error != null) {
+                Log.e("Kakao", "카카오톡 로그인 실패", error)
+            }
+            if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
+                return@loginWithKakaoTalk
+            }
+
+            UserApiClient.instance.loginWithKakaoAccount(context, callback = kakaoCallback)
+        }
+    } else {
+        UserApiClient.instance.loginWithKakaoAccount(context, callback = kakaoCallback)
+    }
+
 }

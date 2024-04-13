@@ -3,9 +3,11 @@ package com.comst.data.di
 import com.comst.data.usecase.login.ClearTokenUseCaseImpl
 import com.comst.data.usecase.login.GetTokenUseCaseImpl
 import com.comst.data.usecase.login.SetTokenUseCaseImpl
+import com.comst.data.usecase.login.SocialLoginUseCaseImpl
 import com.comst.domain.usecase.login.ClearTokenUseCase
 import com.comst.domain.usecase.login.GetTokenUseCase
 import com.comst.domain.usecase.login.SetTokenUseCase
+import com.comst.domain.usecase.login.SocialLoginUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -23,4 +25,7 @@ abstract class UserModule {
 
     @Binds
     abstract fun bindClearTokenUseCase(uc :ClearTokenUseCaseImpl):ClearTokenUseCase
+
+    @Binds
+    abstract fun bindSocialLoginUseCase(uc: SocialLoginUseCaseImpl):SocialLoginUseCase
 }
