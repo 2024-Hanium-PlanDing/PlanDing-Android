@@ -165,14 +165,14 @@ private fun LoginScreen(
                         .clickable {
                             onKaKaoLoginClick()
                         },
-                    painter = painterResource(id = R.drawable.login_kakao),
+                    painter = painterResource(id = R.drawable.ic_login_kakao),
                     contentDescription = "카카오 로그인 버튼",
                     contentScale = ContentScale.Fit
                 )
 
                 Image(
                     modifier = Modifier.height(50.dp),
-                    painter = painterResource(id = R.drawable.login_google),
+                    painter = painterResource(id = R.drawable.ic_login_google),
                     contentDescription = "구글 로그인 버튼",
                     contentScale = ContentScale.Fit
                 )
