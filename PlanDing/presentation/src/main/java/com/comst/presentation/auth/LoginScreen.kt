@@ -247,15 +247,15 @@ private fun loginKakao(context: Context, kakaoCallback: (OAuthToken?, Throwable?
         UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
             if (error != null) {
                 Log.e("Kakao", "카카오톡 로그인 실패", error)
+                if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
+                    return@loginWithKakaoTalk
+                }
+                UserApiClient.instance.loginWithKakaoAccount(context, callback = kakaoCallback)
+            } else if (token != null) {
+                kakaoCallback(token, null)
             }
-            if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
-                return@loginWithKakaoTalk
-            }
-
-            UserApiClient.instance.loginWithKakaoAccount(context, callback = kakaoCallback)
         }
     } else {
         UserApiClient.instance.loginWithKakaoAccount(context, callback = kakaoCallback)
     }
-
 }
