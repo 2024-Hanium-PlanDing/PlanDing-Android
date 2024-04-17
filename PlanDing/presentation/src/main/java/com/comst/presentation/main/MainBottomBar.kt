@@ -35,7 +35,6 @@ import com.comst.presentation.ui.theme.PlanDingTheme
 fun MainBottomBar(
     navController: NavController
 ) {
-    val activity = (LocalContext.current as? Activity)
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute: MainRoute = navBackStackEntry
@@ -44,19 +43,28 @@ fun MainBottomBar(
         ?.let { currentRoute -> MainRoute.values().find { route -> route.route == currentRoute } }
         ?: MainRoute.PERSONAL_SCHEDULE
 
-    BackHandler {
-        activity?.finish()
-    }
-
     MainBottomBar(
         currentRoute = currentRoute,
         onItemClick = { newRoute ->
             navController.navigate(route = newRoute.route) {
+
+                /*
+                // Main의 모든 스크린에서 뒤로가기 누르면 앱 종료
                 popUpTo(
                     navBackStackEntry?.destination?.id ?: navController.graph.startDestinationId
                 ) {
                     saveState = true
                     inclusive = true
+                }
+                 */
+                navController.navigate(route = newRoute.route){
+                    navController.graph.startDestinationRoute?.let {
+                        popUpTo(it){
+                            saveState = true
+                        }
+                    }
+                    this.launchSingleTop = true
+                    this.restoreState = true
                 }
                 launchSingleTop = true
                 restoreState = true
