@@ -71,15 +71,11 @@ fun LoginScreen(
     }
 
     val kakaoCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
-        when {
-            error != null -> {
-                Log.e("Kakao", "카카오 계정 로그인 실패", error)
-            }
 
-            token != null -> {
-                getKakaoUserInfo(viewModel)
-            }
-        }
+        if (error != null) {
+            Log.e("Kakao", "카카오 계정 로그인 실패", error)
+        } else if (token != null) {
+            getKakaoUserInfo(viewModel)        }
     }
 
     val onKaKaoLoginClick = { loginKakao(context, kakaoCallback) }
@@ -88,11 +84,9 @@ fun LoginScreen(
     LoginScreen(
         id = state.id,
         password = state.password,
-        onIdChange = viewModel::onIdChange,
-        onPasswordChange = viewModel::onPasswordChange,
         onNavigateToSignUpScreen = onNavigateToSignUpScreen,
-        onLoginClick = viewModel::onLoginClick,
-        onKaKaoLoginClick = onKaKaoLoginClick
+        onKaKaoLoginClick = onKaKaoLoginClick,
+        onUIAction = viewModel::onUIAction
     )
 }
 
@@ -100,11 +94,9 @@ fun LoginScreen(
 private fun LoginScreen(
     id: String,
     password: String,
-    onIdChange: (String) -> Unit,
-    onPasswordChange: (String) -> Unit,
     onNavigateToSignUpScreen: () -> Unit,
-    onLoginClick: () -> Unit,
     onKaKaoLoginClick: () -> Unit,
+    onUIAction:(UIAction) -> Unit
 ) {
     Surface {
         Column(
@@ -129,7 +121,7 @@ private fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 value = id,
                 label = "아이디",
-                onValueChange = onIdChange
+                onValueChange = { newId -> onUIAction(UIAction.IdChange(newId)) }
             )
             Spacer(Modifier.height(4.dp))
 
@@ -138,14 +130,14 @@ private fun LoginScreen(
                 value = password,
                 label = "비밀번호",
                 visualTransformation = PasswordVisualTransformation(),
-                onValueChange = onPasswordChange
+                onValueChange = { newPassword -> onUIAction(UIAction.PasswordChange(newPassword)) }
             )
             Spacer(Modifier.height(20.dp))
 
             PDButton(
                 modifier = Modifier.fillMaxWidth(),
                 text = "로그인하기",
-                onClick = onLoginClick
+                onClick = { onUIAction(UIAction.Login) }
             )
 
             Spacer(Modifier.height(20.dp))
@@ -210,11 +202,9 @@ private fun LoginScreenPreview() {
         LoginScreen(
             id = "",
             password = "",
-            onIdChange = {},
-            onPasswordChange = {},
             onNavigateToSignUpScreen = {},
-            onLoginClick = {},
-            onKaKaoLoginClick = {}
+            onKaKaoLoginClick = {},
+            onUIAction = {}
         )
     }
 }
@@ -227,16 +217,14 @@ private fun getKakaoUserInfo(viewModel: LoginViewModel) {
             }
 
             user != null -> {
-                viewModel.socialLogin(
-                    SocialLoginInfo(
-                        profileNickname = user.kakaoAccount?.name.toString(),
-                        accountEmail = user.kakaoAccount?.email ?: "",
-                        profileImage = user.kakaoAccount?.profile?.thumbnailImageUrl ?: "",
-                        socialId = user.id.toString(),
-                        type = SocialLoginInfo.Type.KAKAO
-
-                    )
+                val socialLoginInfo = SocialLoginInfo(
+                    profileNickname = user.kakaoAccount?.profile.toString(),
+                    accountEmail = user.kakaoAccount?.email ?: "",
+                    profileImage = user.kakaoAccount?.profile?.thumbnailImageUrl ?: "",
+                    socialId = user.id.toString(),
+                    type = SocialLoginInfo.Type.KAKAO
                 )
+                viewModel.onUIAction(UIAction.SocialLogin(socialLoginInfo))
             }
         }
     }

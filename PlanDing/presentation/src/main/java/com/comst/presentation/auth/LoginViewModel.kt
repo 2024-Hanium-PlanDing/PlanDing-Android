@@ -34,33 +34,50 @@ class LoginViewModel @Inject constructor(
         }
     )
 
-    fun onLoginClick() = intent{
+    fun onUIAction(action: UIAction) {
+        when (action) {
+            is UIAction.IdChange -> onIdChange(action.id)
+            is UIAction.PasswordChange -> onPasswordChange(action.password)
+            is UIAction.Login -> onLoginClick()
+            is UIAction.SocialLogin -> socialLogin(action.accountInfo)
+        }
+    }
+
+    private fun onLoginClick() = intent{
         val id = state.id
         val password = state.password
         //postSideEffect(LoginSideEffect.NavigateToMainActivity)
         setTokenUseCase("aaa","aaa")
     }
 
-    fun onIdChange(id: String) = blockingIntent{
+    private fun onIdChange(id: String) = blockingIntent{
         reduce {
             state.copy(id = id)
         }
     }
 
-    fun onPasswordChange(password: String) = blockingIntent{
+    private fun onPasswordChange(password: String) = blockingIntent{
         reduce {
             state.copy(password = password)
         }
     }
 
-    fun socialLogin(accountInfo: SocialLoginInfo) = intent{
+    private fun socialLogin(accountInfo: SocialLoginInfo) = intent{
         val tokens = socialLoginUseCase(accountInfo).getOrThrow()
         setTokenUseCase(tokens.accessToken, tokens.refreshToken)
         postSideEffect(LoginSideEffect.NavigateToMainActivity)
     }
 
+
+
 }
 
+sealed class UIAction {
+    data class IdChange(val id: String) : UIAction()
+    data class PasswordChange(val password: String) : UIAction()
+    object Login : UIAction()
+    data class SocialLogin(val accountInfo: SocialLoginInfo) : UIAction()
+}
 @Immutable
 data class LoginState(
     val id : String = "",
