@@ -1,6 +1,5 @@
 package com.comst.presentation.auth
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.comst.domain.model.SocialLoginInfo
 import com.comst.domain.usecase.login.SetTokenUseCase
@@ -39,7 +38,7 @@ class LoginViewModel @Inject constructor(
             is UIAction.IdChange -> onIdChange(action.id)
             is UIAction.PasswordChange -> onPasswordChange(action.password)
             is UIAction.Login -> onLoginClick()
-            is UIAction.SocialLogin -> socialLogin(action.accountInfo)
+            is UIAction.SocialLogin -> onSocialLogin(action.accountInfo)
         }
     }
 
@@ -62,7 +61,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun socialLogin(accountInfo: SocialLoginInfo) = intent{
+    private fun onSocialLogin(accountInfo: SocialLoginInfo) = intent{
         val tokens = socialLoginUseCase(accountInfo).getOrThrow()
         setTokenUseCase(tokens.accessToken, tokens.refreshToken)
         postSideEffect(LoginSideEffect.NavigateToMainActivity)
@@ -85,6 +84,6 @@ data class LoginState(
 )
 
 sealed interface LoginSideEffect{
-    class Toast(val message:String):LoginSideEffect
+    data class Toast(val message:String):LoginSideEffect
     object NavigateToMainActivity:LoginSideEffect
 }

@@ -26,14 +26,6 @@ fun MainNavHost() {
     val navController = rememberNavController()
     Surface {
         Scaffold(
-            topBar = {
-                TopAppBar (
-                    modifier = Modifier.background(MaterialTheme.colorScheme.background),
-                    title = {
-                        Text(text = stringResource(id = R.string.app_name))
-                    }
-                )
-            },
             content = { padding ->
                 NavHost(
                     modifier = Modifier.padding(padding),
