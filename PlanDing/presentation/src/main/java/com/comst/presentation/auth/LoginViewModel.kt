@@ -1,5 +1,6 @@
 package com.comst.presentation.auth
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import com.comst.domain.model.SocialLoginInfo
 import com.comst.domain.usecase.login.SetTokenUseCase
@@ -13,7 +14,6 @@ import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
-import javax.annotation.concurrent.Immutable
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,12 +33,12 @@ class LoginViewModel @Inject constructor(
         }
     )
 
-    fun onUIAction(action: UIAction) {
+    fun onUIAction(action: LoginUIAction) {
         when (action) {
-            is UIAction.IdChange -> onIdChange(action.id)
-            is UIAction.PasswordChange -> onPasswordChange(action.password)
-            is UIAction.Login -> onLoginClick()
-            is UIAction.SocialLogin -> onSocialLogin(action.accountInfo)
+            is LoginUIAction.IdChange -> onIdChange(action.id)
+            is LoginUIAction.PasswordChange -> onPasswordChange(action.password)
+            is LoginUIAction.Login -> onLoginClick()
+            is LoginUIAction.SocialLogin -> onSocialLogin(action.accountInfo)
         }
     }
 
@@ -71,11 +71,11 @@ class LoginViewModel @Inject constructor(
 
 }
 
-sealed class UIAction {
-    data class IdChange(val id: String) : UIAction()
-    data class PasswordChange(val password: String) : UIAction()
-    object Login : UIAction()
-    data class SocialLogin(val accountInfo: SocialLoginInfo) : UIAction()
+sealed class LoginUIAction {
+    data class IdChange(val id: String) : LoginUIAction()
+    data class PasswordChange(val password: String) : LoginUIAction()
+    object Login : LoginUIAction()
+    data class SocialLogin(val accountInfo: SocialLoginInfo) : LoginUIAction()
 }
 @Immutable
 data class LoginState(

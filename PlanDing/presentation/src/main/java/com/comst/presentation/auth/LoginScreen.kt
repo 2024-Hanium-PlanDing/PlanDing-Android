@@ -96,7 +96,7 @@ private fun LoginScreen(
     password: String,
     onNavigateToSignUpScreen: () -> Unit,
     onKaKaoLoginClick: () -> Unit,
-    onUIAction:(UIAction) -> Unit
+    onUIAction:(LoginUIAction) -> Unit
 ) {
     Surface {
         Column(
@@ -121,7 +121,7 @@ private fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 value = id,
                 label = "아이디",
-                onValueChange = { newId -> onUIAction(UIAction.IdChange(newId)) }
+                onValueChange = { newId -> onUIAction(LoginUIAction.IdChange(newId)) }
             )
             Spacer(Modifier.height(4.dp))
 
@@ -130,14 +130,14 @@ private fun LoginScreen(
                 value = password,
                 label = "비밀번호",
                 visualTransformation = PasswordVisualTransformation(),
-                onValueChange = { newPassword -> onUIAction(UIAction.PasswordChange(newPassword)) }
+                onValueChange = { newPassword -> onUIAction(LoginUIAction.PasswordChange(newPassword)) }
             )
             Spacer(Modifier.height(20.dp))
 
             PDButton(
                 modifier = Modifier.fillMaxWidth(),
                 text = "로그인하기",
-                onClick = { onUIAction(UIAction.Login) }
+                onClick = { onUIAction(LoginUIAction.Login) }
             )
 
             Spacer(Modifier.height(20.dp))
@@ -224,7 +224,7 @@ private fun getKakaoUserInfo(viewModel: LoginViewModel) {
                     socialId = user.id.toString(),
                     type = SocialLoginInfo.Type.KAKAO
                 )
-                viewModel.onUIAction(UIAction.SocialLogin(socialLoginInfo))
+                viewModel.onUIAction(LoginUIAction.SocialLogin(socialLoginInfo))
             }
         }
     }
