@@ -19,9 +19,8 @@ fun PDScreenHeader(
 ) {
     Box(
         modifier = Modifier
-            .fillMaxWidth()
             .padding(top = 20.dp)
-            .padding(start = 20.dp),
+            .padding(start = 16.dp),
         contentAlignment = Alignment.CenterStart
     ) {
         Text(

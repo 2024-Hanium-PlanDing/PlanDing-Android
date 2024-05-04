@@ -39,7 +39,7 @@ fun PDProfileImage(
                     contentScale = ContentScale.Crop
                 )
             } ?: rememberVectorPainter(image = Icons.Filled.Person),
-            colorFilter = if (profileImageUrl == null) ColorFilter.tint(Color.White) else null,
+            colorFilter = if (profileImageUrl == null) ColorFilter.tint(Color.Black) else null,
             contentDescription = "프로필 사진",
             contentScale = ContentScale.Crop,
 
