@@ -29,14 +29,14 @@ class GroupViewModel @Inject constructor(
 
     )
 
-    fun onUIAction(action: UIAction) {
+    fun onUIAction(action: GroupUIAction) {
         when (action) {
-            is UIAction.GroupMake -> onMakeGroupClick()
-            is UIAction.GroupClick -> onGroupClick(action.id)
+            is GroupUIAction.GroupCreate -> onCreateGroupClick()
+            is GroupUIAction.GroupClick -> onGroupClick(action.id)
         }
     }
 
-    private fun onMakeGroupClick() = intent {
+    private fun onCreateGroupClick() = intent {
         postSideEffect(GroupSideEffect.NavigateToCreateGroupActivity)
     }
 
@@ -45,9 +45,9 @@ class GroupViewModel @Inject constructor(
     }
 }
 
-sealed class UIAction {
-    data class GroupClick(val id: Long) : UIAction()
-    object GroupMake : UIAction()
+sealed class GroupUIAction {
+    data class GroupClick(val id: Long) : GroupUIAction()
+    object GroupCreate : GroupUIAction()
 }
 
 @Immutable

@@ -15,6 +15,9 @@
 
         <activity android:name=".main.MainActivity"/>
 
+        <activity android:name=".main.group.detail.GroupDetailActivity"/>
+        <activity android:name=".main.group.create.CreateGroupActivity"/>
+
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true">
