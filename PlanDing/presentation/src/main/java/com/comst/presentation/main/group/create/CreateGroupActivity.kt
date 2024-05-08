@@ -13,7 +13,7 @@ class CreateGroupActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             PlanDingTheme {
-
+                CreateGroupScreen { finish() }
             }
         }
     }
