@@ -54,6 +54,7 @@ fun MyPageScreen(
     MyPageScreen(
         username = state.username,
         profileImageUrl = state.profileImageUrl,
+        userCode = state.userCode,
         favoriteGroupsCount = state.favoriteGroupsCount,
         receivedGroupRequestsCount = state.receivedGroupRequestsCount,
         onUIAction = viewModel::onUIAction
@@ -63,9 +64,10 @@ fun MyPageScreen(
 @Composable
 private fun MyPageScreen(
     username: String = "",
+    userCode: String = "",
     profileImageUrl: String?,
-    favoriteGroupsCount: String = "0",
-    receivedGroupRequestsCount: String = "0",
+    favoriteGroupsCount: String = "-1",
+    receivedGroupRequestsCount: String = "-1",
     onUIAction:(MyPageUIAction) -> Unit
 ) {
     Surface {
@@ -150,7 +152,7 @@ private fun MyPageScreen(
 
             Text(
                 modifier = Modifier.padding(start = 16.dp),
-                text = "@$username",
+                text = userCode,
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.Gray
             )
@@ -184,6 +186,7 @@ private fun MyPageScreenPreview() {
     PlanDingTheme {
         MyPageScreen(
             username = "username",
+            userCode = "userCode",
             profileImageUrl = "null",
             favoriteGroupsCount = "dolore",
             receivedGroupRequestsCount = "urna",

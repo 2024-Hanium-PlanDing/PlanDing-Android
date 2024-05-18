@@ -64,6 +64,10 @@ dependencies {
     // serialization
     implementation(libs.kotlinx.serialization.json)
 
+    // okhttp
+    implementation(libs.okhttp.logging)
+
+
     // retrofit
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.serialization)
