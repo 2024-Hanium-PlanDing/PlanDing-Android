@@ -1,9 +1,7 @@
 package com.comst.presentation.main.mypage
 
 import androidx.lifecycle.ViewModel
-import com.comst.domain.model.UserInfo
 import com.comst.domain.model.UserProfile
-import com.comst.domain.usecase.user.GetUserInfoUseCase
 import com.comst.domain.usecase.user.GetUserProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -18,7 +16,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
-    private val getUserInfoUseCase: GetUserInfoUseCase,
     private val getUserProfileUseCase: GetUserProfileUseCase
 ) : ViewModel(), ContainerHost<MyPageState, MyPageSideEffect>{
     override val container: Container<MyPageState, MyPageSideEffect> = container(
@@ -40,13 +37,12 @@ class MyPageViewModel @Inject constructor(
     }
 
     private fun load() = intent {
-        val userInfo: UserInfo = getUserInfoUseCase().getOrThrow()
         val userProfile: UserProfile = getUserProfileUseCase().getOrThrow()
         reduce {
             state.copy(
-                username = userInfo.username,
-                userCode = userInfo.userCode,
-                profileImageUrl = userInfo.profileImage,
+                username = userProfile.username,
+                userCode = userProfile.userCode,
+                profileImageUrl = userProfile.profileImage,
                 favoriteGroupsCount = userProfile.groupFavorite,
                 receivedGroupRequestsCount = userProfile.groupRequest
             )

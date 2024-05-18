@@ -220,15 +220,15 @@ private fun getKakaoUserInfo(viewModel: LoginViewModel) {
                 val authId = user.id.toString()
                 val email = user.kakaoAccount?.email ?: ""
                 val profileUrl = user.kakaoAccount?.profile?.thumbnailImageUrl ?: ""
-                Log.d("카카오", "$authId    $email     $profileUrl")
+
                 val socialLoginInfo = SocialLoginInfo(
-                    profileNickname = user.kakaoAccount?.profile.toString(),
+                    profileNickname = user.kakaoAccount?.profile?.nickname.toString(),
                     accountEmail = user.kakaoAccount?.email ?: "",
                     profileImage = user.kakaoAccount?.profile?.thumbnailImageUrl ?: "",
                     socialId = user.id.toString(),
                     type = SocialLoginInfo.Type.KAKAO
-
                 )
+                Log.d("카카오", "$socialLoginInfo")
                 viewModel.onUIAction(LoginUIAction.SocialLogin(socialLoginInfo))
             }
         }

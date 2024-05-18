@@ -1,6 +1,5 @@
 package com.comst.data.usecase.login
 
-import com.comst.data.model.user.LoginResponseDTO
 import com.comst.data.model.user.SocialLoginParam
 import com.comst.data.model.user.toDomainModel
 import com.comst.data.retrofit.UserService
@@ -21,6 +20,7 @@ class SocialLoginUseCaseImpl @Inject constructor(
             profileImage = socialLoginInfo.profileImage,
             socialId = socialLoginInfo.socialId
         )
+
 
         userService.socialLogin(requestBody = requestBody).data.toDomainModel()
     }
