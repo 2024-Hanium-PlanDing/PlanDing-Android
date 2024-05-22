@@ -1,7 +1,10 @@
 package com.comst.presentation.main.group.create
 
+import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
+import com.comst.domain.model.groupRoom.GroupRoomCreate
+import com.comst.domain.usecase.groupRoom.PostGroupRoomUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
@@ -15,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateGroupViewModel @Inject constructor(
-
+    private val postGroupRoomUseCase: PostGroupRoomUseCase
 ) : ViewModel(), ContainerHost<CreateGroupState, CreateGroupSideEffect>{
     override val container: Container<CreateGroupState, CreateGroupSideEffect> = container(
         initialState = CreateGroupState(),
@@ -32,6 +35,7 @@ class CreateGroupViewModel @Inject constructor(
         when(action){
             is CreateGroupUIAction.GroupNameChange -> onGroupNameChange(action.groupName)
             is CreateGroupUIAction.GroupDescriptionChange -> onGroupDescriptionChange(action.groupDescription)
+            is CreateGroupUIAction.CreateGroupRoom -> onCreateGroupRoomClick()
         }
     }
 
@@ -46,11 +50,22 @@ class CreateGroupViewModel @Inject constructor(
             state.copy(groupDescription = groupDescription)
         }
     }
+
+    private fun onCreateGroupRoomClick() = intent {
+        val groupRoomCreate = GroupRoomCreate(
+            name = state.groupName,
+            description = state.groupDescription
+        )
+        postGroupRoomUseCase(groupRoomCreate)
+        postSideEffect(CreateGroupSideEffect.Complete)
+        postSideEffect(CreateGroupSideEffect.Toast("${state.groupName}그룹이 생성되었습니다."))
+    }
 }
 
 sealed class CreateGroupUIAction {
     data class GroupNameChange(val groupName:String) : CreateGroupUIAction()
     data class GroupDescriptionChange(val groupDescription:String) : CreateGroupUIAction()
+    object CreateGroupRoom : CreateGroupUIAction()
 }
 
 @Immutable
@@ -61,4 +76,5 @@ data class CreateGroupState(
 
 sealed interface CreateGroupSideEffect{
     data class Toast(val message:String):CreateGroupSideEffect
+    object Complete : CreateGroupSideEffect
 }

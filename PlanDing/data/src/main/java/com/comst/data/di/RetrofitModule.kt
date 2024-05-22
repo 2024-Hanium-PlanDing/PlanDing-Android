@@ -1,6 +1,7 @@
 package com.comst.data.di
 
 import com.comst.data.BuildConfig.BASE_URL
+import com.comst.data.retrofit.GroupRoomService
 import com.comst.data.retrofit.TokenAuthenticator
 import com.comst.data.retrofit.TokenInterceptor
 import com.comst.data.retrofit.UserService
@@ -16,6 +17,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 import javax.inject.Singleton
 
 @Module
@@ -63,5 +65,10 @@ class RetrofitModule {
     @Provides
     fun provideUserService(retrofit: Retrofit): UserService {
         return retrofit.create(UserService::class.java)
+    }
+
+    @Provides
+    fun provideGroupRoomService(retrofit: Retrofit): GroupRoomService{
+        return retrofit.create(GroupRoomService::class.java)
     }
 }
