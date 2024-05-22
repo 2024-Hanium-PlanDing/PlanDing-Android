@@ -19,14 +19,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.comst.presentation.component.PDScreenHeader
 import com.comst.presentation.main.group.create.CreateGroupActivity
-import com.comst.presentation.model.GroupCardModel
+import com.comst.presentation.model.groupRoom.GroupRoomCardModel
 import com.comst.presentation.ui.theme.PlanDingTheme
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -67,7 +66,7 @@ fun GroupScreen(
     }
 
     GroupScreen(
-        groupCardModels = state.groupCardModels,
+        groupRoomCardModels = state.groupCardModels,
         onUIAction = viewModel::onUIAction,
     )
 }
@@ -75,7 +74,7 @@ fun GroupScreen(
 
 @Composable
 private fun GroupScreen(
-    groupCardModels:List<GroupCardModel>,
+    groupRoomCardModels:List<GroupRoomCardModel>,
     onUIAction:(GroupUIAction) -> Unit
 ){
     Surface {
@@ -89,10 +88,10 @@ private fun GroupScreen(
                         .fillMaxSize()
                 ) {
                     items(
-                        count = groupCardModels.size,
-                        key = { index -> groupCardModels[index].groupId }
+                        count = groupRoomCardModels.size,
+                        key = { index -> groupRoomCardModels[index].groupId }
                     ){ index ->
-                        groupCardModels[index].let {
+                        groupRoomCardModels[index].let {
                             GroupCard(
                                 groupName = it.groupName,
                                 groupDescription = it.groupDescription,
@@ -129,20 +128,20 @@ private fun GroupScreen(
 private fun GroupScreenPreview(){
     PlanDingTheme {
         GroupScreen(
-            groupCardModels = listOf(
-                GroupCardModel(
+            groupRoomCardModels = listOf(
+                GroupRoomCardModel(
                     groupId = 6901,
                     groupName = "Gary Wallace",
                     groupImageUrl = null,
                     groupDescription = "a"
                 ),
-                GroupCardModel(
+                GroupRoomCardModel(
                     groupId = 3934,
                     groupName = "Marguerite Armstrong",
                     groupImageUrl = null,
                     groupDescription = "sociis"
                 ),
-                GroupCardModel(
+                GroupRoomCardModel(
                     groupId = 5545,
                     groupName = "Rickie Vance",
                     groupImageUrl = null,

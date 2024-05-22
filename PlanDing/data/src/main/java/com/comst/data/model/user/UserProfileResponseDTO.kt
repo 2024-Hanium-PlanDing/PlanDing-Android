@@ -1,6 +1,6 @@
 package com.comst.data.model.user
 
-import com.comst.domain.model.UserProfile
+import com.comst.domain.model.user.UserProfile
 
 data class UserProfileResponseDTO(
     val username: String,

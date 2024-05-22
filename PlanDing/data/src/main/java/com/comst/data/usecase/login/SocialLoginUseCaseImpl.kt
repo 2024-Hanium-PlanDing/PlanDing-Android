@@ -3,8 +3,8 @@ package com.comst.data.usecase.login
 import com.comst.data.model.user.SocialLoginParam
 import com.comst.data.model.user.toDomainModel
 import com.comst.data.retrofit.UserService
-import com.comst.domain.model.LoginResponseModel
-import com.comst.domain.model.SocialLoginInfo
+import com.comst.domain.model.user.LoginResponseModel
+import com.comst.domain.model.user.SocialLoginInfo
 import com.comst.domain.usecase.login.SocialLoginUseCase
 import javax.inject.Inject
 

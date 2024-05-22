@@ -2,7 +2,7 @@ package com.comst.presentation.main.group
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
-import com.comst.presentation.model.GroupCardModel
+import com.comst.presentation.model.groupRoom.GroupRoomCardModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
@@ -52,7 +52,7 @@ sealed class GroupUIAction {
 
 @Immutable
 data class GroupState(
-    val groupCardModels: List<GroupCardModel> = emptyList()
+    val groupCardModels: List<GroupRoomCardModel> = emptyList()
 )
 
 sealed interface GroupSideEffect {

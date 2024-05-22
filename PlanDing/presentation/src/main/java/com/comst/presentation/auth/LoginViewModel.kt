@@ -2,7 +2,7 @@ package com.comst.presentation.auth
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
-import com.comst.domain.model.SocialLoginInfo
+import com.comst.domain.model.user.SocialLoginInfo
 import com.comst.domain.usecase.login.SetTokenUseCase
 import com.comst.domain.usecase.login.SocialLoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel

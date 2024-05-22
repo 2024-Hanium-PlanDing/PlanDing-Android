@@ -1,7 +1,7 @@
 package com.comst.presentation.main.mypage
 
 import androidx.lifecycle.ViewModel
-import com.comst.domain.model.UserProfile
+import com.comst.domain.model.user.UserProfile
 import com.comst.domain.usecase.user.GetUserProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler

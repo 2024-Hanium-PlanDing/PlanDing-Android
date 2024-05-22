@@ -2,7 +2,7 @@ package com.comst.data.usecase.user
 
 import com.comst.data.model.user.toDomainModel
 import com.comst.data.retrofit.UserService
-import com.comst.domain.model.UserProfile
+import com.comst.domain.model.user.UserProfile
 import com.comst.domain.usecase.user.GetUserProfileUseCase
 import javax.inject.Inject
 

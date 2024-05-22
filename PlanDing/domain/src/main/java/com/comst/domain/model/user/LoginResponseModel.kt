@@ -1,4 +1,4 @@
-package com.comst.domain.model
+package com.comst.domain.model.user
 
 data class LoginResponseModel (
     val accessToken:String,

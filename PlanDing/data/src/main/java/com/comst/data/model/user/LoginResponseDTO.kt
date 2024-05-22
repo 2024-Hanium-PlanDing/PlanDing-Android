@@ -1,6 +1,6 @@
 package com.comst.data.model.user
 
-import com.comst.domain.model.LoginResponseModel
+import com.comst.domain.model.user.LoginResponseModel
 
 data class LoginResponseDTO (
     val userCode:String,

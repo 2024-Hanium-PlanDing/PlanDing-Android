@@ -29,7 +29,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.comst.domain.model.SocialLoginInfo
+import com.comst.domain.model.user.SocialLoginInfo
 import com.comst.presentation.R
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDTextFiledOutLine
