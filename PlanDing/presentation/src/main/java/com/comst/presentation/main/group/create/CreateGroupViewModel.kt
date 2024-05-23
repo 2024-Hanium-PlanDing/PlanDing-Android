@@ -1,5 +1,6 @@
 package com.comst.presentation.main.group.create
 
+import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import com.comst.domain.model.file.MediaImage
@@ -28,6 +29,7 @@ class CreateGroupViewModel @Inject constructor(
             this.exceptionHandler = CoroutineExceptionHandler{ _, throwable ->
                 intent {
                     postSideEffect(CreateGroupSideEffect.Toast(message = throwable.message.orEmpty()))
+                    Log.d("우우",throwable.message.orEmpty())
                 }
             }
         }
@@ -83,13 +85,17 @@ class CreateGroupViewModel @Inject constructor(
     }
 
     private fun onCreateGroupRoomClick() = intent {
-        val groupRoomCreate = GroupRoomCreate(
-            name = state.groupName,
-            description = state.groupDescription
-        )
-        postGroupRoomUseCase(groupRoomCreate)
-        postSideEffect(CreateGroupSideEffect.Complete)
-        postSideEffect(CreateGroupSideEffect.Toast("${state.groupName}그룹이 생성되었습니다."))
+        if (state.selectedImage != null){
+            val groupRoomCreate = GroupRoomCreate(
+                name = state.groupName,
+                description = state.groupDescription
+            )
+            postGroupRoomUseCase(groupRoomCreate, state.selectedImage!!).getOrThrow()
+            postSideEffect(CreateGroupSideEffect.Complete)
+        }else{
+            postSideEffect(CreateGroupSideEffect.Toast("그룹 이미지는 필수입니다."))
+        }
+
     }
 }
 

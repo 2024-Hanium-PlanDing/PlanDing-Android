@@ -39,7 +39,8 @@ fun CreateGroupNavHost(
                 viewModel = sharedViewModel,
                 onBackClick = {
                     navController.navigateUp()
-                }
+                },
+                onFinish = onFinish
             )
         }
     }

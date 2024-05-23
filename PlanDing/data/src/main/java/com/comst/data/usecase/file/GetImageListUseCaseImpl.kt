@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 // https://developer.android.com/about/versions/14/changes/partial-photo-video-access
 
-class GetImageListUseCaseImpl@Inject constructor(
+class GetImageListUseCaseImpl @Inject constructor(
     private val context: Context
 ): GetImageListUseCase{
     override suspend fun invoke(): List<MediaImage> = withContext(Dispatchers.IO) {

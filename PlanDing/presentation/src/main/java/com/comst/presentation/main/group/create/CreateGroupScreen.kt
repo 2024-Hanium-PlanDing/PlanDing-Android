@@ -32,11 +32,13 @@ import com.comst.presentation.component.PDTextFiled
 import com.comst.presentation.ui.theme.PlanDingTheme
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
+import org.orbitmvi.orbit.syntax.simple.postSideEffect
 
 @Composable
 fun CreateGroupScreen(
     viewModel: CreateGroupViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
+    onFinish: () -> Unit
 ){
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
@@ -49,7 +51,14 @@ fun CreateGroupScreen(
                 Toast.LENGTH_SHORT
             ).show()
 
-            is CreateGroupSideEffect.Complete -> {}
+            is CreateGroupSideEffect.Complete -> {
+                Toast.makeText(
+                    context,
+                    "${state.groupName}그룹이 생성되었습니다.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                onFinish()
+            }
         }
     }
 
