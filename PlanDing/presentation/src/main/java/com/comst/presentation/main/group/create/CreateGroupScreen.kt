@@ -36,7 +36,7 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 @Composable
 fun CreateGroupScreen(
     viewModel: CreateGroupViewModel = hiltViewModel(),
-    onFinish: () -> Unit,
+    onBackClick: () -> Unit,
 ){
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
@@ -49,14 +49,14 @@ fun CreateGroupScreen(
                 Toast.LENGTH_SHORT
             ).show()
 
-            is CreateGroupSideEffect.Complete -> onFinish()
+            is CreateGroupSideEffect.Complete -> {}
         }
     }
 
     CreateGroupScreen(
         groupName = state.groupName,
         groupDescription = state.groupDescription,
-        onBackClick = onFinish,
+        onBackClick = onBackClick,
         onUIAction = viewModel::onUIAction
     )
 

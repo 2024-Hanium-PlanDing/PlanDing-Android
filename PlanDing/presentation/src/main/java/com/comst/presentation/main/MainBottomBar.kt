@@ -57,6 +57,7 @@ fun MainBottomBar(
                     inclusive = true
                 }
                  */
+
                 navController.navigate(route = newRoute.route){
                     navController.graph.startDestinationRoute?.let {
                         popUpTo(it){

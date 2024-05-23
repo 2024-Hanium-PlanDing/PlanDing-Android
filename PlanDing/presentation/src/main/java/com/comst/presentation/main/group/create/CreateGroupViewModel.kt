@@ -1,9 +1,10 @@
 package com.comst.presentation.main.group.create
 
-import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
+import com.comst.domain.model.file.MediaImage
 import com.comst.domain.model.groupRoom.GroupRoomCreate
+import com.comst.domain.usecase.file.GetImageListUseCase
 import com.comst.domain.usecase.groupRoom.PostGroupRoomUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -18,6 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateGroupViewModel @Inject constructor(
+    private val getImageListUseCase: GetImageListUseCase,
     private val postGroupRoomUseCase: PostGroupRoomUseCase
 ) : ViewModel(), ContainerHost<CreateGroupState, CreateGroupSideEffect>{
     override val container: Container<CreateGroupState, CreateGroupSideEffect> = container(
@@ -31,11 +33,40 @@ class CreateGroupViewModel @Inject constructor(
         }
     )
 
+    init {
+        load()
+    }
+
+    private fun load() = intent {
+        val images = getImageListUseCase()
+        reduce {
+            state.copy(
+                selectedImage = images.firstOrNull(),
+                images = images
+            )
+        }
+    }
+
     fun onUIAction(action: CreateGroupUIAction ){
         when(action){
             is CreateGroupUIAction.GroupNameChange -> onGroupNameChange(action.groupName)
             is CreateGroupUIAction.GroupDescriptionChange -> onGroupDescriptionChange(action.groupDescription)
+            is CreateGroupUIAction.SelectGroupImage -> onImageClick(action.image)
             is CreateGroupUIAction.CreateGroupRoom -> onCreateGroupRoomClick()
+        }
+    }
+
+    private fun onImageClick(image: MediaImage) = intent {
+        reduce {
+            if (state.selectedImage == image) {
+                state.copy(
+                    selectedImage = null
+                )
+            }else{
+                state.copy(
+                    selectedImage = image
+                )
+            }
         }
     }
 
@@ -65,11 +96,14 @@ class CreateGroupViewModel @Inject constructor(
 sealed class CreateGroupUIAction {
     data class GroupNameChange(val groupName:String) : CreateGroupUIAction()
     data class GroupDescriptionChange(val groupDescription:String) : CreateGroupUIAction()
+    data class SelectGroupImage(val image:MediaImage) : CreateGroupUIAction()
     object CreateGroupRoom : CreateGroupUIAction()
 }
 
 @Immutable
 data class CreateGroupState(
+    val selectedImage : MediaImage? = null,
+    val images: List<MediaImage> = emptyList(),
     val groupName: String = "",
     val groupDescription: String = ""
 )

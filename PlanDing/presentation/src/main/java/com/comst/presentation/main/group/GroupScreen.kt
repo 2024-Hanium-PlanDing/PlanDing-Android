@@ -1,8 +1,12 @@
 package com.comst.presentation.main.group
 
+import android.Manifest
 import android.content.Intent
 import android.content.res.Configuration
+import android.os.Build
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,6 +41,18 @@ fun GroupScreen(
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
 
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) {permissions ->
+        if (permissions.all { it.value }) {
+            context.startActivity(
+                Intent(context, CreateGroupActivity::class.java)
+            )
+        } else {
+            Toast.makeText(context, "필요한 권한이 부여되지 않았습니다.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     viewModel.collectSideEffect { sideEffect ->
         when(sideEffect){
             is GroupSideEffect.Toast -> Toast.makeText(
@@ -46,11 +62,14 @@ fun GroupScreen(
             ).show()
 
             GroupSideEffect.NavigateToCreateGroupActivity -> {
-                context.startActivity(
-                    Intent(
-                        context, CreateGroupActivity::class.java
-                    )
-                )
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    permissionLauncher.launch(arrayOf(
+                        Manifest.permission.READ_MEDIA_IMAGES,
+                        Manifest.permission.READ_MEDIA_VIDEO
+                    ))
+                } else {
+                    permissionLauncher.launch(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE))
+                }
             }
 
             is GroupSideEffect.NavigateToGroupDetailActivity -> {
