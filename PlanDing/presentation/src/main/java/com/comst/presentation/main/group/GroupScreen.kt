@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.comst.presentation.component.PDScreenHeader
 import com.comst.presentation.main.group.create.CreateGroupActivity
-import com.comst.presentation.model.groupRoom.GroupRoomCardModel
+import com.comst.domain.model.groupRoom.GroupRoomCardModel
 import com.comst.presentation.ui.theme.PlanDingTheme
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -127,28 +127,6 @@ private fun GroupScreen(
 @Composable
 private fun GroupScreenPreview(){
     PlanDingTheme {
-        GroupScreen(
-            groupRoomCardModels = listOf(
-                GroupRoomCardModel(
-                    groupId = 6901,
-                    groupName = "Gary Wallace",
-                    groupImageUrl = null,
-                    groupDescription = "a"
-                ),
-                GroupRoomCardModel(
-                    groupId = 3934,
-                    groupName = "Marguerite Armstrong",
-                    groupImageUrl = null,
-                    groupDescription = "sociis"
-                ),
-                GroupRoomCardModel(
-                    groupId = 5545,
-                    groupName = "Rickie Vance",
-                    groupImageUrl = null,
-                    groupDescription = "similique"
-                )
-            ),
-            onUIAction = {}
-        )
+        GroupScreen()
     }
 }

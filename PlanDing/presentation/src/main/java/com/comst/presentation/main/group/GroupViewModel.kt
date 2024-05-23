@@ -1,21 +1,24 @@
 package com.comst.presentation.main.group
 
+import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
-import com.comst.presentation.model.groupRoom.GroupRoomCardModel
+import com.comst.domain.model.groupRoom.GroupRoomCardModel
+import com.comst.domain.usecase.groupRoom.GetMyGroupRoomsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
+import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 
 
 @HiltViewModel
 class GroupViewModel @Inject constructor(
-
+    private val getMyGroupRoomsUseCase: GetMyGroupRoomsUseCase
 ) : ViewModel(), ContainerHost<GroupState, GroupSideEffect> {
     override val container: Container<GroupState, GroupSideEffect> = container(
         initialState = GroupState(),
@@ -23,11 +26,26 @@ class GroupViewModel @Inject constructor(
             this.exceptionHandler = CoroutineExceptionHandler { _, throwable ->
                 intent {
                     postSideEffect(GroupSideEffect.Toast(throwable.message.orEmpty()))
+                    Log.d("엥",throwable.message.orEmpty())
                 }
             }
         }
 
     )
+
+    init {
+        load()
+    }
+
+    fun load() = intent {
+        val myGroupRooms = getMyGroupRoomsUseCase().getOrThrow()
+
+        reduce {
+            state.copy(
+                groupCardModels = myGroupRooms
+            )
+        }
+    }
 
     fun onUIAction(action: GroupUIAction) {
         when (action) {
@@ -35,6 +53,7 @@ class GroupViewModel @Inject constructor(
             is GroupUIAction.GroupClick -> onGroupClick(action.id)
         }
     }
+
 
     private fun onCreateGroupClick() = intent {
         postSideEffect(GroupSideEffect.NavigateToCreateGroupActivity)
