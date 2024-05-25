@@ -63,7 +63,7 @@ dependencies {
 
     // serialization
     implementation(libs.kotlinx.serialization.json)
-
+0
     // okhttp
     implementation(libs.okhttp.logging)
 
@@ -76,4 +76,8 @@ dependencies {
 
     // datastore
     implementation(libs.datastore)
+
+    // test coroutines
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+    androidTestImplementation("androidx.test:runner:1.5.2")
 }

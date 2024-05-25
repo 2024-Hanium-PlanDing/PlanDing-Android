@@ -89,4 +89,7 @@ dependencies {
 
     // kakao login
     implementation("com.kakao.sdk:v2-user:2.13.0")
+
+    // test coroutines
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
 }
