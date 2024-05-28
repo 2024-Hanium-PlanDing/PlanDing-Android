@@ -18,7 +18,7 @@ android {
 
     defaultConfig {
         applicationId = "com.comst.planding"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
