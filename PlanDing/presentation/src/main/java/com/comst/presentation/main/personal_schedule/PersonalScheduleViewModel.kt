@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.comst.domain.util.DateUtils
 import com.comst.domain.model.base.ScheduleEvent
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleTodayListUseCase
+import com.comst.domain.usecase.commonSchedule.GetCommonScheduleWeekListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
@@ -20,7 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PersonalScheduleViewModel @Inject constructor(
-    private val getCommonScheduleTodayListUseCase: GetCommonScheduleTodayListUseCase
+    private val getCommonScheduleTodayListUseCase: GetCommonScheduleTodayListUseCase,
+    private val getCommonScheduleWeekListUseCase: GetCommonScheduleWeekListUseCase
 ) : ViewModel(), ContainerHost<PersonalScheduleState, PersonalScheduleSideEffect>{
 
     override val container: Container<PersonalScheduleState, PersonalScheduleSideEffect> = container(
@@ -33,6 +35,27 @@ class PersonalScheduleViewModel @Inject constructor(
             }
         }
     )
+
+    init {
+        load()
+    }
+
+    fun load() = intent{
+
+        val todayScheduleEvents = getCommonScheduleTodayListUseCase().getOrThrow()
+        val startDateAndEndDate = DateUtils.getWeekStartAndEnd(state.selectLocalDate)
+        val weekScheduleEvents = getCommonScheduleWeekListUseCase(
+            startDateAndEndDate.first,
+            startDateAndEndDate.second
+        ).getOrThrow()
+
+        reduce {
+            state.copy(
+                todayScheduleEvents = todayScheduleEvents,
+                selectWeekScheduleEvents = weekScheduleEvents,
+            )
+        }
+    }
 
     fun onUIAction(action: PersonalScheduleUIAction) {
         when (action) {
@@ -57,14 +80,22 @@ class PersonalScheduleViewModel @Inject constructor(
     private fun onSelectedDate(date: Date) = intent {
         val newSelectLocalDate = DateUtils.dateToLocalDate(date)
         val todayScheduleEvents = getCommonScheduleTodayListUseCase().getOrThrow()
+
+        val startDateAndEndDate = DateUtils.getWeekStartAndEnd(newSelectLocalDate)
+        Log.d("하하","${startDateAndEndDate.first},${startDateAndEndDate.second}")
+        val weekScheduleEvents = getCommonScheduleWeekListUseCase(
+            startDateAndEndDate.first,
+            startDateAndEndDate.second
+        ).getOrThrow()
+
         reduce {
             state.copy(
                 selectLocalDate = newSelectLocalDate,
                 selectUIDate = DateUtils.localDateToUIDate(newSelectLocalDate),
                 selectDay = DateUtils.getDayOfWeek(newSelectLocalDate),
                 selectedWeekdays = DateUtils.getWeekDays(newSelectLocalDate),
-                todayScheduleEvents = listOf(),
-                selectWeekScheduleEvents = listOf(),
+                todayScheduleEvents = todayScheduleEvents,
+                selectWeekScheduleEvents = weekScheduleEvents,
                 isBottomSheetVisible = false,
             )
         }

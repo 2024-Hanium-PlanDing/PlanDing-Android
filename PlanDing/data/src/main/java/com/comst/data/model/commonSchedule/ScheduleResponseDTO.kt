@@ -24,7 +24,7 @@ fun ScheduleResponseDTO.toDomainModel(): ScheduleEvent {
         content = content,
         startTime = startTime,
         endTime = endTime,
-        day = DateUtils.getDayOfWeek(localDate, "E"),
+        day = DateUtils.getDayOfWeekUIFormat(localDate),
         complete = complete,
         groupName = if (type == ScheduleType.GROUP.type) groupName else null,
         type = when(type){

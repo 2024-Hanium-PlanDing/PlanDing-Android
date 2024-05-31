@@ -80,6 +80,11 @@ object DateUtils {
         return localDate.format(formatter)
     }
 
+    fun getDayOfWeekUIFormat(date: LocalDate): String{
+        val dayOfWeekShort = date.format(DateTimeFormatter.ofPattern("E", Locale.KOREAN))
+        return "$dayOfWeekShort(${date.dayOfMonth})"
+    }
+
 
     fun getCurrentDayOfWeek(format: String = "EEEE"): String {
         return getDayOfWeek(LocalDate.now(), format)
@@ -102,5 +107,18 @@ object DateUtils {
 
     fun getWeekDays(date: Date): List<String> {
         return getWeekDays(dateToLocalDate(date))
+    }
+
+
+
+    fun getWeekStartAndEnd(date: LocalDate, format: String = "yyyy-MM-dd"): Pair<String, String> {
+        val formatter = DateTimeFormatter.ofPattern(format, Locale.getDefault())
+        val startOfWeek = date.minusDays(date.dayOfWeek.value.toLong() % 7)
+        val endOfWeek = startOfWeek.plusDays(6)
+        return Pair(startOfWeek.format(formatter), endOfWeek.format(formatter))
+    }
+
+    fun getWeekStartAndEnd(date: Date, format: String = "yyyy-MM-dd"): Pair<String, String> {
+        return getWeekStartAndEnd(dateToLocalDate(date), format)
     }
 }

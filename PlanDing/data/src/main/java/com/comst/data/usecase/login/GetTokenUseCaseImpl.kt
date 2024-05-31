@@ -9,7 +9,6 @@ class GetTokenUseCaseImpl @Inject constructor(
     private val userDataStore: UserDataStore
 ): GetTokenUseCase{
     override suspend fun invoke(): String?  {
-        Log.d("토큰",userDataStore.getAccessToken().orEmpty())
         return userDataStore.getAccessToken()
     }
 

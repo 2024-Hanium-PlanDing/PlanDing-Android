@@ -44,7 +44,6 @@ fun PDScheduleChart(events: List<ScheduleEvent>, days: List<String>) {
                 .fillMaxSize()
                 .padding(8.dp)
         ) {
-            // Header Row with days of the week
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
