@@ -10,10 +10,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,11 +31,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.comst.presentation.component.PDCalendar
+import com.comst.presentation.component.PDScheduleChart
 import com.comst.presentation.component.PDScreenHeader
+import com.comst.presentation.model.ScheduleEvent
 import com.comst.presentation.ui.theme.PlanDingTheme
-import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,7 +62,10 @@ fun PersonalScheduleScreen(
     val scope = rememberCoroutineScope()
 
     PersonalScheduleScreen(
-        selectDate = state.selectDate,
+        selectUIDate = state.selectUIDate,
+        selectDay = state.selectDay,
+        selectedWeekdays = state.selectedWeekdays,
+        scheduleEvent = state.scheduleEvent,
         onUIAction = viewModel::onUIAction
     )
 
@@ -67,28 +74,19 @@ fun PersonalScheduleScreen(
             onDismissRequest = {
                 viewModel.onUIAction(PersonalScheduleUIAction.CloseBottomSheet)
             },
-            sheetState = calendarBottomSheetState
+            sheetState = calendarBottomSheetState,
         ) {
-            Button(onClick = {
-                scope.launch {
-                    calendarBottomSheetState.hide(
-
-                    )
-                }.invokeOnCompletion {
-                    if (!calendarBottomSheetState.isVisible) {
-                        viewModel.onUIAction(PersonalScheduleUIAction.CloseBottomSheet)
-                    }
-                }
-            }) {
-                Text("Hide bottom sheet")
-            }
+            PDCalendar(viewModel = viewModel)
         }
     }
 }
 
 @Composable
 private fun PersonalScheduleScreen(
-    selectDate: String = "",
+    selectUIDate: String,
+    selectDay: String,
+    selectedWeekdays: List<String>,
+    scheduleEvent: List<ScheduleEvent>,
     onUIAction: (PersonalScheduleUIAction) -> Unit
 ) {
     Surface {
@@ -96,35 +94,52 @@ private fun PersonalScheduleScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.primaryContainer)
+                .verticalScroll(rememberScrollState())
         ) {
             PDScreenHeader(text = "스케줄")
 
-            Row(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .background(
-                        shape = RoundedCornerShape(8.dp),
-                        color = Color.White
-                    )
-                    .clickable {
-                        onUIAction(PersonalScheduleUIAction.OpenBottomSheet)
-                    }
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.DateRange,
-                    contentDescription = "달력",
-                )
+            SelectedDate(
+                selectDate = selectUIDate,
+                selectDay = selectDay,
+                onUIAction = onUIAction
+            )
 
-                Spacer(modifier = Modifier.size(8.dp))
 
-                Text(
-                    modifier = Modifier,
-                    text = selectDate,
-                )
-            }
+            PDScheduleChart(events = scheduleEvent, days = selectedWeekdays)
         }
+    }
+}
+
+@Composable
+private fun SelectedDate(
+    selectDate: String,
+    selectDay: String,
+    onUIAction: (PersonalScheduleUIAction) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .padding(16.dp)
+            .background(
+                shape = RoundedCornerShape(8.dp),
+                color = Color.White
+            )
+            .clickable {
+                onUIAction(PersonalScheduleUIAction.OpenBottomSheet)
+            }
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Filled.DateRange,
+            contentDescription = "달력",
+        )
+
+        Spacer(modifier = Modifier.size(8.dp))
+
+        Text(
+            modifier = Modifier,
+            text = "$selectDate $selectDay",
+        )
     }
 }
 
@@ -134,8 +149,7 @@ private fun PersonalScheduleScreen(
 private fun PersonalScheduleScreenPreview() {
     PlanDingTheme {
         PersonalScheduleScreen(
-            selectDate = "2024년 05월 27일",
-            onUIAction = {}
+
         )
     }
 }

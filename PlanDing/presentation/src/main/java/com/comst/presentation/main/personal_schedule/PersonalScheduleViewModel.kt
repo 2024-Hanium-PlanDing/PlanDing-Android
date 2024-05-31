@@ -1,8 +1,9 @@
 package com.comst.presentation.main.personal_schedule
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.comst.domain.util.DateUtils
-import com.comst.presentation.auth.LoginUIAction
+import com.comst.presentation.model.ScheduleEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
@@ -11,6 +12,8 @@ import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
+import java.time.LocalDate
+import java.util.Date
 import javax.annotation.concurrent.Immutable
 import javax.inject.Inject
 
@@ -34,7 +37,7 @@ class PersonalScheduleViewModel @Inject constructor(
         when (action) {
             is PersonalScheduleUIAction.OpenBottomSheet -> onOpenBottomSheet()
             is PersonalScheduleUIAction.CloseBottomSheet -> onCloseBottomSheet()
-            is PersonalScheduleUIAction.DateSelected -> onSelectDate(action.date)
+            is PersonalScheduleUIAction.SelectedDate -> onSelectedDate(action.date)
         }
     }
 
@@ -50,27 +53,41 @@ class PersonalScheduleViewModel @Inject constructor(
         }
     }
 
-    private fun onSelectDate(date: String) = intent {
+    private fun onSelectedDate(date: Date) = intent {
+        val newSelectLocalDate = DateUtils.dateToLocalDate(date)
         reduce {
-            state.copy(selectDate = date, isBottomSheetVisible = false)
+            state.copy(
+                selectLocalDate = newSelectLocalDate,
+                selectUIDate = DateUtils.localDateToUIDate(newSelectLocalDate),
+                selectDay = DateUtils.getDayOfWeek(newSelectLocalDate),
+                selectedWeekdays = DateUtils.getWeekDays(newSelectLocalDate),
+                scheduleEvent = listOf(),
+                isBottomSheetVisible = false,
+            )
         }
+        Log.d(
+            "하하",
+            "${state.selectLocalDate}\n" + "${state.selectUIDate}\n" + "${state.selectDay}\n"+"${state.selectedWeekdays}"
+            )
     }
-
 }
 
 sealed class  PersonalScheduleUIAction{
     object OpenBottomSheet : PersonalScheduleUIAction()
     object CloseBottomSheet : PersonalScheduleUIAction()
-    data class DateSelected(val date: String) : PersonalScheduleUIAction()
+    data class SelectedDate(val date: Date) : PersonalScheduleUIAction()
 }
 
 @Immutable
 data class PersonalScheduleState(
-    val selectDate : String = DateUtils.getCurrentDate("yyyy년 MM월 dd일"),
+    val selectLocalDate : LocalDate = LocalDate.now(),
+    val selectUIDate : String = DateUtils.localDateToUIDate(selectLocalDate),
+    val selectDay : String = DateUtils.getDayOfWeek(selectLocalDate),
+    val selectedWeekdays : List<String> = DateUtils.getWeekDays(selectLocalDate),
+    val scheduleEvent : List<ScheduleEvent> = emptyList(),
     val isBottomSheetVisible: Boolean = false
 )
 
 sealed interface PersonalScheduleSideEffect {
-
     data class Toast(val message: String) : PersonalScheduleSideEffect
 }
