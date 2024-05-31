@@ -1,5 +1,6 @@
 package com.comst.domain.util
 
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -81,5 +82,24 @@ object DateUtils {
 
     fun getCurrentDayOfWeek(format: String = "EEEE"): String {
         return getDayOfWeek(LocalDate.now(), format)
+    }
+
+    fun getWeekDays(date: LocalDate): List<String> {
+        val daysOfWeek = listOf("일", "월", "화", "수", "목", "금", "토")
+        val result = mutableListOf<String>()
+        val startOfWeek = if (date.dayOfWeek == DayOfWeek.SUNDAY) {
+            date
+        } else {
+            date.with(DayOfWeek.SUNDAY).minusDays(7)
+        }
+        for (i in 0..6) {
+            val currentDay = startOfWeek.plusDays(i.toLong())
+            result.add("${daysOfWeek[i]}(${currentDay.dayOfMonth})")
+        }
+        return result
+    }
+
+    fun getWeekDays(date: Date): List<String> {
+        return getWeekDays(dateToLocalDate(date))
     }
 }
