@@ -34,11 +34,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.comst.presentation.component.PDCalendar
 import com.comst.presentation.component.PDScheduleChart
 import com.comst.presentation.component.PDScreenHeader
-import com.comst.presentation.model.ScheduleEvent
+import com.comst.domain.model.base.ScheduleEvent
 import com.comst.presentation.ui.theme.PlanDingTheme
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
-import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,7 +64,8 @@ fun PersonalScheduleScreen(
         selectUIDate = state.selectUIDate,
         selectDay = state.selectDay,
         selectedWeekdays = state.selectedWeekdays,
-        scheduleEvent = state.scheduleEvent,
+        todayScheduleEvents = state.todayScheduleEvents,
+        selectWeekScheduleEvents = state.selectWeekScheduleEvents,
         onUIAction = viewModel::onUIAction
     )
 
@@ -86,7 +86,8 @@ private fun PersonalScheduleScreen(
     selectUIDate: String,
     selectDay: String,
     selectedWeekdays: List<String>,
-    scheduleEvent: List<ScheduleEvent>,
+    todayScheduleEvents: List<ScheduleEvent>,
+    selectWeekScheduleEvents: List<ScheduleEvent>,
     onUIAction: (PersonalScheduleUIAction) -> Unit
 ) {
     Surface {
@@ -105,7 +106,7 @@ private fun PersonalScheduleScreen(
             )
 
 
-            PDScheduleChart(events = scheduleEvent, days = selectedWeekdays)
+            PDScheduleChart(events = selectWeekScheduleEvents, days = selectedWeekdays)
         }
     }
 }

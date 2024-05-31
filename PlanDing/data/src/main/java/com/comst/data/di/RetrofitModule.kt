@@ -1,6 +1,7 @@
 package com.comst.data.di
 
 import com.comst.data.BuildConfig.BASE_URL
+import com.comst.data.retrofit.CommonScheduleService
 import com.comst.data.retrofit.GroupRoomService
 import com.comst.data.retrofit.TokenAuthenticator
 import com.comst.data.retrofit.TokenInterceptor
@@ -70,5 +71,10 @@ class RetrofitModule {
     @Provides
     fun provideGroupRoomService(retrofit: Retrofit): GroupRoomService{
         return retrofit.create(GroupRoomService::class.java)
+    }
+
+    @Provides
+    fun provideCommonScheduleService(retrofit: Retrofit): CommonScheduleService{
+        return retrofit.create(CommonScheduleService::class.java)
     }
 }

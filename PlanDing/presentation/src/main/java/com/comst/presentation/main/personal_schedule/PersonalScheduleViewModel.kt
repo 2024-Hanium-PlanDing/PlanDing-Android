@@ -3,7 +3,8 @@ package com.comst.presentation.main.personal_schedule
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.comst.domain.util.DateUtils
-import com.comst.presentation.model.ScheduleEvent
+import com.comst.domain.model.base.ScheduleEvent
+import com.comst.domain.usecase.commonSchedule.GetCommonScheduleTodayListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
@@ -19,7 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PersonalScheduleViewModel @Inject constructor(
-
+    private val getCommonScheduleTodayListUseCase: GetCommonScheduleTodayListUseCase
 ) : ViewModel(), ContainerHost<PersonalScheduleState, PersonalScheduleSideEffect>{
 
     override val container: Container<PersonalScheduleState, PersonalScheduleSideEffect> = container(
@@ -55,20 +56,18 @@ class PersonalScheduleViewModel @Inject constructor(
 
     private fun onSelectedDate(date: Date) = intent {
         val newSelectLocalDate = DateUtils.dateToLocalDate(date)
+        val todayScheduleEvents = getCommonScheduleTodayListUseCase().getOrThrow()
         reduce {
             state.copy(
                 selectLocalDate = newSelectLocalDate,
                 selectUIDate = DateUtils.localDateToUIDate(newSelectLocalDate),
                 selectDay = DateUtils.getDayOfWeek(newSelectLocalDate),
                 selectedWeekdays = DateUtils.getWeekDays(newSelectLocalDate),
-                scheduleEvent = listOf(),
+                todayScheduleEvents = listOf(),
+                selectWeekScheduleEvents = listOf(),
                 isBottomSheetVisible = false,
             )
         }
-        Log.d(
-            "하하",
-            "${state.selectLocalDate}\n" + "${state.selectUIDate}\n" + "${state.selectDay}\n"+"${state.selectedWeekdays}"
-            )
     }
 }
 
@@ -84,7 +83,8 @@ data class PersonalScheduleState(
     val selectUIDate : String = DateUtils.localDateToUIDate(selectLocalDate),
     val selectDay : String = DateUtils.getDayOfWeek(selectLocalDate),
     val selectedWeekdays : List<String> = DateUtils.getWeekDays(selectLocalDate),
-    val scheduleEvent : List<ScheduleEvent> = emptyList(),
+    val todayScheduleEvents : List<ScheduleEvent> = emptyList(),
+    val selectWeekScheduleEvents : List<ScheduleEvent> = emptyList(),
     val isBottomSheetVisible: Boolean = false
 )
 

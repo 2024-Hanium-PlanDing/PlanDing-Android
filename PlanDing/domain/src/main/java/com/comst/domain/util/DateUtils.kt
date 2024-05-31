@@ -1,5 +1,6 @@
 package com.comst.domain.util
 
+import com.comst.domain.model.base.DaysOfWeek
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
@@ -85,7 +86,7 @@ object DateUtils {
     }
 
     fun getWeekDays(date: LocalDate): List<String> {
-        val daysOfWeek = listOf("일", "월", "화", "수", "목", "금", "토")
+        val daysOfWeek = DaysOfWeek.values().map { it.korea }
         val result = mutableListOf<String>()
         val startOfWeek = if (date.dayOfWeek == DayOfWeek.SUNDAY) {
             date

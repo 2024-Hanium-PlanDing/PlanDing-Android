@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.comst.domain.model.base.DaysOfWeek
 import com.comst.domain.util.DateUtils
 import com.comst.presentation.R
 import com.comst.presentation.main.personal_schedule.PersonalScheduleUIAction
@@ -164,11 +165,11 @@ fun CalendarBody(
         set(Calendar.DAY_OF_MONTH, 1)
     }
     val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-    val firstDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - 1 // Calendar.SUNDAY is 1, need to start from 0
+    val firstDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - 1
 
     Column {
         Row {
-            listOf("일", "월", "화", "수", "목", "금", "토").forEach { day ->
+            DaysOfWeek.values().map { it.korea }.forEach { day ->
                 Text(
                     text = day,
                     modifier = Modifier.weight(1f),
