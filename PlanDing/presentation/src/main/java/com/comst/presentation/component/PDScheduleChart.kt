@@ -116,15 +116,15 @@ fun PDScheduleChart(events: List<ScheduleEvent>, days: List<String>) {
 
                             events.filter { it.day == day }.forEach { event ->
                                 val topPadding = (event.startTime - 6) * 48.dp
-                                val height = (event.endTime - event.startTime) * 48.dp
+                                val height = (event.endTime - event.startTime + 1) * 48.dp
                                 Box(
                                     modifier = Modifier
-                                        .fillMaxWidth()
+                                        .fillMaxWidth(0.5f)
                                         .padding(top = topPadding)
                                         .height(height)
-                                        .background(Color.Blue, shape = RoundedCornerShape(8.dp))
-                                        .border(0.5.dp, Color.Black),
-                                    contentAlignment = Alignment.Center
+                                        .align(Alignment.Center)
+                                        .background(Color(0xFFB3C1FC), shape = RoundedCornerShape(8.dp)),
+                                    contentAlignment = Alignment.Center,
                                 ) {
                                     Text(text = event.title, color = Color.White, fontSize = 12.sp)
                                 }
