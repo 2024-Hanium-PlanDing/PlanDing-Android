@@ -3,6 +3,7 @@ package com.comst.data.di
 import com.comst.data.BuildConfig.BASE_URL
 import com.comst.data.retrofit.CommonScheduleService
 import com.comst.data.retrofit.GroupRoomService
+import com.comst.data.retrofit.PersonalScheduleService
 import com.comst.data.retrofit.TokenAuthenticator
 import com.comst.data.retrofit.TokenInterceptor
 import com.comst.data.retrofit.UserService
@@ -76,5 +77,10 @@ class RetrofitModule {
     @Provides
     fun provideCommonScheduleService(retrofit: Retrofit): CommonScheduleService{
         return retrofit.create(CommonScheduleService::class.java)
+    }
+
+    @Provides
+    fun providePersonalScheduleService(retrofit: Retrofit): PersonalScheduleService{
+        return retrofit.create(PersonalScheduleService::class.java)
     }
 }
