@@ -1,7 +1,7 @@
 package com.comst.data.retrofit
 
 import com.comst.data.model.BaseResponse
-import com.comst.data.model.commonSchedule.ScheduleResponseDTO
+import com.comst.data.model.base.ScheduleResponseDTO
 import retrofit2.http.GET
 import retrofit2.http.Path
 
