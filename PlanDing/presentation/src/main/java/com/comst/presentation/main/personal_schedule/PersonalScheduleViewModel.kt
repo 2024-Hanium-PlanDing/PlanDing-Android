@@ -62,6 +62,7 @@ class PersonalScheduleViewModel @Inject constructor(
             is PersonalScheduleUIAction.OpenBottomSheet -> onOpenBottomSheet()
             is PersonalScheduleUIAction.CloseBottomSheet -> onCloseBottomSheet()
             is PersonalScheduleUIAction.SelectedDate -> onSelectedDate(action.date)
+            is PersonalScheduleUIAction.ToggleTodayScheduleVisibility -> onToggleTextViewVisibility()
         }
     }
 
@@ -74,6 +75,12 @@ class PersonalScheduleViewModel @Inject constructor(
     private fun onCloseBottomSheet() = intent {
         reduce {
             state.copy(isBottomSheetVisible = false)
+        }
+    }
+
+    private fun onToggleTextViewVisibility() = intent {
+        reduce {
+            state.copy(isTodayScheduleVisible = !state.isTodayScheduleVisible)
         }
     }
 
@@ -106,6 +113,7 @@ sealed class  PersonalScheduleUIAction{
     object OpenBottomSheet : PersonalScheduleUIAction()
     object CloseBottomSheet : PersonalScheduleUIAction()
     data class SelectedDate(val date: Date) : PersonalScheduleUIAction()
+    object ToggleTodayScheduleVisibility : PersonalScheduleUIAction()
 }
 
 @Immutable
@@ -116,7 +124,9 @@ data class PersonalScheduleState(
     val selectedWeekdays : List<String> = DateUtils.getWeekDays(selectLocalDate),
     val todayScheduleEvents : List<ScheduleEvent> = emptyList(),
     val selectWeekScheduleEvents : List<ScheduleEvent> = emptyList(),
-    val isBottomSheetVisible: Boolean = false
+    val isBottomSheetVisible: Boolean = false,
+    val isExpanded: Boolean = false,
+    val isTodayScheduleVisible: Boolean = false
 )
 
 sealed interface PersonalScheduleSideEffect {

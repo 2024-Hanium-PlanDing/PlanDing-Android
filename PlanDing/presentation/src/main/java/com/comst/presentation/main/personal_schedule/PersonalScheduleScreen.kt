@@ -8,13 +8,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -64,6 +68,7 @@ fun PersonalScheduleScreen(
         selectUIDate = state.selectUIDate,
         selectDay = state.selectDay,
         selectedWeekdays = state.selectedWeekdays,
+        isTodayScheduleVisible = state.isTodayScheduleVisible,
         todayScheduleEvents = state.todayScheduleEvents,
         selectWeekScheduleEvents = state.selectWeekScheduleEvents,
         onUIAction = viewModel::onUIAction
@@ -86,6 +91,7 @@ private fun PersonalScheduleScreen(
     selectUIDate: String,
     selectDay: String,
     selectedWeekdays: List<String>,
+    isTodayScheduleVisible: Boolean,
     todayScheduleEvents: List<ScheduleEvent>,
     selectWeekScheduleEvents: List<ScheduleEvent>,
     onUIAction: (PersonalScheduleUIAction) -> Unit
@@ -96,12 +102,14 @@ private fun PersonalScheduleScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.primaryContainer)
                 .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp)
         ) {
             PDScreenHeader(text = "스케줄")
 
             SelectedDate(
                 selectDate = selectUIDate,
                 selectDay = selectDay,
+                isTodayScheduleVisible = isTodayScheduleVisible,
                 onUIAction = onUIAction
             )
 
@@ -115,33 +123,56 @@ private fun PersonalScheduleScreen(
 private fun SelectedDate(
     selectDate: String,
     selectDay: String,
+    isTodayScheduleVisible: Boolean,
     onUIAction: (PersonalScheduleUIAction) -> Unit
 ) {
-    Row(
+    Column(
         modifier = Modifier
-            .padding(16.dp)
+            .fillMaxWidth()
             .background(
                 shape = RoundedCornerShape(8.dp),
                 color = Color.White
             )
-            .clickable {
-                onUIAction(PersonalScheduleUIAction.OpenBottomSheet)
-            }
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = Icons.Filled.DateRange,
-            contentDescription = "달력",
-        )
+        ) {
+        Row(
+            modifier = Modifier
+                .clickable {
+                    onUIAction(PersonalScheduleUIAction.OpenBottomSheet)
+                },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Filled.DateRange,
+                contentDescription = "달력",
+            )
 
-        Spacer(modifier = Modifier.size(8.dp))
+            Spacer(modifier = Modifier.size(8.dp))
 
-        Text(
-            modifier = Modifier,
-            text = "$selectDate $selectDay",
-        )
+            Text(
+                modifier = Modifier,
+                text = "$selectDate $selectDay",
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Icon(
+                imageVector = if (isTodayScheduleVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                contentDescription = "오늘의 스케줄 토글",
+                modifier = Modifier.clickable {
+                    onUIAction(PersonalScheduleUIAction.ToggleTodayScheduleVisibility)
+                }
+            )
+
+        }
+
+        if (isTodayScheduleVisible) {
+            Text(
+                text = "This is a toggled TextView",
+            )
+        }
     }
+
 }
 
 @Preview

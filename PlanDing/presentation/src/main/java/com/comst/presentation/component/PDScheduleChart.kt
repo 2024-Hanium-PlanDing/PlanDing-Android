@@ -42,7 +42,7 @@ fun PDScheduleChart(events: List<ScheduleEvent>, days: List<String>) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp)
+                .padding(top = 8.dp)
         ) {
             Row(
                 modifier = Modifier
