@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.comst.domain.util.DateUtils
 import com.comst.domain.model.base.ScheduleEvent
+import com.comst.domain.model.base.ScheduleType
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleTodayListUseCase
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleWeekListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PersonalScheduleViewModel @Inject constructor(
     private val getCommonScheduleTodayListUseCase: GetCommonScheduleTodayListUseCase,
-    private val getCommonScheduleWeekListUseCase: GetCommonScheduleWeekListUseCase
+    private val getCommonScheduleWeekListUseCase: GetCommonScheduleWeekListUseCase,
 ) : ViewModel(), ContainerHost<PersonalScheduleState, PersonalScheduleSideEffect>{
 
     override val container: Container<PersonalScheduleState, PersonalScheduleSideEffect> = container(
@@ -63,6 +64,7 @@ class PersonalScheduleViewModel @Inject constructor(
             is PersonalScheduleUIAction.CloseBottomSheet -> onCloseBottomSheet()
             is PersonalScheduleUIAction.SelectedDate -> onSelectedDate(action.date)
             is PersonalScheduleUIAction.ToggleTodayScheduleVisibility -> onToggleTextViewVisibility()
+            is PersonalScheduleUIAction.AddTodaySchedule -> onAddTodaySchedule()
         }
     }
 
@@ -86,24 +88,47 @@ class PersonalScheduleViewModel @Inject constructor(
 
     private fun onSelectedDate(date: Date) = intent {
         val newSelectLocalDate = DateUtils.dateToLocalDate(date)
-        val todayScheduleEvents = getCommonScheduleTodayListUseCase().getOrThrow()
-
         val startDateAndEndDate = DateUtils.getWeekStartAndEnd(newSelectLocalDate)
-        Log.d("하하","${startDateAndEndDate.first},${startDateAndEndDate.second}")
+
         val weekScheduleEvents = getCommonScheduleWeekListUseCase(
             startDateAndEndDate.first,
             startDateAndEndDate.second
         ).getOrThrow()
-
         reduce {
             state.copy(
                 selectLocalDate = newSelectLocalDate,
                 selectUIDate = DateUtils.localDateToUIDate(newSelectLocalDate),
                 selectDay = DateUtils.getDayOfWeek(newSelectLocalDate),
                 selectedWeekdays = DateUtils.getWeekDays(newSelectLocalDate),
-                todayScheduleEvents = todayScheduleEvents,
                 selectWeekScheduleEvents = weekScheduleEvents,
+                todayScheduleEvents = listOf(),
                 isBottomSheetVisible = false,
+            )
+        }
+    }
+
+    private fun onAddTodaySchedule() = intent {
+        val aa = mutableListOf<ScheduleEvent>()
+        for (i in 6..12){
+            aa.add(
+                ScheduleEvent(
+                    scheduleId = i.toLong(),
+                    title = "propriae + $i",
+                    content = "te",
+                    startTime = i,
+                    endTime = i+2,
+                    day = "dapibus",
+                    complete = i%2==1,
+                    groupName = null,
+                    type = ScheduleType.GROUP
+
+                )
+            )
+        }
+
+        reduce {
+            state.copy(
+                todayScheduleEvents = aa
             )
         }
     }
@@ -114,6 +139,7 @@ sealed class  PersonalScheduleUIAction{
     object CloseBottomSheet : PersonalScheduleUIAction()
     data class SelectedDate(val date: Date) : PersonalScheduleUIAction()
     object ToggleTodayScheduleVisibility : PersonalScheduleUIAction()
+    object AddTodaySchedule : PersonalScheduleUIAction()
 }
 
 @Immutable
