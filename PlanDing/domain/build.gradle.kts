@@ -1,6 +1,7 @@
 plugins {
     id("java-library")
     alias(libs.plugins.org.jetbrains.kotlin.jvm)
+    kotlin("kapt")
 }
 
 java {
@@ -10,4 +11,5 @@ java {
 
 dependencies {
     implementation(libs.coroutines.core)
+    implementation("javax.inject:javax.inject:1")
 }

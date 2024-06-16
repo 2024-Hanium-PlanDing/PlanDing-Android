@@ -5,12 +5,12 @@ import com.comst.data.model.user.toDomainModel
 import com.comst.data.retrofit.UserService
 import com.comst.domain.model.user.LoginResponseModel
 import com.comst.domain.model.user.SocialLoginInfo
-import com.comst.domain.usecase.login.SocialLoginUseCase
+import com.comst.domain.usecase.SocialLoginUseCase
 import javax.inject.Inject
 
 class SocialLoginUseCaseImpl @Inject constructor(
     private val userService: UserService,
-): SocialLoginUseCase{
+): SocialLoginUseCase {
 
     override suspend fun invoke(socialLoginInfo: SocialLoginInfo):Result<LoginResponseModel> = kotlin.runCatching {
 

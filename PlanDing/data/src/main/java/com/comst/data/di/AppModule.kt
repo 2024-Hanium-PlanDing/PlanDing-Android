@@ -1,4 +1,4 @@
-package com.comst.planding
+package com.comst.data.di
 
 import android.app.Application
 import android.content.Context

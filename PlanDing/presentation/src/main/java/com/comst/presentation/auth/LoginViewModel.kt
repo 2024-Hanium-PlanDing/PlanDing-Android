@@ -3,8 +3,8 @@ package com.comst.presentation.auth
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import com.comst.domain.model.user.SocialLoginInfo
-import com.comst.domain.usecase.login.SetTokenUseCase
-import com.comst.domain.usecase.login.SocialLoginUseCase
+import com.comst.domain.usecase.SocialLoginUseCase
+import com.comst.domain.usecase.local.SetTokenUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container

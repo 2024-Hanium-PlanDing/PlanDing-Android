@@ -1,4 +1,4 @@
-package com.comst.domain.usecase.login
+package com.comst.domain.usecase
 
 import com.comst.domain.model.user.LoginResponseModel
 import com.comst.domain.model.user.SocialLoginInfo

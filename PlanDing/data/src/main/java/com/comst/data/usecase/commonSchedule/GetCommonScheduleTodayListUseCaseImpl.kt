@@ -11,5 +11,9 @@ class GetCommonScheduleTodayListUseCaseImpl @Inject constructor(
 ) : GetCommonScheduleTodayListUseCase{
     override suspend fun invoke(): Result<List<ScheduleEvent>> = kotlin.runCatching {
         commonScheduleService.getCommonScheduleToday().data.map { it.toDomainModel() }
+    }.onSuccess {
+        //Result.success()
+    }.onFailure {
+
     }
 }
