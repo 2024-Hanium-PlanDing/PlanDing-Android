@@ -5,8 +5,7 @@ import com.comst.data.model.groupRoom.GroupCreateParam
 import com.comst.data.model.groupRoom.GroupCreateResponseDTO
 import com.comst.data.model.groupRoom.MyGroupRoomDTO
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import retrofit2.http.Body
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -19,9 +18,8 @@ interface GroupRoomService {
     suspend fun postGroupRoom(
         @Part("request") requestBody: GroupCreateParam,
         @Part thumbnail: MultipartBody.Part
-    ): BaseResponse<GroupCreateResponseDTO>
-
+    ): Response<BaseResponse<GroupCreateResponseDTO>>
 
     @GET("v1/group")
-    suspend fun getMyGroupRoom():BaseResponse<List<MyGroupRoomDTO>>
+    suspend fun getMyGroupRoom(): Response<BaseResponse<List<MyGroupRoomDTO>>>
 }

@@ -5,6 +5,10 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import com.comst.domain.model.groupRoom.GroupRoomCardModel
 import com.comst.domain.usecase.groupRoom.GetMyGroupRoomsUseCase
+import com.comst.domain.util.map
+import com.comst.domain.util.onException
+import com.comst.domain.util.onFail
+import com.comst.domain.util.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
@@ -38,13 +42,17 @@ class GroupViewModel @Inject constructor(
     }
 
     fun load() = intent {
-        val myGroupRooms = getMyGroupRoomsUseCase().getOrThrow()
+        val myGroupRooms = getMyGroupRoomsUseCase().onSuccess {
+            reduce {
+                state.copy(
+                    groupCardModels = it
+                )
+            }
+        }.onFail {
 
-        reduce {
-            state.copy(
-                groupCardModels = myGroupRooms
-            )
         }
+
+
     }
 
     fun onUIAction(action: GroupUIAction) {

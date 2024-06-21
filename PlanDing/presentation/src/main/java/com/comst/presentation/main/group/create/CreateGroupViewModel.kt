@@ -7,6 +7,8 @@ import com.comst.domain.model.file.MediaImage
 import com.comst.domain.model.groupRoom.GroupRoomCreate
 import com.comst.domain.usecase.file.GetImageListUseCase
 import com.comst.domain.usecase.groupRoom.PostGroupRoomUseCase
+import com.comst.domain.util.onFail
+import com.comst.domain.util.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
@@ -91,8 +93,11 @@ class CreateGroupViewModel @Inject constructor(
                 name = state.groupName,
                 description = state.groupDescription
             )
-            postGroupRoomUseCase(groupRoomCreate, state.selectedImage!!).getOrThrow()
-            postSideEffect(CreateGroupSideEffect.Complete)
+            postGroupRoomUseCase(groupRoomCreate, state.selectedImage!!).onSuccess {
+                postSideEffect(CreateGroupSideEffect.Complete)
+            }.onFail {
+
+            }
         }else{
             postSideEffect(CreateGroupSideEffect.Toast("그룹 이미지는 필수입니다."))
         }
