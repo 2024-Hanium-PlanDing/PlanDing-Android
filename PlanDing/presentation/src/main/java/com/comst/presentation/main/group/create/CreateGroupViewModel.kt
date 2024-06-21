@@ -40,12 +40,13 @@ class CreateGroupViewModel @Inject constructor(
     }
 
     private fun load() = intent {
-        val images = getImageListUseCase()
-        reduce {
-            state.copy(
-                selectedImage = images.firstOrNull(),
-                images = images
-            )
+        val images = getImageListUseCase().onSuccess {
+            reduce {
+                state.copy(
+                    selectedImage = it.firstOrNull(),
+                    images = it
+                )
+            }
         }
     }
 

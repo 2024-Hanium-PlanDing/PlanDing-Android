@@ -2,6 +2,7 @@ package com.comst.presentation.main
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -79,7 +80,9 @@ private fun MainBottomBar(
     currentRoute: MainRoute,
     onItemClick: (MainRoute) -> Unit,
 ) {
-    Column {
+    Column(
+        modifier = Modifier.background(color = Color.White)
+    ) {
         Divider()
         Row(
             modifier = Modifier

@@ -1,4 +1,4 @@
-package com.comst.data.usecase.file
+package com.comst.data.converter
 
 import android.content.Context
 import android.database.Cursor
@@ -7,12 +7,11 @@ import android.provider.MediaStore
 import com.comst.domain.model.file.MediaImage
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import javax.inject.Inject
 
-class MediaImageToMultipartUseCaseImpl @Inject constructor(
+class MediaImageMultipartConverter @Inject constructor(
     private val context: Context
 ) {
 

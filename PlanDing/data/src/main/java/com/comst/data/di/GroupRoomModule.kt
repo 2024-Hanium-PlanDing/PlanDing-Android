@@ -1,6 +1,5 @@
 package com.comst.data.di
 
-import com.comst.data.usecase.file.GetImageListUseCaseImpl
 import com.comst.data.usecase.groupRoom.GetMyGroupRoomsUseCaseImpl
 import com.comst.data.usecase.groupRoom.PostGroupRoomUseCaseImpl
 import com.comst.domain.usecase.file.GetImageListUseCase
@@ -20,8 +19,5 @@ abstract class GroupRoomModule {
 
     @Binds
     abstract fun bindGetMyGroupRoomsUseCase(uc:GetMyGroupRoomsUseCaseImpl) : GetMyGroupRoomsUseCase
-
-    @Binds
-    abstract fun bindGetImageListUseCase(uc : GetImageListUseCaseImpl): GetImageListUseCase
 
 }

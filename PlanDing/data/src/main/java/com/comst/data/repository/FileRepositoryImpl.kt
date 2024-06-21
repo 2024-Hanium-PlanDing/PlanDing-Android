@@ -1,21 +1,20 @@
-package com.comst.data.usecase.file
+package com.comst.data.repository
 
 import android.content.ContentUris
 import android.content.Context
 import android.os.Build
 import android.provider.MediaStore
 import com.comst.domain.model.file.MediaImage
-import com.comst.domain.usecase.file.GetImageListUseCase
+import com.comst.domain.repository.FileRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-// https://developer.android.com/about/versions/14/changes/partial-photo-video-access
-
-class GetImageListUseCaseImpl @Inject constructor(
+class FileRepositoryImpl @Inject constructor(
     private val context: Context
-): GetImageListUseCase{
-    override suspend fun invoke(): List<MediaImage> = withContext(Dispatchers.IO) {
+): FileRepository{
+
+    override suspend fun getImageList(): List<MediaImage>  = withContext(Dispatchers.IO) {
         val contentResolver = context.contentResolver
         val projection = arrayOf(
             MediaStore.Images.Media._ID,
@@ -63,4 +62,5 @@ class GetImageListUseCaseImpl @Inject constructor(
 
         return@withContext images
     }
+
 }
