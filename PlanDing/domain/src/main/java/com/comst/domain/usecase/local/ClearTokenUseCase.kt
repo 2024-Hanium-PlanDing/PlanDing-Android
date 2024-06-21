@@ -6,7 +6,12 @@ import javax.inject.Inject
 class ClearTokenUseCase @Inject constructor(
     private val localRepository: LocalRepository
 ) {
-    suspend operator fun invoke(): Result<Unit> = kotlin.runCatching {
-        localRepository.clearToken()
-    }
+    suspend operator fun invoke(): Result<Unit> = localRepository.clearToken().fold(
+        onSuccess = {
+            Result.success(Unit)
+        },
+        onFailure = { exception ->
+            Result.failure(exception)
+        }
+    )
 }

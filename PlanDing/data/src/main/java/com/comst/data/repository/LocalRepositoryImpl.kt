@@ -9,26 +9,16 @@ class LocalRepositoryImpl @Inject constructor(
     private val userDataStore: UserDataStore
 ): LocalRepository {
 
-    override suspend fun clearToken() {
-        try {
-            userDataStore.clear()
-        } catch (exception: Exception) {
-            // 예외 처리
-        }
+    override suspend fun clearToken(): Result<Unit> = kotlin.runCatching{
+        userDataStore.clear()
     }
 
-    override suspend fun getToken(): String? {
-        return try {
-            userDataStore.getAccessToken()
-        } catch (exception: Exception) {
-            // 예외 처리
-            null
-        }
+    override suspend fun getToken(): Result<String?> = kotlin.runCatching{
+        userDataStore.getAccessToken()
     }
 
-    override suspend fun setToken(accessToken: String, refreshToken: String) {
+    override suspend fun setToken(accessToken: String, refreshToken: String): Result<Unit> = kotlin.runCatching{
         userDataStore.setAccessToken(accessToken)
         userDataStore.setRefreshToken(refreshToken)
     }
-
 }

@@ -6,10 +6,12 @@ import javax.inject.Inject
 class SetTokenUseCase @Inject constructor(
     private val localRepository: LocalRepository
 ) {
-    suspend operator fun invoke(accessToken: String, refreshToken: String): Result<Unit> = kotlin.runCatching {
-        localRepository.setToken(
-            accessToken = accessToken,
-            refreshToken = refreshToken
-        )
-    }
+    suspend operator fun invoke(accessToken: String, refreshToken: String): Result<Unit> = localRepository.setToken(accessToken, refreshToken).fold(
+        onSuccess = {
+            Result.success(Unit)
+        },
+        onFailure = { exception ->
+            Result.failure(exception)
+        }
+    )
 }
