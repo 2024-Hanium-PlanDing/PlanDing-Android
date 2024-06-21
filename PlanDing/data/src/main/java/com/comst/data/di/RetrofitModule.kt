@@ -24,7 +24,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class RetrofitModule {
+object RetrofitModule {
 
     @Provides
     @Singleton
@@ -64,23 +64,4 @@ class RetrofitModule {
             .build()
     }
 
-    @Provides
-    fun provideUserService(retrofit: Retrofit): UserService {
-        return retrofit.create(UserService::class.java)
-    }
-
-    @Provides
-    fun provideGroupRoomService(retrofit: Retrofit): GroupRoomService{
-        return retrofit.create(GroupRoomService::class.java)
-    }
-
-    @Provides
-    fun provideCommonScheduleService(retrofit: Retrofit): CommonScheduleService{
-        return retrofit.create(CommonScheduleService::class.java)
-    }
-
-    @Provides
-    fun providePersonalScheduleService(retrofit: Retrofit): PersonalScheduleService{
-        return retrofit.create(PersonalScheduleService::class.java)
-    }
 }
