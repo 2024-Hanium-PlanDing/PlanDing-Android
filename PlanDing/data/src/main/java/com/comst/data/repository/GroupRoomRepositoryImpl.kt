@@ -1,11 +1,10 @@
 package com.comst.data.repository
 
-import android.content.Context
 import com.comst.data.converter.MediaImageMultipartConverter
 import com.comst.data.model.groupRoom.GroupCreateParam
 import com.comst.data.model.groupRoom.toDomainModel
+import com.comst.data.retrofit.ApiHandler
 import com.comst.data.retrofit.GroupRoomService
-import com.comst.data.retrofit.apiHandler
 import com.comst.domain.model.file.MediaImage
 import com.comst.domain.model.groupRoom.GroupRoomCardModel
 import com.comst.domain.model.groupRoom.GroupRoomCreate
@@ -17,20 +16,18 @@ import javax.inject.Inject
 class GroupRoomRepositoryImpl @Inject constructor(
     private val groupRoomService: GroupRoomService,
     private val mediaImageMultipartConverter: MediaImageMultipartConverter,
-    private val context: Context
+    private val apiHandler: ApiHandler
 ): GroupRoomRepository {
 
     override suspend fun getMyGroupRoom(): ApiResult<List<GroupRoomCardModel>> {
-        return apiHandler(
-            context = context,
+        return apiHandler.handle(
             execute = { groupRoomService.getMyGroupRoom() },
             mapper = { response -> response.map { it.toDomainModel() } }
         )
     }
 
     override suspend fun postGroupRoom(groupRoomCreate: GroupRoomCreate, thumbnail: MediaImage): ApiResult<GroupRoomCreateResponseModel> {
-        return apiHandler(
-            context = context,
+        return apiHandler.handle(
             execute = {
                 val request = GroupCreateParam(
                     name = groupRoomCreate.name,
