@@ -3,6 +3,8 @@ package com.comst.presentation.main.mypage
 import androidx.lifecycle.ViewModel
 import com.comst.domain.model.user.UserProfile
 import com.comst.domain.usecase.user.GetUserProfileUseCase
+import com.comst.domain.util.onFail
+import com.comst.domain.util.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
@@ -37,16 +39,20 @@ class MyPageViewModel @Inject constructor(
     }
 
     private fun load() = intent {
-        val userProfile: UserProfile = getUserProfileUseCase().getOrThrow()
-        reduce {
-            state.copy(
-                username = userProfile.username,
-                userCode = userProfile.userCode,
-                profileImageUrl = userProfile.profileImage,
-                favoriteGroupsCount = userProfile.groupFavorite,
-                receivedGroupRequestsCount = userProfile.groupRequest
-            )
+        getUserProfileUseCase().onSuccess {
+            reduce {
+                state.copy(
+                    username = it.username,
+                    userCode = it.userCode,
+                    profileImageUrl = it.profileImage,
+                    favoriteGroupsCount = it.groupFavorite,
+                    receivedGroupRequestsCount = it.groupRequest
+                )
+            }
+        }.onFail {
+
         }
+
     }
 
 }

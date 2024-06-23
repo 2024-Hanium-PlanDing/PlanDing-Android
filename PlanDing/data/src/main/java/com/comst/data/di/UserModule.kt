@@ -1,7 +1,6 @@
 package com.comst.data.di
 
 import com.comst.data.usecase.login.SocialLoginUseCaseImpl
-import com.comst.data.usecase.user.GetUserProfileUseCaseImpl
 import com.comst.domain.usecase.SocialLoginUseCase
 import com.comst.domain.usecase.user.GetUserProfileUseCase
 import dagger.Binds
@@ -15,6 +14,4 @@ abstract class UserModule {
     @Binds
     abstract fun bindSocialLoginUseCase(uc: SocialLoginUseCaseImpl): SocialLoginUseCase
 
-    @Binds
-    abstract fun bindGetUserProfileUseCase(uc: GetUserProfileUseCaseImpl):GetUserProfileUseCase
 }
