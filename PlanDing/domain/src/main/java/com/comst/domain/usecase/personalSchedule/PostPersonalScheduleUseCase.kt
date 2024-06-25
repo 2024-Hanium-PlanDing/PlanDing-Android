@@ -2,8 +2,15 @@ package com.comst.domain.usecase.personalSchedule
 
 import com.comst.domain.model.base.ScheduleEvent
 import com.comst.domain.model.base.ScheduleModel
+import com.comst.domain.repository.PersonalScheduleRepository
+import com.comst.domain.util.ApiResult
+import javax.inject.Inject
 
-interface PostPersonalScheduleUseCase {
+class PostPersonalScheduleUseCase @Inject constructor(
+    private val personalScheduleRepository: PersonalScheduleRepository
+) {
 
-    suspend operator fun invoke(scheduleModel: ScheduleModel):Result<ScheduleEvent>
+    suspend operator fun invoke(scheduleModel: ScheduleModel):ApiResult<ScheduleEvent>{
+        return personalScheduleRepository.postPersonalSchedule(scheduleModel)
+    }
 }

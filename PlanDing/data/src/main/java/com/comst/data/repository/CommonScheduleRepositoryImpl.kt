@@ -1,0 +1,35 @@
+package com.comst.data.repository
+
+import com.comst.data.model.base.toDomainModel
+import com.comst.data.retrofit.ApiHandler
+import com.comst.data.retrofit.CommonScheduleService
+import com.comst.domain.model.base.ScheduleEvent
+import com.comst.domain.repository.CommonScheduleRepository
+import com.comst.domain.util.ApiResult
+import javax.inject.Inject
+
+class CommonScheduleRepositoryImpl @Inject constructor(
+    private val commonScheduleService: CommonScheduleService,
+    private val apiHandler: ApiHandler
+): CommonScheduleRepository {
+
+    override suspend fun getCommonScheduleTodayList(): ApiResult<List<ScheduleEvent>> {
+        return apiHandler.handle(
+            execute = { commonScheduleService.getCommonScheduleToday() },
+            mapper = { response -> response.map { it.toDomainModel() } }
+        )
+    }
+
+    override suspend fun getCommonScheduleWeekList(
+        startDate: String,
+        endDate: String
+    ): ApiResult<List<ScheduleEvent>> {
+        return apiHandler.handle(
+            execute = { commonScheduleService.getCommonScheduleWeek(
+                startDate = startDate,
+                endDate = endDate
+            ) },
+            mapper = { response -> response.map { it.toDomainModel() } }
+        )
+    }
+}

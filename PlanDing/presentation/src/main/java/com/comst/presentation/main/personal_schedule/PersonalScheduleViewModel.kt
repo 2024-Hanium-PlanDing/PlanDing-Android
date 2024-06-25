@@ -7,6 +7,8 @@ import com.comst.domain.model.base.ScheduleEvent
 import com.comst.domain.model.base.ScheduleType
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleTodayListUseCase
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleWeekListUseCase
+import com.comst.domain.util.onFail
+import com.comst.domain.util.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
@@ -43,19 +45,30 @@ class PersonalScheduleViewModel @Inject constructor(
 
     fun load() = intent{
 
-        val todayScheduleEvents = getCommonScheduleTodayListUseCase().getOrThrow()
+        getCommonScheduleTodayListUseCase().onSuccess {
+            reduce {
+                state.copy(
+                    todayScheduleEvents = it,
+                )
+            }
+        }.onFail {
+
+        }
+
         val startDateAndEndDate = DateUtils.getWeekStartAndEnd(state.selectLocalDate)
-        val weekScheduleEvents = getCommonScheduleWeekListUseCase(
+        getCommonScheduleWeekListUseCase(
             startDateAndEndDate.first,
             startDateAndEndDate.second
-        ).getOrThrow()
+        ).onSuccess {
+            reduce {
+                state.copy(
+                    selectWeekScheduleEvents = it,
+                )
+            }
+        }.onFail {
 
-        reduce {
-            state.copy(
-                todayScheduleEvents = todayScheduleEvents,
-                selectWeekScheduleEvents = weekScheduleEvents,
-            )
         }
+
     }
 
     fun onUIAction(action: PersonalScheduleUIAction) {
@@ -90,20 +103,23 @@ class PersonalScheduleViewModel @Inject constructor(
         val newSelectLocalDate = DateUtils.dateToLocalDate(date)
         val startDateAndEndDate = DateUtils.getWeekStartAndEnd(newSelectLocalDate)
 
-        val weekScheduleEvents = getCommonScheduleWeekListUseCase(
+        getCommonScheduleWeekListUseCase(
             startDateAndEndDate.first,
             startDateAndEndDate.second
-        ).getOrThrow()
-        reduce {
-            state.copy(
-                selectLocalDate = newSelectLocalDate,
-                selectUIDate = DateUtils.localDateToUIDate(newSelectLocalDate),
-                selectDay = DateUtils.getDayOfWeek(newSelectLocalDate),
-                selectedWeekdays = DateUtils.getWeekDays(newSelectLocalDate),
-                selectWeekScheduleEvents = weekScheduleEvents,
-                todayScheduleEvents = listOf(),
-                isBottomSheetVisible = false,
-            )
+        ).onSuccess {
+            reduce {
+                state.copy(
+                    selectLocalDate = newSelectLocalDate,
+                    selectUIDate = DateUtils.localDateToUIDate(newSelectLocalDate),
+                    selectDay = DateUtils.getDayOfWeek(newSelectLocalDate),
+                    selectedWeekdays = DateUtils.getWeekDays(newSelectLocalDate),
+                    selectWeekScheduleEvents = it,
+                    todayScheduleEvents = listOf(),
+                    isBottomSheetVisible = false,
+                )
+            }
+        }.onFail {
+
         }
     }
 
