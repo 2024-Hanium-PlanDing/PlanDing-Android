@@ -3,8 +3,10 @@ package com.comst.presentation.auth
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import com.comst.domain.model.user.SocialLoginInfo
-import com.comst.domain.usecase.SocialLoginUseCase
+import com.comst.domain.usecase.user.PostSocialLoginUseCase
 import com.comst.domain.usecase.local.SetTokenUseCase
+import com.comst.domain.util.onFail
+import com.comst.domain.util.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
@@ -19,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val setTokenUseCase : SetTokenUseCase,
-    private val socialLoginUseCase: SocialLoginUseCase
+    private val postSocialLoginUseCase: PostSocialLoginUseCase
 ) : ViewModel(), ContainerHost<LoginState,LoginSideEffect> {
 
     override val container: Container<LoginState, LoginSideEffect> = container(
@@ -62,9 +64,12 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun onSocialLogin(accountInfo: SocialLoginInfo) = intent{
-        val tokens = socialLoginUseCase(accountInfo).getOrThrow()
-        setTokenUseCase(tokens.accessToken, tokens.refreshToken)
-        postSideEffect(LoginSideEffect.NavigateToMainActivity)
+        postSocialLoginUseCase(accountInfo).onSuccess {
+            setTokenUseCase(it.accessToken, it.refreshToken)
+            postSideEffect(LoginSideEffect.NavigateToMainActivity)
+        }.onFail {
+
+        }
     }
 
 
