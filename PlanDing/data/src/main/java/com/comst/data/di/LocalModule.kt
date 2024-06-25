@@ -1,19 +1,21 @@
 package com.comst.data.di
 
 import android.content.Context
-import com.comst.data.converter.MediaImageMultipartConverter
+import com.comst.data.UserDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-@Module
 @InstallIn(SingletonComponent::class)
+@Module
 object LocalModule {
+
     @Provides
     @Singleton
-    fun provideMediaImageMultipartConverter(context: Context): MediaImageMultipartConverter {
-        return MediaImageMultipartConverter(context)
+    fun provideUserDataStore(context: Context): UserDataStore {
+        return UserDataStore(context)
     }
+
 }
