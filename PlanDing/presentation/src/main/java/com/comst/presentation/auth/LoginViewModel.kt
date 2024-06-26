@@ -1,94 +1,70 @@
 package com.comst.presentation.auth
 
-import androidx.compose.runtime.Immutable
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.comst.domain.model.user.SocialLoginInfo
 import com.comst.domain.usecase.user.PostSocialLoginUseCase
 import com.comst.domain.usecase.local.SetTokenUseCase
-import com.comst.domain.util.onFail
+import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
+import com.comst.presentation.common.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
-import org.orbitmvi.orbit.Container
-import org.orbitmvi.orbit.ContainerHost
-import org.orbitmvi.orbit.syntax.simple.blockingIntent
-import org.orbitmvi.orbit.syntax.simple.intent
-import org.orbitmvi.orbit.syntax.simple.postSideEffect
-import org.orbitmvi.orbit.syntax.simple.reduce
-import org.orbitmvi.orbit.viewmodel.container
+import com.comst.presentation.auth.LoginContract.LoginUIEvent
+import com.comst.presentation.auth.LoginContract.LoginUIState
+import com.comst.presentation.auth.LoginContract.LoginUISideEffect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val setTokenUseCase : SetTokenUseCase,
-    private val postSocialLoginUseCase: PostSocialLoginUseCase
-) : ViewModel(), ContainerHost<LoginState,LoginSideEffect> {
+    private val setTokenUseCase: SetTokenUseCase,
+    private val postSocialLoginUseCase: PostSocialLoginUseCase,
+) : BaseViewModel<LoginUIState, LoginUISideEffect, LoginUIEvent>(LoginUIState()) {
 
-    override val container: Container<LoginState, LoginSideEffect> = container(
-        initialState = LoginState(),
-        buildSettings = {
-            this.exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-                intent {
-                    postSideEffect(LoginSideEffect.Toast(message = throwable.message.orEmpty()))
-                }
+    override suspend fun handleEvent(event: LoginUIEvent) {
+        when (event) {
+            is LoginUIEvent.IdChange -> onIdChange(event.id)
+            is LoginUIEvent.PasswordChange -> onPasswordChange(event.password)
+            is LoginUIEvent.Login -> onLoginClick()
+            is LoginUIEvent.SocialLogin -> onSocialLogin(event.accountInfo)
+        }
+    }
+
+    private fun onIdChange(id: String) {
+        setState {
+            copy(id = id)
+        }
+    }
+
+    private fun onPasswordChange(password: String) {
+        setState {
+            copy(password = password)
+        }
+    }
+
+    private fun onLoginClick() = viewModelScope.launch {
+        setState { copy(isLoading = true) }
+        val id = currentState.id
+        val password = currentState.password
+        setTokenUseCase(id, password)
+            .onSuccess {
+                setEffect(LoginUISideEffect.NavigateToMainActivity)
             }
-        }
-    )
-
-    fun onUIAction(action: LoginUIAction) {
-        when (action) {
-            is LoginUIAction.IdChange -> onIdChange(action.id)
-            is LoginUIAction.PasswordChange -> onPasswordChange(action.password)
-            is LoginUIAction.Login -> onLoginClick()
-            is LoginUIAction.SocialLogin -> onSocialLogin(action.accountInfo)
-        }
+            .onFailure {
+                setEffect(LoginUISideEffect.ShowToast(it.message.orEmpty()))
+            }
+        setState { copy(isLoading = false) }
     }
 
-    private fun onLoginClick() = intent{
-        val id = state.id
-        val password = state.password
-        //postSideEffect(LoginSideEffect.NavigateToMainActivity)
-        setTokenUseCase("aaa","aaa")
+    private fun onSocialLogin(accountInfo: SocialLoginInfo) = viewModelScope.launch {
+        setState { copy(isLoading = true) }
+        postSocialLoginUseCase(accountInfo)
+            .onSuccess {
+                setTokenUseCase(it.accessToken, it.refreshToken)
+                setEffect(LoginUISideEffect.NavigateToMainActivity)
+            }.onFailure { statusCode, message ->
+
+            }
+        setState { copy(isLoading = false) }
     }
 
-    private fun onIdChange(id: String) = blockingIntent{
-        reduce {
-            state.copy(id = id)
-        }
-    }
-
-    private fun onPasswordChange(password: String) = blockingIntent{
-        reduce {
-            state.copy(password = password)
-        }
-    }
-
-    private fun onSocialLogin(accountInfo: SocialLoginInfo) = intent{
-        postSocialLoginUseCase(accountInfo).onSuccess {
-            setTokenUseCase(it.accessToken, it.refreshToken)
-            postSideEffect(LoginSideEffect.NavigateToMainActivity)
-        }.onFail {
-
-        }
-    }
-
-
-
-}
-
-sealed class LoginUIAction {
-    data class IdChange(val id: String) : LoginUIAction()
-    data class PasswordChange(val password: String) : LoginUIAction()
-    object Login : LoginUIAction()
-    data class SocialLogin(val accountInfo: SocialLoginInfo) : LoginUIAction()
-}
-@Immutable
-data class LoginState(
-    val id : String = "",
-    val password:String = ""
-)
-
-sealed interface LoginSideEffect{
-    data class Toast(val message:String):LoginSideEffect
-    object NavigateToMainActivity:LoginSideEffect
 }

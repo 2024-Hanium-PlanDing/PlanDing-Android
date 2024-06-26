@@ -46,7 +46,7 @@ import com.kakao.sdk.user.UserApiClient
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModell = hiltViewModel(),
+    viewModel: LoginViewModel = hiltViewModel(),
     onNavigateToSignUpScreen: () -> Unit
 ) {
     val context = LocalContext.current
@@ -213,7 +213,7 @@ private fun LoginScreenPreview() {
     }
 }
 
-private fun getKakaoUserInfo(viewModel: LoginViewModell) {
+private fun getKakaoUserInfo(viewModel: LoginViewModel) {
     UserApiClient.instance.me { user, error ->
         when {
             error != null -> {
