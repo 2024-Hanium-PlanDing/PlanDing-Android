@@ -8,6 +8,6 @@ data class SocialLoginInfo(
     val type: Type
 ) {
     enum class Type {
-        KAKAO
+        KAKAO, GOOGLE
     }
 }

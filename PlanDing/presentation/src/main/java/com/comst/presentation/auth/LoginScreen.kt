@@ -19,6 +19,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -31,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.comst.domain.model.user.SocialLoginInfo
 import com.comst.presentation.R
+import com.comst.presentation.auth.LoginContract.*
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDTextFiledOutLine
 import com.comst.presentation.main.MainActivity
@@ -39,54 +43,55 @@ import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
-import org.orbitmvi.orbit.compose.collectAsState
-import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = hiltViewModel(),
+    viewModel: LoginViewModell = hiltViewModel(),
     onNavigateToSignUpScreen: () -> Unit
 ) {
-    val state = viewModel.collectAsState().value
     val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsState()
 
-    viewModel.collectSideEffect { sideEffect ->
-        when (sideEffect) {
-            is LoginSideEffect.Toast -> Toast.makeText(
-                context,
-                sideEffect.message,
-                Toast.LENGTH_SHORT
-            ).show()
+    LaunchedEffect(key1 = viewModel.effect) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is LoginUISideEffect.NavigateToMainActivity -> {
+                    context.startActivity(
+                        Intent(
+                            context, MainActivity::class.java
+                        ).apply {
+                            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                        }
+                    )
+                }
 
-            LoginSideEffect.NavigateToMainActivity -> {
-                context.startActivity(
-                    Intent(
-                        context, MainActivity::class.java
-                    ).apply {
-                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                    }
-                )
+                is LoginUISideEffect.ShowToast -> {
+                    Toast.makeText(
+                        context,
+                        effect.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }
 
     val kakaoCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
-
         if (error != null) {
             Log.e("Kakao", "카카오 계정 로그인 실패", error)
         } else if (token != null) {
-            getKakaoUserInfo(viewModel)        }
+            getKakaoUserInfo(viewModel)
+        }
     }
 
     val onKaKaoLoginClick = { loginKakao(context, kakaoCallback) }
 
-
     LoginScreen(
-        id = state.id,
-        password = state.password,
+        id = uiState.id,
+        password = uiState.password,
         onNavigateToSignUpScreen = onNavigateToSignUpScreen,
         onKaKaoLoginClick = onKaKaoLoginClick,
-        onUIAction = viewModel::onUIAction
+        onUIAction = viewModel::setEvent
     )
 }
 
@@ -96,7 +101,7 @@ private fun LoginScreen(
     password: String,
     onNavigateToSignUpScreen: () -> Unit,
     onKaKaoLoginClick: () -> Unit,
-    onUIAction:(LoginUIAction) -> Unit
+    onUIAction: (LoginUIEvent) -> Unit
 ) {
     Surface {
         Column(
@@ -121,7 +126,7 @@ private fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 value = id,
                 label = "아이디",
-                onValueChange = { newId -> onUIAction(LoginUIAction.IdChange(newId)) }
+                onValueChange = { newId -> onUIAction(LoginUIEvent.IdChange(newId)) }
             )
             Spacer(Modifier.height(4.dp))
 
@@ -130,14 +135,14 @@ private fun LoginScreen(
                 value = password,
                 label = "비밀번호",
                 visualTransformation = PasswordVisualTransformation(),
-                onValueChange = { newPassword -> onUIAction(LoginUIAction.PasswordChange(newPassword)) }
+                onValueChange = { newPassword -> onUIAction(LoginUIEvent.PasswordChange(newPassword)) }
             )
             Spacer(Modifier.height(20.dp))
 
             PDButton(
                 modifier = Modifier.fillMaxWidth(),
                 text = "로그인하기",
-                onClick = { onUIAction(LoginUIAction.Login) }
+                onClick = { onUIAction(LoginUIEvent.Login) }
             )
 
             Spacer(Modifier.height(20.dp))
@@ -194,7 +199,6 @@ private fun LoginScreen(
     }
 }
 
-
 @Preview
 @Composable
 private fun LoginScreenPreview() {
@@ -209,11 +213,11 @@ private fun LoginScreenPreview() {
     }
 }
 
-private fun getKakaoUserInfo(viewModel: LoginViewModel) {
+private fun getKakaoUserInfo(viewModel: LoginViewModell) {
     UserApiClient.instance.me { user, error ->
         when {
             error != null -> {
-                Log.e("Kakao", "사용저 정보 실패", error)
+                Log.e("Kakao", "사용자 정보 실패", error)
             }
 
             user != null -> {
@@ -229,7 +233,7 @@ private fun getKakaoUserInfo(viewModel: LoginViewModel) {
                     type = SocialLoginInfo.Type.KAKAO
                 )
                 Log.d("카카오", "$socialLoginInfo")
-                viewModel.onUIAction(LoginUIAction.SocialLogin(socialLoginInfo))
+                viewModel.setEvent(LoginUIEvent.SocialLogin(socialLoginInfo))
             }
         }
     }
