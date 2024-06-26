@@ -1,9 +1,8 @@
 package com.comst.presentation.main.mypage
 
 import androidx.lifecycle.ViewModel
-import com.comst.domain.model.user.UserProfile
 import com.comst.domain.usecase.user.GetUserProfileUseCase
-import com.comst.domain.util.onFail
+import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -49,7 +48,7 @@ class MyPageViewModel @Inject constructor(
                     receivedGroupRequestsCount = it.groupRequest
                 )
             }
-        }.onFail {
+        }.onFailure { statusCode, message ->
 
         }
 

@@ -25,7 +25,7 @@ class ApiHandler @Inject constructor(
                     if (it.success) {
                         ApiResult.Success(mapper(it.data))
                     } else {
-                        ApiResult.Fail(it.errorResponse.errorCode, it.errorResponse.message)
+                        ApiResult.Failure(it.errorResponse.errorCode, it.errorResponse.message)
                     }
                 } ?: run {
                     throw NullPointerException("Result is null")
@@ -39,8 +39,8 @@ class ApiHandler @Inject constructor(
     }
 
     private fun <T : Any> getFailApiResult(body: BaseResponse<T>?, response: Response<BaseResponse<T>>) = body?.let {
-        ApiResult.Fail(statusCode = response.code(), message = it.errorResponse.message)
+        ApiResult.Failure(statusCode = response.code(), message = it.errorResponse.message)
     } ?: run {
-        ApiResult.Fail(statusCode = response.code(), message = response.message())
+        ApiResult.Failure(statusCode = response.code(), message = response.message())
     }
 }

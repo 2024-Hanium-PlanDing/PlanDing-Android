@@ -7,7 +7,7 @@ import com.comst.domain.model.file.MediaImage
 import com.comst.domain.model.groupRoom.GroupRoomCreate
 import com.comst.domain.usecase.file.GetImageListUseCase
 import com.comst.domain.usecase.groupRoom.PostGroupRoomUseCase
-import com.comst.domain.util.onFail
+import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -95,7 +95,7 @@ class CreateGroupViewModel @Inject constructor(
             )
             postGroupRoomUseCase(groupRoomCreate, state.selectedImage!!).onSuccess {
                 postSideEffect(CreateGroupSideEffect.Complete)
-            }.onFail {
+            }.onFailure { statusCode, message ->
 
             }
         }else{

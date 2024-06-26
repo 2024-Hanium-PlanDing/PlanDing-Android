@@ -1,13 +1,12 @@
 package com.comst.presentation.main.personal_schedule
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.comst.domain.util.DateUtils
 import com.comst.domain.model.base.ScheduleEvent
 import com.comst.domain.model.base.ScheduleType
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleTodayListUseCase
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleWeekListUseCase
-import com.comst.domain.util.onFail
+import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -51,7 +50,7 @@ class PersonalScheduleViewModel @Inject constructor(
                     todayScheduleEvents = it,
                 )
             }
-        }.onFail {
+        }.onFailure { statusCode, message ->
 
         }
 
@@ -65,7 +64,7 @@ class PersonalScheduleViewModel @Inject constructor(
                     selectWeekScheduleEvents = it,
                 )
             }
-        }.onFail {
+        }.onFailure { statusCode, message ->
 
         }
 
@@ -118,7 +117,7 @@ class PersonalScheduleViewModel @Inject constructor(
                     isBottomSheetVisible = false,
                 )
             }
-        }.onFail {
+        }.onFailure { statusCode, message ->
 
         }
     }

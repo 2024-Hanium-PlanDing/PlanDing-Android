@@ -5,9 +5,7 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import com.comst.domain.model.groupRoom.GroupRoomCardModel
 import com.comst.domain.usecase.groupRoom.GetMyGroupRoomsUseCase
-import com.comst.domain.util.map
-import com.comst.domain.util.onException
-import com.comst.domain.util.onFail
+import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -48,7 +46,7 @@ class GroupViewModel @Inject constructor(
                     groupCardModels = it
                 )
             }
-        }.onFail {
+        }.onFailure { statusCode, message ->
 
         }
 
