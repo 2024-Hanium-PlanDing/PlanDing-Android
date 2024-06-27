@@ -1,10 +1,6 @@
 package com.comst.presentation.main.group
 
-import android.util.Log
-import androidx.compose.runtime.Immutable
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.comst.domain.model.groupRoom.GroupRoomCardModel
 import com.comst.domain.usecase.groupRoom.GetMyGroupRoomsUseCase
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess

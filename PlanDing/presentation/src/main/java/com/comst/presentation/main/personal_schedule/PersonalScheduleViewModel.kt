@@ -1,66 +1,58 @@
 package com.comst.presentation.main.personal_schedule
 
-import androidx.lifecycle.ViewModel
+import android.util.Log
+import androidx.lifecycle.viewModelScope
 import com.comst.domain.util.DateUtils
-import com.comst.domain.model.base.ScheduleEvent
-import com.comst.domain.model.base.ScheduleType
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleTodayListUseCase
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleWeekListUseCase
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
+import com.comst.presentation.common.base.BaseViewModel
+import com.comst.presentation.main.personal_schedule.ScheduleContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
-import org.orbitmvi.orbit.Container
-import org.orbitmvi.orbit.ContainerHost
-import org.orbitmvi.orbit.syntax.simple.intent
-import org.orbitmvi.orbit.syntax.simple.postSideEffect
-import org.orbitmvi.orbit.syntax.simple.reduce
-import org.orbitmvi.orbit.viewmodel.container
-import java.time.LocalDate
+import kotlinx.coroutines.launch
 import java.util.Date
-import javax.annotation.concurrent.Immutable
 import javax.inject.Inject
 
 @HiltViewModel
 class PersonalScheduleViewModel @Inject constructor(
     private val getCommonScheduleTodayListUseCase: GetCommonScheduleTodayListUseCase,
     private val getCommonScheduleWeekListUseCase: GetCommonScheduleWeekListUseCase,
-) : ViewModel(), ContainerHost<PersonalScheduleState, PersonalScheduleSideEffect>{
-
-    override val container: Container<PersonalScheduleState, PersonalScheduleSideEffect> = container(
-        initialState = PersonalScheduleState(),
-        buildSettings = {
-            this.exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-                intent {
-                    postSideEffect(PersonalScheduleSideEffect.Toast(throwable.message.orEmpty()))
-                }
-            }
-        }
-    )
+) : BaseViewModel<ScheduleUIState, ScheduleUISideEffect, ScheduleUIEvent>(ScheduleUIState()){
 
     init {
         load()
     }
 
-    fun load() = intent{
+    override suspend fun handleEvent(event: ScheduleUIEvent) {
+        when(event){
+            is ScheduleUIEvent.OpenBottomSheetClick -> onOpenBottomSheet()
+            is ScheduleUIEvent.CloseBottomSheetClick -> onCloseBottomSheet()
+            is ScheduleUIEvent.SelectedDate -> onSelectedDate(event.date)
+            is ScheduleUIEvent.ToggleTodayScheduleVisibility -> onToggleTextViewVisibility()
+            is ScheduleUIEvent.AddTodaySchedule -> onAddTodaySchedule()
+        }
+    }
+
+    fun load() = viewModelScope.launch{
 
         getCommonScheduleTodayListUseCase().onSuccess {
-            reduce {
-                state.copy(
-                    todayScheduleEvents = it,
+            setState {
+                copy(
+                    todayScheduleEvents = it
                 )
             }
         }.onFailure { statusCode, message ->
 
         }
 
-        val startDateAndEndDate = DateUtils.getWeekStartAndEnd(state.selectLocalDate)
+        val startDateAndEndDate = DateUtils.getWeekStartAndEnd(currentState.selectLocalDate)
         getCommonScheduleWeekListUseCase(
             startDateAndEndDate.first,
             startDateAndEndDate.second
         ).onSuccess {
-            reduce {
-                state.copy(
+            setState {
+                copy(
                     selectWeekScheduleEvents = it,
                 )
             }
@@ -70,44 +62,34 @@ class PersonalScheduleViewModel @Inject constructor(
 
     }
 
-    fun onUIAction(action: PersonalScheduleUIAction) {
-        when (action) {
-            is PersonalScheduleUIAction.OpenBottomSheet -> onOpenBottomSheet()
-            is PersonalScheduleUIAction.CloseBottomSheet -> onCloseBottomSheet()
-            is PersonalScheduleUIAction.SelectedDate -> onSelectedDate(action.date)
-            is PersonalScheduleUIAction.ToggleTodayScheduleVisibility -> onToggleTextViewVisibility()
-            is PersonalScheduleUIAction.AddTodaySchedule -> onAddTodaySchedule()
+    private fun onOpenBottomSheet() = viewModelScope.launch {
+        setState {
+            copy(isBottomSheetVisible = true)
         }
     }
 
-    private fun onOpenBottomSheet() = intent {
-        reduce {
-            state.copy(isBottomSheetVisible = true)
+    private fun onCloseBottomSheet() = viewModelScope.launch {
+        setState {
+            copy(isBottomSheetVisible = false)
         }
     }
 
-    private fun onCloseBottomSheet() = intent {
-        reduce {
-            state.copy(isBottomSheetVisible = false)
+    private fun onToggleTextViewVisibility() = viewModelScope.launch {
+        setState {
+            copy(isTodayScheduleVisible = !currentState.isTodayScheduleVisible)
         }
     }
 
-    private fun onToggleTextViewVisibility() = intent {
-        reduce {
-            state.copy(isTodayScheduleVisible = !state.isTodayScheduleVisible)
-        }
-    }
-
-    private fun onSelectedDate(date: Date) = intent {
+    private fun onSelectedDate(date: Date) = viewModelScope.launch {
         val newSelectLocalDate = DateUtils.dateToLocalDate(date)
         val startDateAndEndDate = DateUtils.getWeekStartAndEnd(newSelectLocalDate)
-
+        Log.d("흠", "엥")
         getCommonScheduleWeekListUseCase(
             startDateAndEndDate.first,
             startDateAndEndDate.second
         ).onSuccess {
-            reduce {
-                state.copy(
+            setState {
+                copy(
                     selectLocalDate = newSelectLocalDate,
                     selectUIDate = DateUtils.localDateToUIDate(newSelectLocalDate),
                     selectDay = DateUtils.getDayOfWeek(newSelectLocalDate),
@@ -122,54 +104,8 @@ class PersonalScheduleViewModel @Inject constructor(
         }
     }
 
-    private fun onAddTodaySchedule() = intent {
-        val aa = mutableListOf<ScheduleEvent>()
-        for (i in 6..12){
-            aa.add(
-                ScheduleEvent(
-                    scheduleId = i.toLong(),
-                    title = "propriae + $i",
-                    content = "te",
-                    startTime = i,
-                    endTime = i+2,
-                    day = "dapibus",
-                    complete = i%2==1,
-                    groupName = null,
-                    type = ScheduleType.GROUP
+    private fun onAddTodaySchedule() = viewModelScope.launch {
 
-                )
-            )
-        }
-
-        reduce {
-            state.copy(
-                todayScheduleEvents = aa
-            )
-        }
     }
-}
 
-sealed class  PersonalScheduleUIAction{
-    object OpenBottomSheet : PersonalScheduleUIAction()
-    object CloseBottomSheet : PersonalScheduleUIAction()
-    data class SelectedDate(val date: Date) : PersonalScheduleUIAction()
-    object ToggleTodayScheduleVisibility : PersonalScheduleUIAction()
-    object AddTodaySchedule : PersonalScheduleUIAction()
-}
-
-@Immutable
-data class PersonalScheduleState(
-    val selectLocalDate : LocalDate = LocalDate.now(),
-    val selectUIDate : String = DateUtils.localDateToUIDate(selectLocalDate),
-    val selectDay : String = DateUtils.getDayOfWeek(selectLocalDate),
-    val selectedWeekdays : List<String> = DateUtils.getWeekDays(selectLocalDate),
-    val todayScheduleEvents : List<ScheduleEvent> = emptyList(),
-    val selectWeekScheduleEvents : List<ScheduleEvent> = emptyList(),
-    val isBottomSheetVisible: Boolean = false,
-    val isExpanded: Boolean = false,
-    val isTodayScheduleVisible: Boolean = false
-)
-
-sealed interface PersonalScheduleSideEffect {
-    data class Toast(val message: String) : PersonalScheduleSideEffect
 }

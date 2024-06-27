@@ -1,6 +1,5 @@
 package com.comst.presentation.component
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,25 +11,16 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -43,8 +33,8 @@ import androidx.compose.ui.unit.dp
 import com.comst.domain.model.base.DaysOfWeek
 import com.comst.domain.util.DateUtils
 import com.comst.presentation.R
-import com.comst.presentation.main.personal_schedule.PersonalScheduleUIAction
 import com.comst.presentation.main.personal_schedule.PersonalScheduleViewModel
+import com.comst.presentation.main.personal_schedule.ScheduleContract.ScheduleUIEvent.*
 import java.util.Calendar
 
 @Composable
@@ -52,8 +42,8 @@ fun PDCalendar(
     modifier: Modifier = Modifier.fillMaxSize(),
     viewModel: PersonalScheduleViewModel,
 ) {
-    val state = viewModel.container.stateFlow.collectAsState().value
-    val initialDate = remember { DateUtils.uiDateToDate(state.selectUIDate) }
+    val uiState by viewModel.uiState.collectAsState()
+    val initialDate = remember { DateUtils.uiDateToDate(uiState.selectUIDate) }
     val calendar = remember { Calendar.getInstance().apply { time = initialDate } }
     var displayedMonth by remember { mutableIntStateOf(calendar.get(Calendar.MONTH)) }
     var displayedYear by remember { mutableIntStateOf(calendar.get(Calendar.YEAR)) }
@@ -80,7 +70,7 @@ fun PDCalendar(
                     set(Calendar.MONTH, displayedMonth)
                     set(Calendar.DAY_OF_MONTH, day)
                 }
-                viewModel.onUIAction(PersonalScheduleUIAction.SelectedDate(selectedCalendar.time))
+                viewModel.setEvent(SelectedDate(selectedCalendar.time))
             }
         )
     }

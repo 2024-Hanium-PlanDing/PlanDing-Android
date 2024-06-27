@@ -35,6 +35,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,25 +53,29 @@ import com.comst.presentation.component.PDScheduleChart
 import com.comst.presentation.component.PDScreenHeader
 import com.comst.domain.model.base.ScheduleEvent
 import com.comst.presentation.R
+import com.comst.presentation.main.personal_schedule.ScheduleContract.*
+import com.comst.presentation.main.personal_schedule.ScheduleContract.ScheduleUIEvent.*
 import com.comst.presentation.ui.theme.PlanDingTheme
-import org.orbitmvi.orbit.compose.collectAsState
-import org.orbitmvi.orbit.compose.collectSideEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PersonalScheduleScreen(
     viewModel: PersonalScheduleViewModel = hiltViewModel()
 ) {
-    val state = viewModel.collectAsState().value
     val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsState()
 
-    viewModel.collectSideEffect { sideEffect ->
-        when (sideEffect) {
-            is PersonalScheduleSideEffect.Toast -> Toast.makeText(
-                context,
-                sideEffect.message,
-                Toast.LENGTH_SHORT
-            ).show()
+    LaunchedEffect(key1 = viewModel.effect) {
+        viewModel.effect.collect{ effect ->
+            when(effect){
+                is ScheduleUISideEffect.ShowToast -> {
+                    Toast.makeText(
+                        context,
+                        effect.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
         }
     }
 
@@ -76,19 +83,19 @@ fun PersonalScheduleScreen(
     val scope = rememberCoroutineScope()
 
     PersonalScheduleScreen(
-        selectUIDate = state.selectUIDate,
-        selectDay = state.selectDay,
-        selectedWeekdays = state.selectedWeekdays,
-        isTodayScheduleVisible = state.isTodayScheduleVisible,
-        todayScheduleEvents = state.todayScheduleEvents,
-        selectWeekScheduleEvents = state.selectWeekScheduleEvents,
-        onUIAction = viewModel::onUIAction
+        selectUIDate = uiState.selectUIDate,
+        selectDay = uiState.selectDay,
+        selectedWeekdays = uiState.selectedWeekdays,
+        isTodayScheduleVisible = uiState.isTodayScheduleVisible,
+        todayScheduleEvents = uiState.todayScheduleEvents,
+        selectWeekScheduleEvents = uiState.selectWeekScheduleEvents,
+        onUIAction = viewModel::setEvent
     )
 
-    if (state.isBottomSheetVisible) {
+    if (uiState.isBottomSheetVisible) {
         ModalBottomSheet(
             onDismissRequest = {
-                viewModel.onUIAction(PersonalScheduleUIAction.CloseBottomSheet)
+                viewModel.setEvent(CloseBottomSheetClick)
             },
             sheetState = calendarBottomSheetState,
         ) {
@@ -105,7 +112,7 @@ private fun PersonalScheduleScreen(
     isTodayScheduleVisible: Boolean,
     todayScheduleEvents: List<ScheduleEvent>,
     selectWeekScheduleEvents: List<ScheduleEvent>,
-    onUIAction: (PersonalScheduleUIAction) -> Unit
+    onUIAction: (ScheduleUIEvent) -> Unit
 ) {
     Surface {
         Column(
@@ -137,7 +144,7 @@ private fun SelectedDate(
     selectDay: String,
     todayScheduleEvents: List<ScheduleEvent>,
     isTodayScheduleVisible: Boolean,
-    onUIAction: (PersonalScheduleUIAction) -> Unit
+    onUIAction: (ScheduleUIEvent) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -150,7 +157,7 @@ private fun SelectedDate(
         Row(
             modifier = Modifier
                 .clickable {
-                    onUIAction(PersonalScheduleUIAction.OpenBottomSheet)
+                    onUIAction(OpenBottomSheetClick)
                 }
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -173,7 +180,7 @@ private fun SelectedDate(
                 imageVector = if (isTodayScheduleVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                 contentDescription = "오늘의 스케줄 토글",
                 modifier = Modifier.clickable {
-                    onUIAction(PersonalScheduleUIAction.ToggleTodayScheduleVisibility)
+                    onUIAction(ToggleTodayScheduleVisibility)
                 }
             )
 
@@ -241,7 +248,7 @@ private fun SelectedDate(
                     containerColor = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(60.dp),
                     onClick = {
-                        onUIAction(PersonalScheduleUIAction.AddTodaySchedule)
+                        onUIAction(AddTodaySchedule)
                     },
                 ) {
                     Icon(
