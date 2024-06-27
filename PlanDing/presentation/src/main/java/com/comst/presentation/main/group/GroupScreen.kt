@@ -21,6 +21,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,6 +33,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.comst.presentation.component.PDScreenHeader
 import com.comst.presentation.main.group.create.CreateGroupActivity
 import com.comst.domain.model.groupRoom.GroupRoomCardModel
+import com.comst.presentation.main.group.GroupContract.GroupUIEvent
+import com.comst.presentation.main.group.GroupContract.GroupUISideEffect
 import com.comst.presentation.ui.theme.PlanDingTheme
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -38,8 +43,8 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 fun GroupScreen(
     viewModel: GroupViewModel = hiltViewModel()
 ) {
-    val state = viewModel.collectAsState().value
     val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsState()
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -53,40 +58,44 @@ fun GroupScreen(
         }
     }
 
-    viewModel.collectSideEffect { sideEffect ->
-        when(sideEffect){
-            is GroupSideEffect.Toast -> Toast.makeText(
-                context,
-                sideEffect.message,
-                Toast.LENGTH_SHORT
-            ).show()
-
-            GroupSideEffect.NavigateToCreateGroupActivity -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    permissionLauncher.launch(arrayOf(
-                        Manifest.permission.READ_MEDIA_IMAGES,
-                        Manifest.permission.READ_MEDIA_VIDEO
-                    ))
-                } else {
-                    permissionLauncher.launch(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE))
-                }
-            }
-
-            is GroupSideEffect.NavigateToGroupDetailActivity -> {
-                context.startActivity(
-                    Intent(
-                        context, CreateGroupActivity::class.java
-                    ).apply {
-                        putExtra("", sideEffect.id)
+    LaunchedEffect(key1 = viewModel.effect) {
+        viewModel.effect.collect{ effect ->
+            when(effect){
+                is GroupUISideEffect.NavigateToCreateGroupActivity -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(arrayOf(
+                            Manifest.permission.READ_MEDIA_IMAGES,
+                            Manifest.permission.READ_MEDIA_VIDEO
+                        ))
+                    } else {
+                        permissionLauncher.launch(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE))
                     }
-                )
+                }
+
+                is GroupUISideEffect.NavigateToGroupDetailActivity -> {
+                    context.startActivity(
+                        Intent(
+                            context, CreateGroupActivity::class.java
+                        ).apply {
+                            putExtra("", effect.id)
+                        }
+                    )
+                }
+
+                is GroupUISideEffect.ShowToast -> {
+                    Toast.makeText(
+                        context,
+                        effect.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }
 
     GroupScreen(
-        groupRoomCardModels = state.groupCardModels,
-        onUIAction = viewModel::onUIAction,
+        groupRoomCardModels = uiState.groupCardModels,
+        onUIAction = viewModel::setEvent,
     )
 }
 
@@ -94,7 +103,7 @@ fun GroupScreen(
 @Composable
 private fun GroupScreen(
     groupRoomCardModels:List<GroupRoomCardModel>,
-    onUIAction:(GroupUIAction) -> Unit
+    onUIAction:(GroupUIEvent) -> Unit
 ){
     Surface {
         Box(modifier = Modifier.fillMaxSize()){
@@ -128,7 +137,7 @@ private fun GroupScreen(
                     .padding(16.dp),
                 containerColor = MaterialTheme.colorScheme.primary,
                 shape = RoundedCornerShape(60.dp),
-                onClick = { onUIAction(GroupUIAction.GroupCreate) },
+                onClick = { onUIAction(GroupUIEvent.GroupCreateClick) },
             ) {
                 Icon(
                     modifier = Modifier.size(40.dp),

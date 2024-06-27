@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -29,7 +28,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -52,8 +50,6 @@ import com.comst.presentation.component.PDScheduleChart
 import com.comst.presentation.component.PDScreenHeader
 import com.comst.domain.model.base.ScheduleEvent
 import com.comst.presentation.R
-import com.comst.presentation.main.group.GroupCard
-import com.comst.presentation.main.group.GroupUIAction
 import com.comst.presentation.ui.theme.PlanDingTheme
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect

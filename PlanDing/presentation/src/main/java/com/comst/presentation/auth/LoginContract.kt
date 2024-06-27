@@ -10,7 +10,7 @@ class LoginContract {
     data class LoginUIState(
         val id: String = "",
         val password: String = "",
-        val isLoading: Boolean = false
+        val isLoading: Boolean = false,
     ): UIState
 
     sealed class LoginUISideEffect : UISideEffect {
