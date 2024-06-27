@@ -1,46 +1,43 @@
 package com.comst.presentation.main.mypage
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.comst.domain.usecase.user.GetUserProfileUseCase
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
+import com.comst.presentation.common.base.BaseViewModel
+import com.comst.presentation.main.mypage.MyPageContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
-import javax.annotation.concurrent.Immutable
 import javax.inject.Inject
 
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
     private val getUserProfileUseCase: GetUserProfileUseCase
-) : ViewModel(), ContainerHost<MyPageState, MyPageSideEffect>{
-    override val container: Container<MyPageState, MyPageSideEffect> = container(
-        initialState = MyPageState(),
-        buildSettings = {
-            this.exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-                intent {
-                    postSideEffect(MyPageSideEffect.Toast(throwable.message.orEmpty()))
-                }
-            }
-        }
-    )
+) : BaseViewModel<MyPageUIState, MyPageUISideEffect, MyPageUIEvent>(MyPageUIState()){
 
     init {
         load()
     }
-    fun onUIAction(action: MyPageUIAction){
 
+    override suspend fun handleEvent(event: MyPageUIEvent) {
+        when(event){
+            else -> {}
+        }
     }
 
-    private fun load() = intent {
+    private fun load() = viewModelScope.launch {
+        setState { copy(isLoading = true) }
         getUserProfileUseCase().onSuccess {
-            reduce {
-                state.copy(
+            setState {
+                copy(
                     username = it.username,
                     userCode = it.userCode,
                     profileImageUrl = it.profileImage,
@@ -48,27 +45,13 @@ class MyPageViewModel @Inject constructor(
                     receivedGroupRequestsCount = it.groupRequest
                 )
             }
+
         }.onFailure { statusCode, message ->
 
         }
-
+        setState { copy(isLoading = false) }
     }
 
-}
 
-sealed class MyPageUIAction{
 
-}
-
-@Immutable
-data class MyPageState(
-    val username : String = "",
-    val userCode : String = "",
-    val profileImageUrl : String? = null ,
-    val favoriteGroupsCount : String = "-1",
-    val receivedGroupRequestsCount : String = "-1"
-)
-
-sealed interface MyPageSideEffect {
-    data class Toast(val message: String) : MyPageSideEffect
 }

@@ -20,6 +20,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.comst.presentation.component.PDProfileImage
 import com.comst.presentation.component.PDScreenHeader
+import com.comst.presentation.main.mypage.MyPageContract.*
 import com.comst.presentation.ui.theme.PlanDingTheme
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -38,26 +42,30 @@ fun MyPageScreen(
     viewModel: MyPageViewModel = hiltViewModel()
 ) {
 
-    val state = viewModel.collectAsState().value
     val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsState()
 
-    viewModel.collectSideEffect { sideEffect ->
-        when(sideEffect) {
-            is MyPageSideEffect.Toast -> Toast.makeText(
-                context,
-                sideEffect.message,
-                Toast.LENGTH_SHORT
-            ).show()
+    LaunchedEffect(key1 = viewModel.effect) {
+        viewModel.effect.collect{ effect ->
+            when(effect){
+                is MyPageUISideEffect.ShowToast -> {
+                    Toast.makeText(
+                        context,
+                        effect.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
         }
     }
 
     MyPageScreen(
-        username = state.username,
-        profileImageUrl = state.profileImageUrl,
-        userCode = state.userCode,
-        favoriteGroupsCount = state.favoriteGroupsCount,
-        receivedGroupRequestsCount = state.receivedGroupRequestsCount,
-        onUIAction = viewModel::onUIAction
+        username = uiState.username,
+        profileImageUrl = uiState.profileImageUrl,
+        userCode = uiState.userCode,
+        favoriteGroupsCount = uiState.favoriteGroupsCount,
+        receivedGroupRequestsCount = uiState.receivedGroupRequestsCount,
+        onUIAction = viewModel::setEvent
     )
 }
 
@@ -68,7 +76,7 @@ private fun MyPageScreen(
     profileImageUrl: String?,
     favoriteGroupsCount: String = "-1",
     receivedGroupRequestsCount: String = "-1",
-    onUIAction:(MyPageUIAction) -> Unit
+    onUIAction:(MyPageUIEvent) -> Unit
 ) {
     Surface {
         Column(
