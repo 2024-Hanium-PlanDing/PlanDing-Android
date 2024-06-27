@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.comst.presentation.ui.theme.BackgroundColor3
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,7 +27,7 @@ fun PDTextFiled(
         value = value,
         onValueChange = onValueChange,
         colors = TextFieldDefaults.textFieldColors(
-            containerColor = Color.White,
+            containerColor = BackgroundColor3,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,

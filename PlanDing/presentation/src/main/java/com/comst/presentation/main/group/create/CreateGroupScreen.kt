@@ -31,6 +31,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.comst.presentation.component.PDTextFiled
 import com.comst.presentation.main.group.create.CreateGroupContract.*
+import com.comst.presentation.ui.theme.BackgroundColor1
+import com.comst.presentation.ui.theme.BackgroundColor2
+import com.comst.presentation.ui.theme.BackgroundColor3
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
@@ -108,7 +111,6 @@ private fun CreateGroupScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
-                        .background(MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     PDTextFiled(
                         modifier = Modifier

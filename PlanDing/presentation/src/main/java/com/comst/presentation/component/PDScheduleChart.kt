@@ -27,22 +27,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import com.comst.domain.model.base.ScheduleEvent
+import com.comst.presentation.ui.theme.BackgroundColor3
+import com.comst.presentation.ui.theme.MainPurple200
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
 fun PDScheduleChart(events: List<ScheduleEvent>, days: List<String>) {
     val hours = (6..24).toList()
-    val primaryContainerColor = MaterialTheme.colorScheme.primaryContainer
     val borderColor = Color.Gray
     val textColor = Color.Black
 
-    Surface(
-        color = primaryContainerColor
-    ) {
+    Surface {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 8.dp)
+                .padding(horizontal = 16.dp)
+                .background(BackgroundColor3)
         ) {
             Row(
                 modifier = Modifier
@@ -108,7 +108,7 @@ fun PDScheduleChart(events: List<ScheduleEvent>, days: List<String>) {
                                         modifier = Modifier
                                             .height(48.dp)
                                             .fillMaxWidth()
-                                            .background(primaryContainerColor)
+                                            .background(BackgroundColor3)
                                             .border(0.5.dp, borderColor)
                                     )
                                 }

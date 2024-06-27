@@ -33,8 +33,8 @@ import androidx.compose.ui.unit.dp
 import com.comst.domain.model.base.DaysOfWeek
 import com.comst.domain.util.DateUtils
 import com.comst.presentation.R
-import com.comst.presentation.main.personal_schedule.ScheduleViewModel
-import com.comst.presentation.main.personal_schedule.ScheduleContract.ScheduleUIEvent.*
+import com.comst.presentation.main.schedule.ScheduleViewModel
+import com.comst.presentation.main.schedule.ScheduleContract.ScheduleUIEvent.*
 import java.util.Calendar
 
 @Composable

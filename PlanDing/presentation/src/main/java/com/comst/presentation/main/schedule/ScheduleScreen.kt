@@ -1,4 +1,4 @@
-package com.comst.presentation.main.personal_schedule
+package com.comst.presentation.main.schedule
 
 import android.content.res.Configuration
 import android.widget.Toast
@@ -53,13 +53,15 @@ import com.comst.presentation.component.PDScheduleChart
 import com.comst.presentation.component.PDScreenHeader
 import com.comst.domain.model.base.ScheduleEvent
 import com.comst.presentation.R
-import com.comst.presentation.main.personal_schedule.ScheduleContract.*
-import com.comst.presentation.main.personal_schedule.ScheduleContract.ScheduleUIEvent.*
+import com.comst.presentation.main.schedule.ScheduleContract.*
+import com.comst.presentation.main.schedule.ScheduleContract.ScheduleUIEvent.*
+import com.comst.presentation.ui.theme.BackgroundColor2
+import com.comst.presentation.ui.theme.MainPurple200
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PersonalScheduleScreen(
+fun ScheduleScreen(
     viewModel: ScheduleViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -82,7 +84,7 @@ fun PersonalScheduleScreen(
     val calendarBottomSheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
 
-    PersonalScheduleScreen(
+    ScheduleScreen(
         selectUIDate = uiState.selectUIDate,
         selectDay = uiState.selectDay,
         selectedWeekdays = uiState.selectedWeekdays,
@@ -105,7 +107,7 @@ fun PersonalScheduleScreen(
 }
 
 @Composable
-private fun PersonalScheduleScreen(
+private fun ScheduleScreen(
     selectUIDate: String,
     selectDay: String,
     selectedWeekdays: List<String>,
@@ -118,9 +120,7 @@ private fun PersonalScheduleScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.primaryContainer)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp)
         ) {
             PDScreenHeader(text = "스케줄")
 
@@ -132,6 +132,7 @@ private fun PersonalScheduleScreen(
                 onUIAction = onUIAction
             )
 
+            Spacer(modifier = Modifier.height(16.dp))
 
             PDScheduleChart(events = selectWeekScheduleEvents, days = selectedWeekdays)
         }
@@ -149,6 +150,7 @@ private fun SelectedDate(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 16.dp)
             .background(
                 shape = RoundedCornerShape(8.dp),
                 color = Color.White
@@ -193,7 +195,7 @@ private fun SelectedDate(
                     .fillMaxWidth()
                     .height(400.dp)
                     .background(
-                        color = Color(0xFFF7F8FA),
+                        color = BackgroundColor2,
                         shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
                     )
             ) {
@@ -265,9 +267,9 @@ private fun SelectedDate(
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun PersonalScheduleScreenPreview() {
+private fun ScheduleScreenPreview() {
     PlanDingTheme {
-        PersonalScheduleScreen(
+        ScheduleScreen(
 
         )
     }

@@ -1,4 +1,4 @@
-package com.comst.presentation.main.personal_schedule
+package com.comst.presentation.main.schedule
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
@@ -8,7 +8,7 @@ import com.comst.domain.usecase.commonSchedule.GetCommonScheduleWeekListUseCase
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
-import com.comst.presentation.main.personal_schedule.ScheduleContract.*
+import com.comst.presentation.main.schedule.ScheduleContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.Date

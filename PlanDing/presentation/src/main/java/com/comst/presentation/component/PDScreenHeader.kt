@@ -19,7 +19,7 @@ fun PDScreenHeader(
 ) {
     Box(
         modifier = Modifier
-            .padding(top = 20.dp)
+            .padding(top = 20.dp, bottom = 16.dp)
             .padding(start = 16.dp),
         contentAlignment = Alignment.CenterStart
     ) {

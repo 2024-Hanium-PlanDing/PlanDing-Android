@@ -9,7 +9,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -123,6 +125,8 @@ private fun GroupScreen(
                                 groupDescription = it.groupDescription,
                                 groupImageUrl = it.groupImageUrl
                             )
+                            
+                            Spacer(modifier = Modifier.height(12.dp))
                         }
                     }
                 }

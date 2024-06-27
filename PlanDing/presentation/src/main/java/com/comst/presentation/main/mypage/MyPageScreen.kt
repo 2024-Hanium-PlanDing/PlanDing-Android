@@ -35,6 +35,7 @@ import com.comst.presentation.component.PDScreenHeader
 import com.comst.presentation.main.mypage.MyPageContract.*
 import com.comst.presentation.ui.theme.PlanDingTheme
 
+
 @Composable
 fun MyPageScreen(
     viewModel: MyPageViewModel = hiltViewModel()
@@ -91,7 +92,6 @@ private fun MyPageScreen(
                 Spacer(modifier = Modifier.weight(1f))
 
                 IconButton(
-                    modifier = Modifier.padding(end = 16.dp),
                     onClick = { }
                 ) {
                     Icon(

@@ -34,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.comst.presentation.component.PDProfileImage
+import com.comst.presentation.ui.theme.BackgroundColor3
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
@@ -44,10 +45,10 @@ fun GroupCard(
 ) {
     Row(
         modifier = Modifier
-            .padding(horizontal = 20.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp)
             .fillMaxWidth()
             .background(
-                color = MaterialTheme.colorScheme.primaryContainer,
+                color = BackgroundColor3,
                 shape = RoundedCornerShape(16.dp)
             ),
         verticalAlignment = Alignment.Top

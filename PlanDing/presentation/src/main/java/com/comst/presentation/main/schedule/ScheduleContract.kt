@@ -1,4 +1,4 @@
-package com.comst.presentation.main.personal_schedule
+package com.comst.presentation.main.schedule
 
 import com.comst.domain.model.base.ScheduleEvent
 import com.comst.domain.util.DateUtils

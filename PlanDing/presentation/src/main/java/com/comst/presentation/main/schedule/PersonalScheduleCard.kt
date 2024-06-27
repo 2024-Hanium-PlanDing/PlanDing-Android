@@ -1,4 +1,4 @@
-package com.comst.presentation.main.personal_schedule
+package com.comst.presentation.main.schedule
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,7 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
@@ -30,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.comst.domain.model.base.ScheduleEvent
 import com.comst.domain.model.base.ScheduleType
+import com.comst.presentation.ui.theme.BackgroundColor2
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
@@ -42,9 +42,9 @@ fun PersonalScheduleCard(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = Color(0xFFF7F8FA)),
+            .background(color = BackgroundColor2),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFF7F8FA),
+            containerColor = BackgroundColor2,
         )
     ) {
         Column(
