@@ -84,7 +84,7 @@ private fun MyPageScreen(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Bottom
+                verticalAlignment = Alignment.CenterVertically
             ) {
 
                 PDScreenHeader(text = "마이페이지")
