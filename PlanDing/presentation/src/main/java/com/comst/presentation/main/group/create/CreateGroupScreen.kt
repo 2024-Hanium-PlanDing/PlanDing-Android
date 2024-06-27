@@ -32,9 +32,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.comst.presentation.component.PDTextFiled
 import com.comst.presentation.main.group.create.CreateGroupContract.*
 import com.comst.presentation.ui.theme.PlanDingTheme
-import org.orbitmvi.orbit.compose.collectAsState
-import org.orbitmvi.orbit.compose.collectSideEffect
-import org.orbitmvi.orbit.syntax.simple.postSideEffect
 
 @Composable
 fun CreateGroupScreen(

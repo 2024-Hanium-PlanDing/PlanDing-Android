@@ -34,8 +34,6 @@ import com.comst.presentation.component.PDProfileImage
 import com.comst.presentation.component.PDScreenHeader
 import com.comst.presentation.main.mypage.MyPageContract.*
 import com.comst.presentation.ui.theme.PlanDingTheme
-import org.orbitmvi.orbit.compose.collectAsState
-import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
 fun MyPageScreen(

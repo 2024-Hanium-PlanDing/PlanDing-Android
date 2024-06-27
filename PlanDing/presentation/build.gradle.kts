@@ -78,11 +78,6 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.hilt.navigation.compose)
 
-    // orbit
-    implementation(libs.orbit.core)
-    implementation(libs.orbit.compose)
-    implementation(libs.orbit.viewmodel)
-
     // coil
     implementation(libs.coil)
     implementation(libs.coil.compose)

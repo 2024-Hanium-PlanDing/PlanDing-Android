@@ -36,8 +36,6 @@ import com.comst.domain.model.groupRoom.GroupRoomCardModel
 import com.comst.presentation.main.group.GroupContract.GroupUIEvent
 import com.comst.presentation.main.group.GroupContract.GroupUISideEffect
 import com.comst.presentation.ui.theme.PlanDingTheme
-import org.orbitmvi.orbit.compose.collectAsState
-import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
 fun GroupScreen(
