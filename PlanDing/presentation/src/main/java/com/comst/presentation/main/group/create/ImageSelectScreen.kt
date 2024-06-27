@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,6 +29,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,7 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.comst.domain.model.file.MediaImage
-import org.orbitmvi.orbit.compose.collectAsState
+import com.comst.presentation.main.group.create.CreateGroupContract.CreateGroupUIEvent
 
 @Composable
 fun ImageSelectScreen(
@@ -47,14 +48,14 @@ fun ImageSelectScreen(
     onBackClick: () -> Unit,
     onNextClick: () -> Unit
 ) {
-    val state = viewModel.collectAsState().value
+    val uiState by viewModel.uiState.collectAsState()
 
     ImageSelectScreen(
-        selectedImage = state.selectedImage,
-        images = state.images,
+        selectedImage = uiState.selectedImage,
+        images = uiState.images,
         onBackClick = onBackClick,
         onNextClick = onNextClick,
-        onUIAction = viewModel::onUIAction
+        onUIAction = viewModel::setEvent
     )
 
 }
@@ -66,7 +67,7 @@ private fun ImageSelectScreen(
     images: List<MediaImage>,
     onBackClick: () -> Unit,
     onNextClick: () -> Unit,
-    onUIAction: (CreateGroupUIAction) -> Unit
+    onUIAction: (CreateGroupUIEvent) -> Unit
 ) {
     Surface {
         Scaffold(
@@ -130,7 +131,7 @@ private fun ImageSelectScreen(
                             val image = images[index]
                             Box(
                                 modifier = Modifier.clickable {
-                                    onUIAction(CreateGroupUIAction.SelectGroupImage(image))
+                                    onUIAction(CreateGroupUIEvent.SelectGroupImage(image))
                                 }
                             ) {
                                 Image(

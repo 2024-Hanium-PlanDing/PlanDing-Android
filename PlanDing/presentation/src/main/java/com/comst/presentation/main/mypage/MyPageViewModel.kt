@@ -1,6 +1,5 @@
 package com.comst.presentation.main.mypage
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.comst.domain.usecase.user.GetUserProfileUseCase
 import com.comst.domain.util.onFailure
@@ -8,14 +7,7 @@ import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
 import com.comst.presentation.main.mypage.MyPageContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
-import org.orbitmvi.orbit.Container
-import org.orbitmvi.orbit.ContainerHost
-import org.orbitmvi.orbit.syntax.simple.intent
-import org.orbitmvi.orbit.syntax.simple.postSideEffect
-import org.orbitmvi.orbit.syntax.simple.reduce
-import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 
 @HiltViewModel
