@@ -15,7 +15,7 @@ import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
-class PersonalScheduleViewModel @Inject constructor(
+class ScheduleViewModel @Inject constructor(
     private val getCommonScheduleTodayListUseCase: GetCommonScheduleTodayListUseCase,
     private val getCommonScheduleWeekListUseCase: GetCommonScheduleWeekListUseCase,
 ) : BaseViewModel<ScheduleUIState, ScheduleUISideEffect, ScheduleUIEvent>(ScheduleUIState()){

@@ -60,7 +60,7 @@ import com.comst.presentation.ui.theme.PlanDingTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PersonalScheduleScreen(
-    viewModel: PersonalScheduleViewModel = hiltViewModel()
+    viewModel: ScheduleViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()

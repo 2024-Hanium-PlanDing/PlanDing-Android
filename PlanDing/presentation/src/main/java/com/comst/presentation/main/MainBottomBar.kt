@@ -42,7 +42,7 @@ fun MainBottomBar(
         ?.destination
         ?.route
         ?.let { currentRoute -> MainRoute.values().find { route -> route.route == currentRoute } }
-        ?: MainRoute.PERSONAL_SCHEDULE
+        ?: MainRoute.SCHEDULE
 
     MainBottomBar(
         currentRoute = currentRoute,
@@ -131,7 +131,7 @@ private fun MainBottomBar(
 private fun MainBottomBarPreview() {
     PlanDingTheme {
         Surface {
-            var currentRoute by remember { mutableStateOf(MainRoute.PERSONAL_SCHEDULE) }
+            var currentRoute by remember { mutableStateOf(MainRoute.SCHEDULE) }
             MainBottomBar(
                 currentRoute = currentRoute,
                 onItemClick = { newRoute -> currentRoute = newRoute }

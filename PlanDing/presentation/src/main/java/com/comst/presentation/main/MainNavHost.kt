@@ -30,9 +30,9 @@ fun MainNavHost() {
                 NavHost(
                     modifier = Modifier.padding(padding),
                     navController = navController,
-                    startDestination = MainRoute.PERSONAL_SCHEDULE.route
+                    startDestination = MainRoute.SCHEDULE.route
                 ){
-                    composable(route = MainRoute.PERSONAL_SCHEDULE.route){
+                    composable(route = MainRoute.SCHEDULE.route){
                         PersonalScheduleScreen()
                     }
                     composable(route = MainRoute.MY_PAGE.route){
