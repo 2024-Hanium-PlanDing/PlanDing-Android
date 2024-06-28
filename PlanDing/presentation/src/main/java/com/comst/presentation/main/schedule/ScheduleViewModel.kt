@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.comst.domain.util.DateUtils
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleTodayListUseCase
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleWeekListUseCase
+import com.comst.domain.usecase.personalSchedule.GetPersonalScheduleListUseCase
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
@@ -18,6 +19,7 @@ import javax.inject.Inject
 class ScheduleViewModel @Inject constructor(
     private val getCommonScheduleTodayListUseCase: GetCommonScheduleTodayListUseCase,
     private val getCommonScheduleWeekListUseCase: GetCommonScheduleWeekListUseCase,
+    private val getPersonalScheduleListUseCase: GetPersonalScheduleListUseCase
 ) : BaseViewModel<ScheduleUIState, ScheduleUISideEffect, ScheduleUIEvent>(ScheduleUIState()){
 
     init {
@@ -59,6 +61,19 @@ class ScheduleViewModel @Inject constructor(
 
         }
 
+        val dailyPeriod = DateUtils.getDayStartAndEnd(currentState.selectLocalDate)
+        getPersonalScheduleListUseCase(
+            dailyPeriod
+        ).onSuccess {
+            setState {
+                copy(
+                    todayScheduleEvents = it,
+                )
+            }
+        }.onFailure{ statusCode, message ->
+
+        }
+
     }
 
     private fun onOpenBottomSheet() = viewModelScope.launch {
@@ -82,6 +97,8 @@ class ScheduleViewModel @Inject constructor(
     private fun onSelectedDate(date: Date) = viewModelScope.launch {
         val newSelectLocalDate = DateUtils.dateToLocalDate(date)
         val weeklySchedulePeriod = DateUtils.getWeekStartAndEnd(newSelectLocalDate)
+        val dailyPeriod = DateUtils.getDayStartAndEnd(newSelectLocalDate)
+
 
         getCommonScheduleWeekListUseCase(
             weeklySchedulePeriod
@@ -98,6 +115,18 @@ class ScheduleViewModel @Inject constructor(
                 )
             }
         }.onFailure { statusCode, message ->
+
+        }
+
+        getPersonalScheduleListUseCase(
+            dailyPeriod
+        ).onSuccess {
+            setState {
+                copy(
+                    todayScheduleEvents = it,
+                )
+            }
+        }.onFailure{ statusCode, message ->
 
         }
     }

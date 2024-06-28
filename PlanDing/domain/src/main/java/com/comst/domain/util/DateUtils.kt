@@ -110,6 +110,15 @@ object DateUtils {
         return getWeekDays(dateToLocalDate(date))
     }
 
+    fun getDayStartAndEnd(date: LocalDate, format: String = "yyyy-MM-dd"): SchedulePeriodModel {
+        val formatter = DateTimeFormatter.ofPattern(format, Locale.getDefault())
+        val formattedDate = date.format(formatter)
+        return SchedulePeriodModel(formattedDate, formattedDate)
+    }
+
+    fun getDayStartAndEnd(date: Date, format: String = "yyyy-MM-dd"): SchedulePeriodModel {
+        return getDayStartAndEnd(dateToLocalDate(date), format)
+    }
 
 
     fun getWeekStartAndEnd(date: LocalDate, format: String = "yyyy-MM-dd"): SchedulePeriodModel {
