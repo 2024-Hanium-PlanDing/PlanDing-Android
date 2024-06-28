@@ -4,6 +4,7 @@ import com.comst.data.model.base.toDomainModel
 import com.comst.data.retrofit.ApiHandler
 import com.comst.data.retrofit.CommonScheduleService
 import com.comst.domain.model.base.ScheduleEvent
+import com.comst.domain.model.base.SchedulePeriodModel
 import com.comst.domain.repository.CommonScheduleRepository
 import com.comst.domain.util.ApiResult
 import javax.inject.Inject
@@ -21,13 +22,12 @@ class CommonScheduleRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getCommonScheduleWeekList(
-        startDate: String,
-        endDate: String
+        request: SchedulePeriodModel
     ): ApiResult<List<ScheduleEvent>> {
         return apiHandler.handle(
             execute = { commonScheduleService.getCommonScheduleWeek(
-                startDate = startDate,
-                endDate = endDate
+                startDate = request.startDate,
+                endDate = request.endDate
             ) },
             mapper = { response -> response.map { it.toDomainModel() } }
         )

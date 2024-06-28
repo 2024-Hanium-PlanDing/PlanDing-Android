@@ -1,6 +1,7 @@
 package com.comst.domain.util
 
 import com.comst.domain.model.base.DaysOfWeek
+import com.comst.domain.model.base.SchedulePeriodModel
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
@@ -111,14 +112,14 @@ object DateUtils {
 
 
 
-    fun getWeekStartAndEnd(date: LocalDate, format: String = "yyyy-MM-dd"): Pair<String, String> {
+    fun getWeekStartAndEnd(date: LocalDate, format: String = "yyyy-MM-dd"): SchedulePeriodModel {
         val formatter = DateTimeFormatter.ofPattern(format, Locale.getDefault())
         val startOfWeek = date.minusDays(date.dayOfWeek.value.toLong() % 7)
         val endOfWeek = startOfWeek.plusDays(6)
-        return Pair(startOfWeek.format(formatter), endOfWeek.format(formatter))
+        return SchedulePeriodModel(startOfWeek.format(formatter), endOfWeek.format(formatter))
     }
 
-    fun getWeekStartAndEnd(date: Date, format: String = "yyyy-MM-dd"): Pair<String, String> {
+    fun getWeekStartAndEnd(date: Date, format: String = "yyyy-MM-dd"): SchedulePeriodModel {
         return getWeekStartAndEnd(dateToLocalDate(date), format)
     }
 }

@@ -46,10 +46,9 @@ class ScheduleViewModel @Inject constructor(
 
         }
 
-        val startDateAndEndDate = DateUtils.getWeekStartAndEnd(currentState.selectLocalDate)
+        val weeklySchedulePeriod = DateUtils.getWeekStartAndEnd(currentState.selectLocalDate)
         getCommonScheduleWeekListUseCase(
-            startDateAndEndDate.first,
-            startDateAndEndDate.second
+            weeklySchedulePeriod
         ).onSuccess {
             setState {
                 copy(
@@ -82,11 +81,10 @@ class ScheduleViewModel @Inject constructor(
 
     private fun onSelectedDate(date: Date) = viewModelScope.launch {
         val newSelectLocalDate = DateUtils.dateToLocalDate(date)
-        val startDateAndEndDate = DateUtils.getWeekStartAndEnd(newSelectLocalDate)
-        Log.d("흠", "엥")
+        val weeklySchedulePeriod = DateUtils.getWeekStartAndEnd(newSelectLocalDate)
+
         getCommonScheduleWeekListUseCase(
-            startDateAndEndDate.first,
-            startDateAndEndDate.second
+            weeklySchedulePeriod
         ).onSuccess {
             setState {
                 copy(
