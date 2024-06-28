@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -49,7 +50,7 @@ fun PDCalendar(
     var displayedYear by remember { mutableIntStateOf(calendar.get(Calendar.YEAR)) }
     var selectedDate by remember { mutableIntStateOf(calendar.get(Calendar.DAY_OF_MONTH)) }
 
-    Column {
+    Column(modifier = modifier.padding(16.dp)) {
         CalendarHeader(
             displayedMonth,
             displayedYear,
@@ -60,6 +61,7 @@ fun PDCalendar(
                 calendar.set(Calendar.YEAR, newYear)
             }
         )
+        Spacer(modifier = Modifier.height(8.dp))
         CalendarBody(
             displayedMonth,
             displayedYear,
@@ -71,6 +73,7 @@ fun PDCalendar(
                     set(Calendar.DAY_OF_MONTH, day)
                 }
                 viewModel.setEvent(SelectedDate(selectedCalendar.time))
+                selectedDate = day
             }
         )
     }
@@ -99,7 +102,6 @@ fun CalendarHeader(month: Int, year: Int, onMonthChange: (Int, Int) -> Unit) {
                     contentDescription = "Previous Year"
                 )
             }
-            Spacer(modifier = Modifier.width(8.dp))
             IconButton(onClick = {
                 val newMonth = if (month == 0) 11 else month - 1
                 val newYear = if (month == 0) year - 1 else year
@@ -114,8 +116,8 @@ fun CalendarHeader(month: Int, year: Int, onMonthChange: (Int, Int) -> Unit) {
 
         Text(
             text = "${months[month]} $year",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 8.dp)
         )
 
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -129,7 +131,6 @@ fun CalendarHeader(month: Int, year: Int, onMonthChange: (Int, Int) -> Unit) {
                     contentDescription = "Next Month"
                 )
             }
-            Spacer(modifier = Modifier.width(8.dp))
             IconButton(onClick = {
                 val newYear = year + 1
                 onMonthChange(month, newYear)
@@ -163,10 +164,13 @@ fun CalendarBody(
                 Text(
                     text = day,
                     modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(4.dp))
 
         var day = 1
         for (week in 0 until 6) {
@@ -186,17 +190,16 @@ fun CalendarBody(
                                 .padding(4.dp)
                                 .clip(CircleShape)
                                 .background(
-                                    if (currentDay == selectedDate) MaterialTheme.colorScheme.primaryContainer else Color(
-                                        0xFFF9FAFF
-                                    )
+                                    if (currentDay == selectedDate) MaterialTheme.colorScheme.primary else Color.Transparent
                                 )
                                 .clickable { onDateSelected(currentDay) },
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = "$currentDay",
-                                color = if (currentDay == selectedDate) Color.Black else MaterialTheme.colorScheme.onBackground,
-                                textAlign = TextAlign.Center
+                                color = if (currentDay == selectedDate) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onBackground,
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.bodyLarge
                             )
                         }
                         day++
