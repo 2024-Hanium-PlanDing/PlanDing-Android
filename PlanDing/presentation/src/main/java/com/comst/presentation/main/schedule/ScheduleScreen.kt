@@ -32,13 +32,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -89,7 +95,8 @@ fun ScheduleScreen(
         selectDay = uiState.selectDay,
         selectedWeekdays = uiState.selectedWeekdays,
         isTodayScheduleVisible = uiState.isTodayScheduleVisible,
-        todayScheduleEvents = uiState.todayScheduleEvents,
+        todayScheduleEvents = uiState.todayPersonalScheduleEvents,
+        todayGroupScheduleEvents = uiState.todayGroupScheduleEvents,
         selectWeekScheduleEvents = uiState.selectWeekScheduleEvents,
         onUIAction = viewModel::setEvent
     )
@@ -113,6 +120,7 @@ private fun ScheduleScreen(
     selectedWeekdays: List<String>,
     isTodayScheduleVisible: Boolean,
     todayScheduleEvents: List<ScheduleEvent>,
+    todayGroupScheduleEvents: List<ScheduleEvent>,
     selectWeekScheduleEvents: List<ScheduleEvent>,
     onUIAction: (ScheduleUIEvent) -> Unit
 ) {
@@ -128,7 +136,8 @@ private fun ScheduleScreen(
                 selectDate = selectUIDate,
                 selectDay = selectDay,
                 isTodayScheduleVisible = isTodayScheduleVisible,
-                todayScheduleEvents = todayScheduleEvents,
+                todayPersonalScheduleEvents = todayScheduleEvents,
+                todayGroupScheduleEvents = todayGroupScheduleEvents,
                 onUIAction = onUIAction
             )
 
@@ -143,10 +152,13 @@ private fun ScheduleScreen(
 private fun SelectedDate(
     selectDate: String,
     selectDay: String,
-    todayScheduleEvents: List<ScheduleEvent>,
+    todayPersonalScheduleEvents: List<ScheduleEvent>,
+    todayGroupScheduleEvents: List<ScheduleEvent>,
     isTodayScheduleVisible: Boolean,
     onUIAction: (ScheduleUIEvent) -> Unit
 ) {
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -185,80 +197,127 @@ private fun SelectedDate(
                     onUIAction(ToggleTodayScheduleVisibility)
                 }
             )
-
         }
 
         if (isTodayScheduleVisible) {
             Spacer(modifier = Modifier.height(4.dp))
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(400.dp)
                     .background(
                         color = BackgroundColor2,
                         shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
                     )
             ) {
-                if (todayScheduleEvents.isEmpty()) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                TabRow(selectedTabIndex = selectedTabIndex) {
+                    Tab(
+                        selected = selectedTabIndex == 0,
+                        onClick = { selectedTabIndex = 0 }
                     ) {
-                        Box(modifier = Modifier.weight(4f))
-                        Box(
-                            modifier = Modifier
-                                .size(120.dp)
-                                .background(color = Color(0xFFF4F4F4), shape = CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                modifier = Modifier.size(80.dp),
-                                painter = painterResource(id = R.drawable.ic_main_schedule),
-                                contentDescription = "일정 없을 때 이미지"
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(20.dp))
-                        Text(
-                            text = "등록된 일정이 없습니다.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Box(modifier = Modifier.weight(6f))
+                        Text(text = "개인일정", modifier = Modifier.padding(16.dp))
                     }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize()
+                    Tab(
+                        selected = selectedTabIndex == 1,
+                        onClick = { selectedTabIndex = 1 }
                     ) {
-                        items(
-                            count = todayScheduleEvents.size,
-                            key = { index -> todayScheduleEvents[index].scheduleId }
-                        ) { index ->
-                            todayScheduleEvents[index].let {
-                                PersonalScheduleCard(schedule = it)
-                            }
-                            Divider()
-                        }
+                        Text(text = "그룹일정", modifier = Modifier.padding(16.dp))
                     }
                 }
-                FloatingActionButton(
+
+                Box(
                     modifier = Modifier
-                        .size(80.dp)
-                        .padding(16.dp)
-                        .align(Alignment.BottomEnd),
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(60.dp),
-                    onClick = {
-                        onUIAction(AddTodaySchedule)
-                    },
+                        .fillMaxWidth()
+                        .height(400.dp)
                 ) {
-                    Icon(
-                        modifier = Modifier.size(32.dp),
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = "Add"
-                    )
+                    if (selectedTabIndex == 0) {
+                        if (todayPersonalScheduleEvents.isEmpty()) {
+                            NoScheduleContent()
+                        } else {
+                            ScheduleList(todayPersonalScheduleEvents, onUIAction, isPersonalSchedule = true)
+                        }
+                    } else {
+                        if (todayGroupScheduleEvents.isEmpty()) {
+                            NoScheduleContent()
+                        } else {
+                            ScheduleList(todayGroupScheduleEvents, onUIAction, isPersonalSchedule = false)
+                        }
+                    }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun NoScheduleContent() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(modifier = Modifier.weight(4f))
+        Box(
+            modifier = Modifier
+                .size(120.dp)
+                .background(color = Color(0xFFF4F4F4), shape = CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                modifier = Modifier.size(80.dp),
+                painter = painterResource(id = R.drawable.ic_main_schedule),
+                contentDescription = "일정 없을 때 이미지"
+            )
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+        Text(
+            text = "등록된 일정이 없습니다.",
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Box(modifier = Modifier.weight(6f))
+    }
+}
+
+@Composable
+private fun ScheduleList(
+    events: List<ScheduleEvent>,
+    onUIAction: (ScheduleUIEvent) -> Unit,
+    isPersonalSchedule: Boolean
+) {
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(
+                count = events.size,
+                key = { index -> events[index].scheduleId }
+            ) { index ->
+                events[index].let {
+                    PersonalScheduleCard(schedule = it)
+                }
+                Divider()
+            }
+        }
+        if (isPersonalSchedule) {
+            FloatingActionButton(
+                modifier = Modifier
+                    .size(80.dp)
+                    .padding(16.dp)
+                    .align(Alignment.BottomEnd),
+                containerColor = MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(60.dp),
+                onClick = {
+                    onUIAction(AddTodaySchedule)
+                },
+            ) {
+                Icon(
+                    modifier = Modifier.size(32.dp),
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Add"
+                )
             }
         }
     }

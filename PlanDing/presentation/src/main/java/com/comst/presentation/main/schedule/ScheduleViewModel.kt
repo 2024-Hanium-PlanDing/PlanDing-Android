@@ -38,16 +38,6 @@ class ScheduleViewModel @Inject constructor(
 
     fun load() = viewModelScope.launch{
 
-        getCommonScheduleTodayListUseCase().onSuccess {
-            setState {
-                copy(
-                    todayScheduleEvents = it
-                )
-            }
-        }.onFailure { statusCode, message ->
-
-        }
-
         val weeklySchedulePeriod = DateUtils.getWeekStartAndEnd(currentState.selectLocalDate)
         getCommonScheduleWeekListUseCase(
             weeklySchedulePeriod
@@ -67,7 +57,7 @@ class ScheduleViewModel @Inject constructor(
         ).onSuccess {
             setState {
                 copy(
-                    todayScheduleEvents = it,
+                    todayPersonalScheduleEvents = it,
                 )
             }
         }.onFailure{ statusCode, message ->
@@ -110,7 +100,6 @@ class ScheduleViewModel @Inject constructor(
                     selectDay = DateUtils.getDayOfWeek(newSelectLocalDate),
                     selectedWeekdays = DateUtils.getWeekDays(newSelectLocalDate),
                     selectWeekScheduleEvents = it,
-                    todayScheduleEvents = listOf(),
                     isBottomSheetVisible = false,
                 )
             }
@@ -123,7 +112,7 @@ class ScheduleViewModel @Inject constructor(
         ).onSuccess {
             setState {
                 copy(
-                    todayScheduleEvents = it,
+                    todayPersonalScheduleEvents = it,
                 )
             }
         }.onFailure{ statusCode, message ->
