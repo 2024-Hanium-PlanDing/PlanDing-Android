@@ -85,7 +85,7 @@ fun PDScheduleChart(events: List<ScheduleEvent>, days: List<String>) {
                                 .border(0.5.dp, borderColor),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(text = "$hour:00", fontSize = 12.sp, color = textColor)
+                            Text(text = String.format("%02d:00",hour), fontSize = 12.sp, color = textColor)
                         }
                     }
                 }
