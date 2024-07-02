@@ -16,18 +16,17 @@ import javax.inject.Inject
 class GroupRoomRepositoryImpl @Inject constructor(
     private val groupRoomService: GroupRoomService,
     private val mediaImageMultipartConverter: MediaImageMultipartConverter,
-    private val apiHandler: ApiHandler
 ): GroupRoomRepository {
 
     override suspend fun getMyGroupRoom(): ApiResult<List<GroupRoomCardModel>> {
-        return apiHandler.handle(
+        return ApiHandler.handle(
             execute = { groupRoomService.getMyGroupRoom() },
             mapper = { response -> response.map { it.toDomainModel() } }
         )
     }
 
     override suspend fun postGroupRoom(groupRoomCreate: GroupRoomCreate, thumbnail: MediaImage): ApiResult<GroupRoomCreateResponseModel> {
-        return apiHandler.handle(
+        return ApiHandler.handle(
             execute = {
                 val request = GroupCreateParam(
                     name = groupRoomCreate.name,

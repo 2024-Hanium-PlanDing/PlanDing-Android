@@ -11,11 +11,10 @@ import javax.inject.Inject
 
 class CommonScheduleRepositoryImpl @Inject constructor(
     private val commonScheduleService: CommonScheduleService,
-    private val apiHandler: ApiHandler
 ): CommonScheduleRepository {
 
     override suspend fun getCommonScheduleTodayList(): ApiResult<List<ScheduleEvent>> {
-        return apiHandler.handle(
+        return ApiHandler.handle(
             execute = { commonScheduleService.getCommonScheduleToday() },
             mapper = { response -> response.map { it.toDomainModel() } }
         )
@@ -24,7 +23,7 @@ class CommonScheduleRepositoryImpl @Inject constructor(
     override suspend fun getCommonScheduleWeekList(
         request: SchedulePeriodModel
     ): ApiResult<List<ScheduleEvent>> {
-        return apiHandler.handle(
+        return ApiHandler.handle(
             execute = { commonScheduleService.getCommonScheduleWeek(
                 startDate = request.startDate,
                 endDate = request.endDate

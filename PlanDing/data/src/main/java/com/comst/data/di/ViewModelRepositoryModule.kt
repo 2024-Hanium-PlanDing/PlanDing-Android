@@ -1,12 +1,10 @@
 package com.comst.data.di
 
-import android.content.Context
 import com.comst.data.converter.MediaImageMultipartConverter
 import com.comst.data.repository.CommonScheduleRepositoryImpl
 import com.comst.data.repository.GroupRoomRepositoryImpl
 import com.comst.data.repository.PersonalScheduleRepositoryImpl
 import com.comst.data.repository.UserRepositoryImpl
-import com.comst.data.retrofit.ApiHandler
 import com.comst.data.retrofit.CommonScheduleService
 import com.comst.data.retrofit.GroupRoomService
 import com.comst.data.retrofit.PersonalScheduleService
@@ -30,35 +28,31 @@ object ViewModelRepositoryModule {
     fun provideGroupRoomRepository(
         groupRoomService: GroupRoomService,
         mediaImageMultipartConverter: MediaImageMultipartConverter,
-        apiHandler: ApiHandler
     ): GroupRoomRepository {
-        return GroupRoomRepositoryImpl(groupRoomService, mediaImageMultipartConverter,apiHandler)
+        return GroupRoomRepositoryImpl(groupRoomService, mediaImageMultipartConverter)
     }
 
     @Provides
     @ViewModelScoped
     fun provideUserRepository(
         userService: UserService,
-        apiHandler: ApiHandler
     ): UserRepository {
-        return UserRepositoryImpl(userService, apiHandler)
+        return UserRepositoryImpl(userService)
     }
 
     @Provides
     @ViewModelScoped
     fun provideCommonScheduleRepositoryRepository(
         commonScheduleService: CommonScheduleService,
-        apiHandler: ApiHandler
     ): CommonScheduleRepository {
-        return CommonScheduleRepositoryImpl(commonScheduleService, apiHandler)
+        return CommonScheduleRepositoryImpl(commonScheduleService)
     }
 
     @Provides
     @ViewModelScoped
     fun providePersonalScheduleRepository(
         personalScheduleService: PersonalScheduleService,
-        apiHandler: ApiHandler
     ): PersonalScheduleRepository {
-        return PersonalScheduleRepositoryImpl(personalScheduleService, apiHandler)
+        return PersonalScheduleRepositoryImpl(personalScheduleService)
     }
 }

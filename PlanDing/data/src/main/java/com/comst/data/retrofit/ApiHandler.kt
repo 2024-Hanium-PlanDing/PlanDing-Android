@@ -1,21 +1,15 @@
 package com.comst.data.retrofit
 
-import android.content.Context
+import com.comst.data.di.RetrofitModule.NETWORK_EXCEPTION_BODY_IS_NULL
 import com.comst.data.model.BaseResponse
 import com.comst.domain.util.ApiResult
 import retrofit2.Response
-import javax.inject.Inject
 
-class ApiHandler @Inject constructor(
-    private val context: Context
-) {
+object ApiHandler  {
     suspend fun <T : Any, R : Any> handle(
         execute: suspend () -> Response<BaseResponse<T>>,
         mapper: (T) -> R
     ): ApiResult<R> {
-        if (!NetworkUtils.isOnline(context)) {
-            return ApiResult.Error(Exception("Network is offline"))
-        }
 
         return try {
             val response = execute()
@@ -28,7 +22,7 @@ class ApiHandler @Inject constructor(
                         ApiResult.Failure(it.errorResponse.errorCode, it.errorResponse.message)
                     }
                 } ?: run {
-                    throw NullPointerException("Result is null")
+                    throw NullPointerException(NETWORK_EXCEPTION_BODY_IS_NULL)
                 }
             } else {
                 getFailApiResult(body, response)

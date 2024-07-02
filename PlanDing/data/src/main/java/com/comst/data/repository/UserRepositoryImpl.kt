@@ -13,11 +13,10 @@ import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val userService: UserService,
-    private val apiHandler: ApiHandler
 ): UserRepository {
 
     override suspend fun getUserProfile(): ApiResult<UserProfile> {
-        return apiHandler.handle(
+        return ApiHandler.handle(
             execute = { userService.getUserProfile() },
             mapper = { response -> response.toDomainModel()}
         )
@@ -32,7 +31,7 @@ class UserRepositoryImpl @Inject constructor(
             socialId = socialLoginInfo.socialId
         )
 
-        return apiHandler.handle(
+        return ApiHandler.handle(
             execute = { userService.postSocialLogin(requestBody) },
             mapper = { response -> response.toDomainModel() }
         )

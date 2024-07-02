@@ -14,7 +14,6 @@ import javax.inject.Inject
 
 class PersonalScheduleRepositoryImpl @Inject constructor(
     private val personalScheduleService: PersonalScheduleService,
-    private val apiHandler: ApiHandler
 ): PersonalScheduleRepository {
 
     override suspend fun postPersonalSchedule(scheduleModel: ScheduleModel): ApiResult<ScheduleEvent> {
@@ -25,13 +24,13 @@ class PersonalScheduleRepositoryImpl @Inject constructor(
             startTime = scheduleModel.startTime,
             endTime = scheduleModel.endTime
         )
-        return apiHandler.handle(
+        return ApiHandler.handle(
             execute = { personalScheduleService.postPersonalSchedule(request) },
             mapper = { response -> response.toDomainModel() }
         )
     }
     override suspend fun getPersonalScheduleList(request: SchedulePeriodModel): ApiResult<List<ScheduleEvent>> {
-        return apiHandler.handle(
+        return ApiHandler.handle(
             execute = { personalScheduleService.getPersonalSchedule(
                 startDate = request.startDate,
                 endDate = request.endDate

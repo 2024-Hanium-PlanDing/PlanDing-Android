@@ -1,30 +1,27 @@
 package com.comst.data.di
 
 import com.comst.data.BuildConfig.BASE_URL
-import com.comst.data.retrofit.CommonScheduleService
-import com.comst.data.retrofit.GroupRoomService
-import com.comst.data.retrofit.PersonalScheduleService
+import com.comst.data.retrofit.NetworkConnectionInterceptor
 import com.comst.data.retrofit.TokenAuthenticator
 import com.comst.data.retrofit.TokenInterceptor
-import com.comst.data.retrofit.UserService
 import com.google.gson.GsonBuilder
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object RetrofitModule {
+
+    const val NETWORK_EXCEPTION_OFFLINE_CASE = "network status is offline"
+    const val NETWORK_EXCEPTION_BODY_IS_NULL = "result body is null"
 
     @Provides
     @Singleton
@@ -40,26 +37,31 @@ object RetrofitModule {
     fun providesOkHttpClient(
         interceptor: TokenInterceptor,
         authenticator: TokenAuthenticator,
+        networkConnectionInterceptor: NetworkConnectionInterceptor
     ): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
         return OkHttpClient
             .Builder()
+            .connectTimeout(5, TimeUnit.SECONDS)
+            .readTimeout(5, TimeUnit.SECONDS)
+            .writeTimeout(5, TimeUnit.SECONDS)
+            .addInterceptor(networkConnectionInterceptor)
             .addInterceptor(loggingInterceptor)
             .addInterceptor(interceptor)
             .authenticator(authenticator)
+            .retryOnConnectionFailure(false)
             .build()
     }
 
     @Provides
     fun provideRetrofit(
-        client: OkHttpClient,
-        gsonConverterFactory: GsonConverterFactory
+        client: OkHttpClient
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl("${BASE_URL}/api/")
-            .addConverterFactory(gsonConverterFactory)
+            .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
     }
