@@ -21,6 +21,7 @@ class ScheduleContract {
         val isBottomSheetVisible: Boolean = false,
         val isExpanded: Boolean = false,
         val isTodayScheduleVisible: Boolean = false,
+        val isAddScheduleDialogVisible: Boolean = false,
         val isLoading: Boolean = false
     ): UIState
 
@@ -35,5 +36,7 @@ class ScheduleContract {
         data class SelectedDate(val date: Date) : ScheduleUIEvent()
         object ToggleTodayScheduleVisibility : ScheduleUIEvent()
         object AddTodaySchedule : ScheduleUIEvent()
+        object ShowAddScheduleDialog : ScheduleUIEvent()
+        object HideAddScheduleDialog : ScheduleUIEvent()
     }
 }

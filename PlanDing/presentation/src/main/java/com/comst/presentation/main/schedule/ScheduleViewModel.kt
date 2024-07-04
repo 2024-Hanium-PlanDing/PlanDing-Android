@@ -1,6 +1,5 @@
 package com.comst.presentation.main.schedule
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.comst.domain.util.DateUtils
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleTodayListUseCase
@@ -33,6 +32,8 @@ class ScheduleViewModel @Inject constructor(
             is ScheduleUIEvent.SelectedDate -> onSelectedDate(event.date)
             is ScheduleUIEvent.ToggleTodayScheduleVisibility -> onToggleTextViewVisibility()
             is ScheduleUIEvent.AddTodaySchedule -> onAddTodaySchedule()
+            is ScheduleUIEvent.ShowAddScheduleDialog -> onShowAddScheduleDialog()
+            is ScheduleUIEvent.HideAddScheduleDialog -> onHideAddScheduleDialog()
         }
     }
 
@@ -117,6 +118,18 @@ class ScheduleViewModel @Inject constructor(
             }
         }.onFailure{ statusCode, message ->
 
+        }
+    }
+
+    private fun onShowAddScheduleDialog() = viewModelScope.launch {
+        setState {
+            copy(isAddScheduleDialogVisible = true)
+        }
+    }
+
+    private fun onHideAddScheduleDialog() = viewModelScope.launch {
+        setState {
+            copy(isAddScheduleDialogVisible = false)
         }
     }
 

@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -35,6 +36,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -61,6 +63,7 @@ import com.comst.domain.model.base.ScheduleEvent
 import com.comst.presentation.R
 import com.comst.presentation.main.schedule.ScheduleContract.*
 import com.comst.presentation.main.schedule.ScheduleContract.ScheduleUIEvent.*
+import com.comst.presentation.main.schedule.addSchedule.AddScheduleDialog
 import com.comst.presentation.ui.theme.BackgroundColor2
 import com.comst.presentation.ui.theme.MainPurple200
 import com.comst.presentation.ui.theme.PlanDingTheme
@@ -74,8 +77,8 @@ fun ScheduleScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(key1 = viewModel.effect) {
-        viewModel.effect.collect{ effect ->
-            when(effect){
+        viewModel.effect.collect { effect ->
+            when (effect) {
                 is ScheduleUISideEffect.ShowToast -> {
                     Toast.makeText(
                         context,
@@ -87,43 +90,6 @@ fun ScheduleScreen(
         }
     }
 
-    val calendarBottomSheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
-
-    ScheduleScreen(
-        selectUIDate = uiState.selectUIDate,
-        selectDay = uiState.selectDay,
-        selectedWeekdays = uiState.selectedWeekdays,
-        isTodayScheduleVisible = uiState.isTodayScheduleVisible,
-        todayScheduleEvents = uiState.todayPersonalScheduleEvents,
-        todayGroupScheduleEvents = uiState.todayGroupScheduleEvents,
-        selectWeekScheduleEvents = uiState.selectWeekScheduleEvents,
-        onUIAction = viewModel::setEvent
-    )
-
-    if (uiState.isBottomSheetVisible) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                viewModel.setEvent(CloseBottomSheetClick)
-            },
-            sheetState = calendarBottomSheetState,
-        ) {
-            PDCalendar(viewModel = viewModel)
-        }
-    }
-}
-
-@Composable
-private fun ScheduleScreen(
-    selectUIDate: String,
-    selectDay: String,
-    selectedWeekdays: List<String>,
-    isTodayScheduleVisible: Boolean,
-    todayScheduleEvents: List<ScheduleEvent>,
-    todayGroupScheduleEvents: List<ScheduleEvent>,
-    selectWeekScheduleEvents: List<ScheduleEvent>,
-    onUIAction: (ScheduleUIEvent) -> Unit
-) {
     Surface {
         Column(
             modifier = Modifier
@@ -132,141 +98,174 @@ private fun ScheduleScreen(
         ) {
             PDScreenHeader(text = "스케줄")
 
-            SelectedDate(
-                selectDate = selectUIDate,
-                selectDay = selectDay,
-                isTodayScheduleVisible = isTodayScheduleVisible,
-                todayPersonalScheduleEvents = todayScheduleEvents,
-                todayGroupScheduleEvents = todayGroupScheduleEvents,
-                onUIAction = onUIAction
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .background(
+                        shape = RoundedCornerShape(8.dp),
+                        color = Color.White
+                    ),
+            ) {
+                ScheduleTabs(
+                    selectUIDate = uiState.selectUIDate,
+                    selectDay = uiState.selectDay,
+                    isTodayScheduleVisible = uiState.isTodayScheduleVisible,
+                    todayPersonalScheduleEvents = uiState.todayPersonalScheduleEvents,
+                    todayGroupScheduleEvents = uiState.todayGroupScheduleEvents,
+                    onUIAction = viewModel::setEvent
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            PDScheduleChart(events = selectWeekScheduleEvents, days = selectedWeekdays)
+            PDScheduleChart(events = uiState.selectWeekScheduleEvents, days = uiState.selectedWeekdays)
         }
+    }
+
+    if (uiState.isBottomSheetVisible) {
+        CalendarBottomSheet(
+            viewModel = viewModel
+        )
+    }
+
+    if (uiState.isAddScheduleDialogVisible) {
+        AddScheduleDialog(
+            date = uiState.selectUIDate,
+            onDismiss = {
+                viewModel.setEvent(HideAddScheduleDialog)
+            },
+            onConfirm = { title, description, startTime, endTime ->
+                viewModel.setEvent(HideAddScheduleDialog)
+            }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CalendarBottomSheet(
+    viewModel: ScheduleViewModel
+) {
+    val calendarBottomSheetState = rememberModalBottomSheetState()
+
+    ModalBottomSheet(
+        onDismissRequest = {
+            viewModel.setEvent(CloseBottomSheetClick)
+        },
+        sheetState = calendarBottomSheetState,
+    ) {
+        PDCalendar(viewModel = viewModel)
     }
 }
 
 @Composable
-private fun SelectedDate(
-    selectDate: String,
+private fun ScheduleTabs(
+    selectUIDate: String,
     selectDay: String,
+    isTodayScheduleVisible: Boolean,
     todayPersonalScheduleEvents: List<ScheduleEvent>,
     todayGroupScheduleEvents: List<ScheduleEvent>,
-    isTodayScheduleVisible: Boolean,
     onUIAction: (ScheduleUIEvent) -> Unit
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .background(
-                shape = RoundedCornerShape(8.dp),
-                color = Color.White
-            ),
-    ) {
-        Column {
-            Row(
+    Column {
+        Row(
+            modifier = Modifier
+                .clickable {
+                    onUIAction(OpenBottomSheetClick)
+                }
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Filled.DateRange,
+                contentDescription = "달력",
+            )
+
+            Spacer(modifier = Modifier.size(8.dp))
+
+            Text(
+                modifier = Modifier,
+                text = "$selectUIDate $selectDay",
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Icon(
+                imageVector = if (isTodayScheduleVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                contentDescription = "오늘의 스케줄 토글",
+                modifier = Modifier.clickable {
+                    onUIAction(ToggleTodayScheduleVisibility)
+                }
+            )
+        }
+
+        if (isTodayScheduleVisible) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Column(
                 modifier = Modifier
-                    .clickable {
-                        onUIAction(OpenBottomSheetClick)
-                    }
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxWidth()
+                    .background(
+                        color = BackgroundColor2,
+                        shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
+                    )
             ) {
-                Icon(
-                    imageVector = Icons.Filled.DateRange,
-                    contentDescription = "달력",
-                )
-
-                Spacer(modifier = Modifier.size(8.dp))
-
-                Text(
-                    modifier = Modifier,
-                    text = "$selectDate $selectDay",
-                )
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Icon(
-                    imageVector = if (isTodayScheduleVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = "오늘의 스케줄 토글",
-                    modifier = Modifier.clickable {
-                        onUIAction(ToggleTodayScheduleVisibility)
+                TabRow(selectedTabIndex = selectedTabIndex) {
+                    Tab(
+                        selected = selectedTabIndex == 0,
+                        onClick = { selectedTabIndex = 0 }
+                    ) {
+                        Text(text = "개인일정", modifier = Modifier.padding(16.dp))
                     }
-                )
-            }
+                    Tab(
+                        selected = selectedTabIndex == 1,
+                        onClick = { selectedTabIndex = 1 }
+                    ) {
+                        Text(text = "그룹일정", modifier = Modifier.padding(16.dp))
+                    }
+                }
 
-            if (isTodayScheduleVisible) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Column(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(
-                            color = BackgroundColor2,
-                            shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
-                        )
+                        .height(400.dp)
                 ) {
-                    TabRow(selectedTabIndex = selectedTabIndex) {
-                        Tab(
-                            selected = selectedTabIndex == 0,
-                            onClick = { selectedTabIndex = 0 }
-                        ) {
-                            Text(text = "개인일정", modifier = Modifier.padding(16.dp))
-                        }
-                        Tab(
-                            selected = selectedTabIndex == 1,
-                            onClick = { selectedTabIndex = 1 }
-                        ) {
-                            Text(text = "그룹일정", modifier = Modifier.padding(16.dp))
-                        }
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(400.dp)
-                    ) {
-                        if (selectedTabIndex == 0) {
-                            if (todayPersonalScheduleEvents.isEmpty()) {
-                                NoScheduleContent()
-                            } else {
-                                ScheduleList(todayPersonalScheduleEvents)
-                            }
+                    if (selectedTabIndex == 0) {
+                        if (todayPersonalScheduleEvents.isEmpty()) {
+                            NoScheduleContent()
                         } else {
-                            if (todayGroupScheduleEvents.isEmpty()) {
-                                NoScheduleContent()
-                            } else {
-                                ScheduleList(todayGroupScheduleEvents)
-                            }
+                            ScheduleList(todayPersonalScheduleEvents)
+                        }
+                        FloatingActionButton(
+                            modifier = Modifier
+                                .size(80.dp)
+                                .padding(16.dp)
+                                .align(Alignment.BottomEnd),
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            shape = RoundedCornerShape(60.dp),
+                            onClick = {
+                                onUIAction(ShowAddScheduleDialog)
+                            },
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(32.dp),
+                                imageVector = Icons.Filled.Add,
+                                contentDescription = "Add"
+                            )
+                        }
+                    } else {
+                        if (todayGroupScheduleEvents.isEmpty()) {
+                            NoScheduleContent()
+                        } else {
+                            ScheduleList(todayGroupScheduleEvents)
                         }
                     }
                 }
             }
         }
-
-        if (isTodayScheduleVisible && selectedTabIndex == 0) {
-            FloatingActionButton(
-                modifier = Modifier
-                    .size(80.dp)
-                    .padding(16.dp)
-                    .align(Alignment.BottomEnd),
-                containerColor = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(60.dp),
-                onClick = {
-                    onUIAction(AddTodaySchedule)
-                },
-            ) {
-                Icon(
-                    modifier = Modifier.size(32.dp),
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = "Add"
-                )
-            }
-        }
+        
     }
 }
 
