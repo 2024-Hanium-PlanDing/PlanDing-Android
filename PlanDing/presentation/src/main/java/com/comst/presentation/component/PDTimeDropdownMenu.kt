@@ -38,11 +38,14 @@ import androidx.compose.ui.unit.sp
 import com.comst.presentation.R
 
 @Composable
-fun PDTimeDropdownMenu() {
+fun PDTimeDropdownMenu(
+    selectedTime: Int,
+    onConfirm: (Int) -> Unit
+) {
     val hours = (6..24).toList()
 
     var isDropDownMenuExpanded by remember { mutableStateOf(false) }
-    var selectTime by remember { mutableIntStateOf(6) }
+    var selectTime by remember { mutableIntStateOf(selectedTime) }
     val listState = rememberLazyListState()
 
     LaunchedEffect(isDropDownMenuExpanded) {
@@ -92,6 +95,7 @@ fun PDTimeDropdownMenu() {
                             onClick = {
                                 isDropDownMenuExpanded = false
                                 selectTime = hour
+                                onConfirm(selectTime)
                             }
                         )
                     }
@@ -106,6 +110,6 @@ fun PDTimeDropdownMenu() {
 @Composable
 private fun PDTimeDropdownMenuPreview() {
     MaterialTheme {
-        PDTimeDropdownMenu()
+        PDTimeDropdownMenu(selectedTime = 7366, onConfirm = {})
     }
 }

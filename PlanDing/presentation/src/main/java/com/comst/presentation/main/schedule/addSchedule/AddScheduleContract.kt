@@ -10,8 +10,8 @@ class AddScheduleContract {
         val date: String = "",
         val title: String = "",
         val description: String = "",
-        val startTime: String = "",
-        val endTime: String = "",
+        val startTime: Int = 6,
+        val endTime: Int = 6,
         val isLoading: Boolean = false,
     ) : UIState
 
@@ -22,7 +22,7 @@ class AddScheduleContract {
     sealed class AddScheduleUIEvent : UIEvent {
         data class TitleChange(val title: String) : AddScheduleUIEvent()
         data class DescriptionChange(val description: String) : AddScheduleUIEvent()
-        data class SelectedStartTime(val startTime: String) : AddScheduleUIEvent()
-        data class SelectedEndTime(val endTime: String) : AddScheduleUIEvent()
+        data class SelectedStartTime(val startTime: Int) : AddScheduleUIEvent()
+        data class SelectedEndTime(val endTime: Int) : AddScheduleUIEvent()
     }
 }

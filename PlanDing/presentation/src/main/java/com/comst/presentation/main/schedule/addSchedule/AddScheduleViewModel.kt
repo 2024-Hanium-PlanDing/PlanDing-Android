@@ -38,13 +38,13 @@ class AddScheduleViewModel @Inject constructor() :
         }
     }
 
-    private fun onSelectedStartTime(startTime: String){
+    private fun onSelectedStartTime(startTime: Int){
         setState {
             copy(startTime = startTime)
         }
     }
 
-    private fun onSelectedEndTime(endTime: String){
+    private fun onSelectedEndTime(endTime: Int){
         setState {
             copy(endTime = endTime)
         }

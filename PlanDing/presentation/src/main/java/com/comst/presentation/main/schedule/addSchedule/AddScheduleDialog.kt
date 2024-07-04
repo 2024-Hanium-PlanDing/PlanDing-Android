@@ -1,6 +1,7 @@
 package com.comst.presentation.main.schedule.addSchedule
 
 import android.content.res.Configuration
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,9 +39,9 @@ fun AddScheduleDialog(
     viewModel: AddScheduleViewModel = hiltViewModel(),
     date: String,
     onDismiss: () -> Unit,
-    onConfirm: (String, String, String, String) -> Unit
+    onConfirm: (String, String, Int, Int) -> Unit
 ) {
-    LaunchedEffect(Unit) {
+    LaunchedEffect(date) {
         viewModel.initialize(date)
     }
 
@@ -68,7 +69,7 @@ fun AddScheduleDialog(
         startTime = uiState.startTime,
         endTime = uiState.endTime,
         onDismiss = onDismiss,
-        onConfirm = { s: String, s1: String, s2: String, s3: String -> onConfirm(s, s1, s2, s3) },
+        onConfirm = { title: String, description: String, startTime: Int, endTime: Int -> onConfirm(title, description, startTime, endTime) },
         onUIAction = viewModel::setEvent
     )
 }
@@ -78,10 +79,10 @@ private fun AddScheduleDialog(
     date: String,
     title: String,
     description: String,
-    startTime: String,
-    endTime: String,
+    startTime: Int,
+    endTime: Int,
     onDismiss: () -> Unit,
-    onConfirm: (String, String, String, String) -> Unit,
+    onConfirm: (String, String, Int, Int) -> Unit,
     onUIAction: (AddScheduleUIEvent) -> Unit
 ) {
 
@@ -124,17 +125,28 @@ private fun AddScheduleDialog(
                         .padding(vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    PDTimeDropdownMenu()
+                    PDTimeDropdownMenu(
+                        selectedTime = startTime,
+                        onConfirm = {
+                            onUIAction(AddScheduleUIEvent.SelectedStartTime(it))
+                        }
+                    )
                     Spacer(modifier = Modifier.weight(0.5f))
                     Text(text = "부터")
                     Spacer(modifier = Modifier.weight(1f))
-                    PDTimeDropdownMenu()
+                    PDTimeDropdownMenu(
+                        selectedTime = endTime,
+                        onConfirm = {
+                            onUIAction(AddScheduleUIEvent.SelectedEndTime(it))
+                        }
+                    )
                     Spacer(modifier = Modifier.weight(0.5f))
                     Text(text = "까지")
                 }
             }
         },
         confirmButton = {
+            Log.d("타임","생성 버튼")
             PDButton(
                 onClick = {
                     onConfirm(title, description, startTime, endTime)
@@ -144,6 +156,7 @@ private fun AddScheduleDialog(
             )
         },
         dismissButton = {
+            Log.d("타임","dismiss 버튼")
             Button(
                 onClick = onDismiss,
                 modifier = Modifier.fillMaxWidth(),
@@ -170,13 +183,13 @@ private fun AddScheduleDialog(
 private fun AddScheduleDialogPreview() {
     PlanDingTheme {
         AddScheduleDialog(
-            date = "possim",
-            title = "menandri",
-            description = "euripidis",
-            startTime = "meliore",
-            endTime = "fastidii",
+            date = "torquent",
+            title = "falli",
+            description = "urna",
+            startTime = 1937,
+            endTime = 7845,
             onDismiss = {},
-            onConfirm = { s: String, s1: String, s2: String, s3: String -> },
+            onConfirm = { s: String, s1: String, i: Int, i1: Int -> },
             onUIAction = {}
 
         )
