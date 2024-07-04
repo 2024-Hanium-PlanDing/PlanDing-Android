@@ -93,18 +93,6 @@ fun GroupScreen(
         }
     }
 
-    GroupScreen(
-        groupRoomCardModels = uiState.groupCardModels,
-        onUIAction = viewModel::setEvent,
-    )
-}
-
-
-@Composable
-private fun GroupScreen(
-    groupRoomCardModels:List<GroupRoomCardModel>,
-    onUIAction:(GroupUIEvent) -> Unit
-){
     Surface {
         Box(modifier = Modifier.fillMaxSize()){
             Column(
@@ -116,16 +104,16 @@ private fun GroupScreen(
                         .fillMaxSize()
                 ) {
                     items(
-                        count = groupRoomCardModels.size,
-                        key = { index -> groupRoomCardModels[index].groupId }
+                        count = uiState.groupCardModels.size,
+                        key = { index -> uiState.groupCardModels[index].groupId }
                     ){ index ->
-                        groupRoomCardModels[index].let {
+                        uiState.groupCardModels[index].let {
                             GroupCard(
                                 groupName = it.groupName,
                                 groupDescription = it.groupDescription,
                                 groupImageUrl = it.groupImageUrl
                             )
-                            
+
                             Spacer(modifier = Modifier.height(12.dp))
                         }
                     }
@@ -139,7 +127,7 @@ private fun GroupScreen(
                     .padding(16.dp),
                 containerColor = MaterialTheme.colorScheme.primary,
                 shape = RoundedCornerShape(60.dp),
-                onClick = { onUIAction(GroupUIEvent.GroupCreateClick) },
+                onClick = { viewModel.setEvent(GroupUIEvent.GroupCreateClick) },
             ) {
                 Icon(
                     modifier = Modifier.size(40.dp),
@@ -150,6 +138,15 @@ private fun GroupScreen(
 
         }
     }
+}
+
+
+@Composable
+private fun GroupScreen(
+    groupRoomCardModels:List<GroupRoomCardModel>,
+    onUIAction:(GroupUIEvent) -> Unit
+){
+
 }
 
 @Preview

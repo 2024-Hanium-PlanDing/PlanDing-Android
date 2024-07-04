@@ -58,25 +58,6 @@ fun MyPageScreen(
         }
     }
 
-    MyPageScreen(
-        username = uiState.username,
-        profileImageUrl = uiState.profileImageUrl,
-        userCode = uiState.userCode,
-        favoriteGroupsCount = uiState.favoriteGroupsCount,
-        receivedGroupRequestsCount = uiState.receivedGroupRequestsCount,
-        onUIAction = viewModel::setEvent
-    )
-}
-
-@Composable
-private fun MyPageScreen(
-    username: String = "",
-    userCode: String = "",
-    profileImageUrl: String?,
-    favoriteGroupsCount: String = "-1",
-    receivedGroupRequestsCount: String = "-1",
-    onUIAction:(MyPageUIEvent) -> Unit
-) {
     Surface {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -113,7 +94,7 @@ private fun MyPageScreen(
             ) {
                 PDProfileImage(
                     modifier = Modifier.size(100.dp),
-                    profileImageUrl = profileImageUrl
+                    profileImageUrl = uiState.profileImageUrl
                 )
 
                 Column(
@@ -121,7 +102,7 @@ private fun MyPageScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = favoriteGroupsCount,
+                        text = uiState.favoriteGroupsCount,
                         style = MaterialTheme.typography.titleLarge
                     )
                     Text(
@@ -137,7 +118,7 @@ private fun MyPageScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = receivedGroupRequestsCount,
+                        text = uiState.receivedGroupRequestsCount,
                         style = MaterialTheme.typography.titleLarge
                     )
                     Text(
@@ -152,13 +133,13 @@ private fun MyPageScreen(
             Text(
                 modifier = Modifier
                     .padding(top = 8.dp, start = 16.dp),
-                text = username,
+                text = uiState.username,
                 style = MaterialTheme.typography.titleLarge
             )
 
             Text(
                 modifier = Modifier.padding(start = 16.dp),
-                text = userCode,
+                text = uiState.userCode,
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.Gray
             )
@@ -191,12 +172,7 @@ private fun MyPageScreen(
 private fun MyPageScreenPreview() {
     PlanDingTheme {
         MyPageScreen(
-            username = "username",
-            userCode = "userCode",
-            profileImageUrl = "null",
-            favoriteGroupsCount = "dolore",
-            receivedGroupRequestsCount = "urna",
-            onUIAction = {}
+
         )
     }
 }

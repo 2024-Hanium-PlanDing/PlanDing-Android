@@ -1,11 +1,13 @@
 package com.comst.presentation.main.schedule.addSchedule
 
+import androidx.compose.runtime.Immutable
 import com.comst.presentation.common.base.UIEvent
 import com.comst.presentation.common.base.UISideEffect
 import com.comst.presentation.common.base.UIState
 
 class AddScheduleContract {
 
+    @Immutable
     data class AddScheduleUIState(
         val date: String = "",
         val title: String = "",

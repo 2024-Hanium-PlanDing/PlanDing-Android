@@ -42,6 +42,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.comst.domain.model.file.MediaImage
 import com.comst.presentation.main.group.create.CreateGroupContract.CreateGroupUIEvent
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImageSelectScreen(
     viewModel: CreateGroupViewModel,
@@ -50,25 +51,6 @@ fun ImageSelectScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    ImageSelectScreen(
-        selectedImage = uiState.selectedImage,
-        images = uiState.images,
-        onBackClick = onBackClick,
-        onNextClick = onNextClick,
-        onUIAction = viewModel::setEvent
-    )
-
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun ImageSelectScreen(
-    selectedImage: MediaImage?,
-    images: List<MediaImage>,
-    onBackClick: () -> Unit,
-    onNextClick: () -> Unit,
-    onUIAction: (CreateGroupUIEvent) -> Unit
-) {
     Surface {
         Scaffold(
             topBar = {
@@ -101,11 +83,11 @@ private fun ImageSelectScreen(
                         modifier = Modifier.weight(1f),
                         contentAlignment = Alignment.Center
                     ) {
-                        if (selectedImage != null) {
+                        if (uiState.selectedImage != null) {
                             Image(
                                 modifier = Modifier.fillMaxSize(),
                                 painter = rememberAsyncImagePainter(
-                                    model = selectedImage.uri
+                                    model = uiState.selectedImage!!.uri
                                 ),
                                 contentScale = ContentScale.Crop,
                                 contentDescription = null
@@ -125,13 +107,13 @@ private fun ImageSelectScreen(
                         verticalArrangement = Arrangement.spacedBy(2.dp),
                     ) {
                         items(
-                            count = images.size,
-                            key = { index -> images[index].uri }
+                            count = uiState.images.size,
+                            key = { index -> uiState.images[index].uri }
                         ) { index ->
-                            val image = images[index]
+                            val image = uiState.images[index]
                             Box(
                                 modifier = Modifier.clickable {
-                                    onUIAction(CreateGroupUIEvent.SelectGroupImage(image))
+                                    viewModel.setEvent(CreateGroupUIEvent.SelectGroupImage(image))
                                 }
                             ) {
                                 Image(
@@ -145,7 +127,7 @@ private fun ImageSelectScreen(
                                     contentDescription = null,
                                     contentScale = ContentScale.Crop
                                 )
-                                if (selectedImage?.uri == image.uri) {
+                                if (uiState.selectedImage?.uri == image.uri) {
                                     Icon(
                                         modifier = Modifier
                                             .padding(start = 4.dp, top = 4.dp)

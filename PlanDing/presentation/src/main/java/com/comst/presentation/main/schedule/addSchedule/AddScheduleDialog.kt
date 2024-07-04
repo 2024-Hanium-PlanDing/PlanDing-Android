@@ -62,30 +62,6 @@ fun AddScheduleDialog(
         }
     }
 
-    AddScheduleDialog(
-        date = uiState.date,
-        title = uiState.title,
-        description = uiState.description,
-        startTime = uiState.startTime,
-        endTime = uiState.endTime,
-        onDismiss = onDismiss,
-        onConfirm = { title: String, description: String, startTime: Int, endTime: Int -> onConfirm(title, description, startTime, endTime) },
-        onUIAction = viewModel::setEvent
-    )
-}
-
-@Composable
-private fun AddScheduleDialog(
-    date: String,
-    title: String,
-    description: String,
-    startTime: Int,
-    endTime: Int,
-    onDismiss: () -> Unit,
-    onConfirm: (String, String, Int, Int) -> Unit,
-    onUIAction: (AddScheduleUIEvent) -> Unit
-) {
-
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(text = "일정 추가") },
@@ -103,9 +79,9 @@ private fun AddScheduleDialog(
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
                     label = "제목을 입력해주세요",
-                    value = title,
+                    value = uiState.title,
                     onValueChange = {
-                        onUIAction(AddScheduleUIEvent.TitleChange(it))
+                        viewModel.setEvent(AddScheduleUIEvent.TitleChange(it))
                     }
                 )
                 PDTextFiledOutLine(
@@ -114,9 +90,9 @@ private fun AddScheduleDialog(
                         .heightIn(min = 200.dp)
                         .padding(vertical = 8.dp),
                     label = "일정 내용을 입력해주세요",
-                    value = description,
+                    value = uiState.description,
                     onValueChange = {
-                        onUIAction(AddScheduleUIEvent.DescriptionChange(it))
+                        viewModel.setEvent(AddScheduleUIEvent.DescriptionChange(it))
                     }
                 )
                 Row(
@@ -126,18 +102,18 @@ private fun AddScheduleDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     PDTimeDropdownMenu(
-                        selectedTime = startTime,
+                        selectedTime = uiState.startTime,
                         onConfirm = {
-                            onUIAction(AddScheduleUIEvent.SelectedStartTime(it))
+                            viewModel.setEvent(AddScheduleUIEvent.SelectedStartTime(it))
                         }
                     )
                     Spacer(modifier = Modifier.weight(0.5f))
                     Text(text = "부터")
                     Spacer(modifier = Modifier.weight(1f))
                     PDTimeDropdownMenu(
-                        selectedTime = endTime,
+                        selectedTime = uiState.endTime,
                         onConfirm = {
-                            onUIAction(AddScheduleUIEvent.SelectedEndTime(it))
+                            viewModel.setEvent(AddScheduleUIEvent.SelectedEndTime(it))
                         }
                     )
                     Spacer(modifier = Modifier.weight(0.5f))
@@ -149,7 +125,7 @@ private fun AddScheduleDialog(
             Log.d("타임","생성 버튼")
             PDButton(
                 onClick = {
-                    onConfirm(title, description, startTime, endTime)
+                    onConfirm(uiState.title, uiState.description, uiState.startTime, uiState.endTime)
                 },
                 text = "생성",
                 modifier = Modifier.fillMaxWidth()
@@ -183,15 +159,10 @@ private fun AddScheduleDialog(
 private fun AddScheduleDialogPreview() {
     PlanDingTheme {
         AddScheduleDialog(
-            date = "torquent",
-            title = "falli",
-            description = "urna",
-            startTime = 1937,
-            endTime = 7845,
+            viewModel = AddScheduleViewModel(),
+            date = "duo",
             onDismiss = {},
-            onConfirm = { s: String, s1: String, i: Int, i1: Int -> },
-            onUIAction = {}
-
+            onConfirm = { s: String, s1: String, i: Int, i1: Int -> }
         )
     }
 }

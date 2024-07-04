@@ -86,23 +86,6 @@ fun LoginScreen(
 
     val onKaKaoLoginClick = { loginKakao(context, kakaoCallback) }
 
-    LoginScreen(
-        id = uiState.id,
-        password = uiState.password,
-        onNavigateToSignUpScreen = onNavigateToSignUpScreen,
-        onKaKaoLoginClick = onKaKaoLoginClick,
-        onUIAction = viewModel::setEvent
-    )
-}
-
-@Composable
-private fun LoginScreen(
-    id: String,
-    password: String,
-    onNavigateToSignUpScreen: () -> Unit,
-    onKaKaoLoginClick: () -> Unit,
-    onUIAction: (LoginUIEvent) -> Unit
-) {
     Surface {
         Column(
             modifier = Modifier
@@ -124,25 +107,25 @@ private fun LoginScreen(
 
             PDTextFiledOutLine(
                 modifier = Modifier.fillMaxWidth(),
-                value = id,
+                value = uiState.id,
                 label = "아이디",
-                onValueChange = { newId -> onUIAction(LoginUIEvent.IdChange(newId)) }
+                onValueChange = { newId -> viewModel.setEvent(LoginUIEvent.IdChange(newId)) }
             )
             Spacer(Modifier.height(4.dp))
 
             PDTextFiledOutLine(
                 modifier = Modifier.fillMaxWidth(),
-                value = password,
+                value = uiState.password,
                 label = "비밀번호",
                 visualTransformation = PasswordVisualTransformation(),
-                onValueChange = { newPassword -> onUIAction(LoginUIEvent.PasswordChange(newPassword)) }
+                onValueChange = { newPassword -> viewModel.setEvent(LoginUIEvent.PasswordChange(newPassword)) }
             )
             Spacer(Modifier.height(20.dp))
 
             PDButton(
                 modifier = Modifier.fillMaxWidth(),
                 text = "로그인하기",
-                onClick = { onUIAction(LoginUIEvent.Login) }
+                onClick = { viewModel.setEvent(LoginUIEvent.Login) }
             )
 
             Spacer(Modifier.height(20.dp))
@@ -203,13 +186,7 @@ private fun LoginScreen(
 @Composable
 private fun LoginScreenPreview() {
     PlanDingTheme {
-        LoginScreen(
-            id = "",
-            password = "",
-            onNavigateToSignUpScreen = {},
-            onKaKaoLoginClick = {},
-            onUIAction = {}
-        )
+
     }
 }
 

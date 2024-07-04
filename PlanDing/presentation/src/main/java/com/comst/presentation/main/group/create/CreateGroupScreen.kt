@@ -36,6 +36,7 @@ import com.comst.presentation.ui.theme.BackgroundColor2
 import com.comst.presentation.ui.theme.BackgroundColor3
 import com.comst.presentation.ui.theme.PlanDingTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateGroupScreen(
     viewModel: CreateGroupViewModel = hiltViewModel(),
@@ -61,23 +62,6 @@ fun CreateGroupScreen(
         }
     }
 
-    CreateGroupScreen(
-        groupName = uiState.groupName,
-        groupDescription = uiState.groupDescription,
-        onBackClick = onBackClick,
-        onUIAction = viewModel::setEvent
-    )
-
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun CreateGroupScreen(
-    groupName: String,
-    groupDescription: String,
-    onBackClick: () -> Unit,
-    onUIAction: (CreateGroupUIEvent) -> Unit
-) {
     Surface {
         Scaffold(
             topBar = {
@@ -98,7 +82,7 @@ private fun CreateGroupScreen(
                     },
                     actions = {
                         TextButton(onClick = {
-                            onUIAction(CreateGroupUIEvent.CreateGroupRoom)
+                            viewModel.setEvent(CreateGroupUIEvent.CreateGroupRoom)
                         }) {
                             Text(text = "생성", color = Color.Black)
                         }
@@ -116,9 +100,9 @@ private fun CreateGroupScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp),
-                        value = groupName,
+                        value = uiState.groupName,
                         hint = "그룹의 이름을 적어주세요.",
-                        onValueChange = { newGroupName -> onUIAction(CreateGroupUIEvent.GroupNameChange(newGroupName)) }
+                        onValueChange = { newGroupName -> viewModel.setEvent(CreateGroupUIEvent.GroupNameChange(newGroupName)) }
                     )
 
                     PDTextFiled(
@@ -126,9 +110,9 @@ private fun CreateGroupScreen(
                             .fillMaxWidth()
                             .defaultMinSize(minHeight = 250.dp)
                             .padding(horizontal = 16.dp),
-                        value = groupDescription,
+                        value = uiState.groupDescription,
                         hint = "그룹의 설명을 적어주세요.",
-                        onValueChange = { newGroupDescription -> onUIAction(CreateGroupUIEvent.GroupDescriptionChange(newGroupDescription)) }
+                        onValueChange = { newGroupDescription -> viewModel.setEvent(CreateGroupUIEvent.GroupDescriptionChange(newGroupDescription)) }
                     )
                 }
             },
@@ -137,6 +121,18 @@ private fun CreateGroupScreen(
             }
         )
     }
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CreateGroupScreen(
+    groupName: String,
+    groupDescription: String,
+    onBackClick: () -> Unit,
+    onUIAction: (CreateGroupUIEvent) -> Unit
+) {
+
 }
 
 @Preview

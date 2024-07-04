@@ -1,5 +1,6 @@
 package com.comst.presentation.main.group
 
+import androidx.compose.runtime.Immutable
 import com.comst.domain.model.groupRoom.GroupRoomCardModel
 import com.comst.presentation.common.base.UIEvent
 import com.comst.presentation.common.base.UISideEffect
@@ -7,6 +8,7 @@ import com.comst.presentation.common.base.UIState
 
 class GroupContract {
 
+    @Immutable
     data class GroupUIState(
         val groupCardModels: List<GroupRoomCardModel> = emptyList(),
         val isLoading: Boolean = false

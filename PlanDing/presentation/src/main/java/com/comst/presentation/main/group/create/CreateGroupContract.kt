@@ -1,5 +1,6 @@
 package com.comst.presentation.main.group.create
 
+import androidx.compose.runtime.Immutable
 import com.comst.domain.model.file.MediaImage
 import com.comst.presentation.common.base.UIEvent
 import com.comst.presentation.common.base.UISideEffect
@@ -7,6 +8,7 @@ import com.comst.presentation.common.base.UIState
 
 class CreateGroupContract {
 
+    @Immutable
     data class CreateGroupUIState(
         val selectedImage : MediaImage? = null,
         val images: List<MediaImage> = emptyList(),

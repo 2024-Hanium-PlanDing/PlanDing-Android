@@ -1,5 +1,6 @@
 package com.comst.presentation.auth
 
+import androidx.compose.runtime.Immutable
 import com.comst.domain.model.user.SocialLoginInfo
 import com.comst.presentation.common.base.UIEvent
 import com.comst.presentation.common.base.UISideEffect
@@ -7,6 +8,7 @@ import com.comst.presentation.common.base.UIState
 
 class LoginContract {
 
+    @Immutable
     data class LoginUIState(
         val id: String = "",
         val password: String = "",

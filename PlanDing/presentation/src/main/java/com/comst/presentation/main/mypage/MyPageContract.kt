@@ -1,11 +1,13 @@
 package com.comst.presentation.main.mypage
 
+import androidx.compose.runtime.Immutable
 import com.comst.presentation.common.base.UIEvent
 import com.comst.presentation.common.base.UISideEffect
 import com.comst.presentation.common.base.UIState
 
 class MyPageContract {
 
+    @Immutable
     data class MyPageUIState(
         val username: String = "",
         val userCode: String = "",
