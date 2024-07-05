@@ -131,4 +131,13 @@ object DateUtils {
     fun getWeekStartAndEnd(date: Date, format: String = "yyyy-MM-dd"): SchedulePeriodModel {
         return getWeekStartAndEnd(dateToLocalDate(date), format)
     }
+
+    fun getServerFormat(date: LocalDate, format: String = "yyyy-MM-dd"): String {
+        val formatter = DateTimeFormatter.ofPattern(format, Locale.getDefault())
+        return date.format(formatter)
+    }
+
+    fun getServerFormat(date: Date, format: String = "yyyy-MM-dd"): String {
+        return getServerFormat(dateToLocalDate(date), format)
+    }
 }

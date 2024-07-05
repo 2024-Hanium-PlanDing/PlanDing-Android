@@ -3,7 +3,6 @@ package com.comst.presentation.main.schedule.addSchedule
 import android.content.res.Configuration
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.comst.domain.model.base.ScheduleEvent
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDTextFiledOutLine
 import com.comst.presentation.component.PDTimeDropdownMenu
@@ -33,13 +33,14 @@ import com.comst.presentation.main.schedule.addSchedule.AddScheduleContract.AddS
 import com.comst.presentation.main.schedule.addSchedule.AddScheduleContract.AddScheduleUIEvent
 import com.comst.presentation.ui.theme.BackgroundColor3
 import com.comst.presentation.ui.theme.PlanDingTheme
+import java.time.LocalDate
 
 @Composable
 fun AddScheduleDialog(
     viewModel: AddScheduleViewModel = hiltViewModel(),
-    date: String,
+    date: LocalDate,
     onDismiss: () -> Unit,
-    onConfirm: (String, String, Int, Int) -> Unit
+    onConfirm: (ScheduleEvent) -> Unit
 ) {
     LaunchedEffect(date) {
         viewModel.initialize(date)
@@ -58,6 +59,9 @@ fun AddScheduleDialog(
                         Toast.LENGTH_SHORT
                     ).show()
                 }
+                is AddScheduleSideEffect.SuccessCreateSchedule -> {
+                    onConfirm(effect.scheduleEvent)
+                }
             }
         }
     }
@@ -70,7 +74,7 @@ fun AddScheduleDialog(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = date,
+                    text = uiState.uiDate,
                     modifier = Modifier
                         .padding(bottom = 8.dp)
                 )
@@ -90,7 +94,7 @@ fun AddScheduleDialog(
                         .heightIn(min = 200.dp)
                         .padding(vertical = 8.dp),
                     label = "일정 내용을 입력해주세요",
-                    value = uiState.description,
+                    value = uiState.content,
                     onValueChange = {
                         viewModel.setEvent(AddScheduleUIEvent.DescriptionChange(it))
                     }
@@ -125,7 +129,7 @@ fun AddScheduleDialog(
             Log.d("타임","생성 버튼")
             PDButton(
                 onClick = {
-                    onConfirm(uiState.title, uiState.description, uiState.startTime, uiState.endTime)
+                    viewModel.setEvent(AddScheduleUIEvent.CreateSchedule)
                 },
                 text = "생성",
                 modifier = Modifier.fillMaxWidth()
@@ -158,11 +162,6 @@ fun AddScheduleDialog(
 @Composable
 private fun AddScheduleDialogPreview() {
     PlanDingTheme {
-        AddScheduleDialog(
-            viewModel = AddScheduleViewModel(),
-            date = "duo",
-            onDismiss = {},
-            onConfirm = { s: String, s1: String, i: Int, i1: Int -> }
-        )
+
     }
 }

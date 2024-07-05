@@ -1,6 +1,7 @@
 package com.comst.presentation.main.schedule
 
 import androidx.lifecycle.viewModelScope
+import com.comst.domain.model.base.ScheduleEvent
 import com.comst.domain.util.DateUtils
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleTodayListUseCase
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleWeekListUseCase
@@ -65,6 +66,15 @@ class ScheduleViewModel @Inject constructor(
 
         }
 
+    }
+
+    fun addSchedule(scheduleEvent: ScheduleEvent){
+        setState {
+            copy(
+                todayPersonalScheduleEvents = currentState.todayPersonalScheduleEvents + scheduleEvent,
+                selectWeekScheduleEvents = currentState.selectWeekScheduleEvents + scheduleEvent
+            )
+        }
     }
 
     private fun onOpenBottomSheet() = viewModelScope.launch {

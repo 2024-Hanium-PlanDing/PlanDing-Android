@@ -68,7 +68,6 @@ import com.comst.presentation.ui.theme.BackgroundColor2
 import com.comst.presentation.ui.theme.MainPurple200
 import com.comst.presentation.ui.theme.PlanDingTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScheduleScreen(
     viewModel: ScheduleViewModel = hiltViewModel()
@@ -131,11 +130,12 @@ fun ScheduleScreen(
 
     if (uiState.isAddScheduleDialogVisible) {
         AddScheduleDialog(
-            date = uiState.selectUIDate,
+            date = uiState.selectLocalDate,
             onDismiss = {
                 viewModel.setEvent(HideAddScheduleDialog)
             },
-            onConfirm = { title, description, startTime, endTime ->
+            onConfirm = { scheduleEvent ->
+                viewModel.addSchedule(scheduleEvent = scheduleEvent)
                 viewModel.setEvent(HideAddScheduleDialog)
             }
         )
