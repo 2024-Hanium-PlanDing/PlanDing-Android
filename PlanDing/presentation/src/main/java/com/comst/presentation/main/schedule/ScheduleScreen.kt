@@ -304,14 +304,15 @@ private fun NoScheduleContent() {
 private fun ScheduleList(
     events: List<ScheduleEvent>,
 ) {
+    val sortedEvents = remember(events) { events.sortedBy { it.startTime } }
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         items(
-            count = events.size,
-            key = { index -> events[index].scheduleId }
+            count = sortedEvents.size,
+            key = { index -> sortedEvents[index].scheduleId }
         ) { index ->
-            events[index].let {
+            sortedEvents[index].let {
                 PersonalScheduleCard(schedule = it)
             }
             Divider()
