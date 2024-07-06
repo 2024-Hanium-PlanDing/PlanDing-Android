@@ -32,7 +32,12 @@ class AddScheduleViewModel @Inject constructor(
         setState {
             copy(
                 date = date,
-                uiDate = DateUtils.localDateToUIDate(date)
+                uiDate = DateUtils.localDateToUIDate(date),
+                title = "",
+                content = "",
+                startTime = 6,
+                endTime = 6,
+                isLoading = false
             )
         }
     }
