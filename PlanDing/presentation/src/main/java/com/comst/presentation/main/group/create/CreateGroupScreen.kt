@@ -1,14 +1,13 @@
 package com.comst.presentation.main.group.create
 
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,9 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.comst.presentation.component.PDTextFiled
 import com.comst.presentation.main.group.create.CreateGroupContract.*
-import com.comst.presentation.ui.theme.BackgroundColor1
-import com.comst.presentation.ui.theme.BackgroundColor2
-import com.comst.presentation.ui.theme.BackgroundColor3
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,14 +71,14 @@ fun CreateGroupScreen(
                     navigationIcon = {
                         IconButton(onClick = onBackClick) {
                             Icon(
-                                imageVector = Icons.Filled.ArrowBack,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "뒤로가기"
                             )
                         }
                     },
                     actions = {
                         TextButton(onClick = {
-                            viewModel.setEvent(CreateGroupUIEvent.CreateGroupRoom)
+                            viewModel.setEvent(CreateGroupUIEvent.CreateGroup)
                         }) {
                             Text(text = "생성", color = Color.Black)
                         }

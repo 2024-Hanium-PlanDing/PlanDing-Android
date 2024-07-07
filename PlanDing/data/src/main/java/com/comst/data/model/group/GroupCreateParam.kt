@@ -1,4 +1,4 @@
-package com.comst.data.model.groupRoom
+package com.comst.data.model.group
 
 import kotlinx.serialization.Serializable
 

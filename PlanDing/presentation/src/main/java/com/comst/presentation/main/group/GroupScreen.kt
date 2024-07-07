@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.comst.presentation.component.PDScreenHeader
 import com.comst.presentation.main.group.create.CreateGroupActivity
-import com.comst.domain.model.groupRoom.GroupRoomCardModel
+import com.comst.domain.model.group.GroupCardModel
 import com.comst.presentation.main.group.GroupContract.GroupUIEvent
 import com.comst.presentation.main.group.GroupContract.GroupUISideEffect
 import com.comst.presentation.main.group.detail.GroupDetailActivity
@@ -145,7 +145,7 @@ fun GroupScreen(
 
 @Composable
 private fun GroupScreen(
-    groupRoomCardModels:List<GroupRoomCardModel>,
+    groupCardModels:List<GroupCardModel>,
     onUIAction:(GroupUIEvent) -> Unit
 ){
 

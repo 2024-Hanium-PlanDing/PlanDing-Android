@@ -1,7 +1,7 @@
 package com.comst.presentation.main.group
 
 import androidx.lifecycle.viewModelScope
-import com.comst.domain.usecase.groupRoom.GetMyGroupRoomsUseCase
+import com.comst.domain.usecase.group.GetMyGroupsUseCase
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GroupViewModel @Inject constructor(
-    private val getMyGroupRoomsUseCase: GetMyGroupRoomsUseCase
+    private val getMyGroupsUseCase: GetMyGroupsUseCase
 ) : BaseViewModel<GroupUIState, GroupUISideEffect, GroupUIEvent>(GroupUIState()){
 
 
@@ -30,7 +30,7 @@ class GroupViewModel @Inject constructor(
 
     fun load() = viewModelScope.launch {
         setState { copy(isLoading = true) }
-        getMyGroupRoomsUseCase().onSuccess {
+        getMyGroupsUseCase().onSuccess {
             setState {
                 copy(
                     groupCardModels = it

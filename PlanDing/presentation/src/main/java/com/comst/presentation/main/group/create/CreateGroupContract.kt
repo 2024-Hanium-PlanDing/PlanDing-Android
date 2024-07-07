@@ -26,6 +26,6 @@ class CreateGroupContract {
         data class GroupNameChange(val groupName:String) : CreateGroupUIEvent()
         data class GroupDescriptionChange(val groupDescription:String) : CreateGroupUIEvent()
         data class SelectGroupImage(val image:MediaImage) : CreateGroupUIEvent()
-        object CreateGroupRoom : CreateGroupUIEvent()
+        object CreateGroup : CreateGroupUIEvent()
     }
 }

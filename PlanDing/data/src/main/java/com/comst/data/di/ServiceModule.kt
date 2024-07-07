@@ -1,7 +1,7 @@
 package com.comst.data.di
 
 import com.comst.data.retrofit.CommonScheduleService
-import com.comst.data.retrofit.GroupRoomService
+import com.comst.data.retrofit.GroupService
 import com.comst.data.retrofit.PersonalScheduleService
 import com.comst.data.retrofit.UserService
 import dagger.Module
@@ -20,8 +20,8 @@ object ServiceModule {
     }
 
     @Provides
-    fun provideGroupRoomService(retrofit: Retrofit): GroupRoomService {
-        return retrofit.create(GroupRoomService::class.java)
+    fun provideGroupService(retrofit: Retrofit): GroupService {
+        return retrofit.create(GroupService::class.java)
     }
 
     @Provides

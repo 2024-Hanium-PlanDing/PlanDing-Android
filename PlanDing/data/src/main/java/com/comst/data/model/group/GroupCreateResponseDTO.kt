@@ -1,6 +1,6 @@
-package com.comst.data.model.groupRoom
+package com.comst.data.model.group
 
-import com.comst.domain.model.groupRoom.GroupRoomCreateResponseModel
+import com.comst.domain.model.group.GroupCreateResponseModel
 
 data class GroupCreateResponseDTO(
     val id: Long,
@@ -10,8 +10,8 @@ data class GroupCreateResponseDTO(
     val ownerCode: String
 )
 
-fun GroupCreateResponseDTO.toDomainModel(): GroupRoomCreateResponseModel {
-    return GroupRoomCreateResponseModel(
+fun GroupCreateResponseDTO.toDomainModel(): GroupCreateResponseModel {
+    return GroupCreateResponseModel(
         id =  id,
         name = name,
         description = description,

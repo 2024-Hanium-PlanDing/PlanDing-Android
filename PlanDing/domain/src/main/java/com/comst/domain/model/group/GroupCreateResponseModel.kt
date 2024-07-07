@@ -1,6 +1,6 @@
-package com.comst.domain.model.groupRoom
+package com.comst.domain.model.group
 
-data class GroupRoomCreateResponseModel(
+data class GroupCreateResponseModel(
     val id: Long,
     val name: String,
     val description: String,

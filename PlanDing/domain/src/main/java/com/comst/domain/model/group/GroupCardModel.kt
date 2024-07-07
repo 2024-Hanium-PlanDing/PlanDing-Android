@@ -1,6 +1,6 @@
-package com.comst.domain.model.groupRoom
+package com.comst.domain.model.group
 
-data class GroupRoomCardModel (
+data class GroupCardModel (
     val groupId:Long,
     val groupCode:String,
     val groupOwnerCode:String,

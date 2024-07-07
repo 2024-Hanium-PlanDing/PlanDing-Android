@@ -2,9 +2,9 @@ package com.comst.presentation.main.group.create
 
 import androidx.lifecycle.viewModelScope
 import com.comst.domain.model.file.MediaImage
-import com.comst.domain.model.groupRoom.GroupRoomCreate
+import com.comst.domain.model.group.GroupCreate
 import com.comst.domain.usecase.file.GetImageListUseCase
-import com.comst.domain.usecase.groupRoom.PostGroupRoomUseCase
+import com.comst.domain.usecase.group.PostGroupUseCase
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateGroupViewModel @Inject constructor(
     private val getImageListUseCase: GetImageListUseCase,
-    private val postGroupRoomUseCase: PostGroupRoomUseCase
+    private val postGroupUseCase: PostGroupUseCase
 ) : BaseViewModel<CreateGroupUIState, CreateGroupUISideEffect, CreateGroupUIEvent>(CreateGroupUIState()){
     init {
         load()
@@ -26,7 +26,7 @@ class CreateGroupViewModel @Inject constructor(
         when(event){
             is CreateGroupUIEvent.SelectGroupImage -> onImageClick(event.image)
 
-            is CreateGroupUIEvent.CreateGroupRoom -> onCreateGroupRoomClick()
+            is CreateGroupUIEvent.CreateGroup -> onCreateGroupClick()
 
             is CreateGroupUIEvent.GroupNameChange -> onGroupNameChange(event.groupName)
 
@@ -69,13 +69,13 @@ class CreateGroupViewModel @Inject constructor(
         }
     }
 
-    private fun onCreateGroupRoomClick() = viewModelScope.launch {
+    private fun onCreateGroupClick() = viewModelScope.launch {
 
         if (currentState.selectedImage == null){
             setEffect(CreateGroupUISideEffect.ShowToast("그룹 이미지는 필수입니다."))
         }else{
-            postGroupRoomUseCase(
-                GroupRoomCreate(
+            postGroupUseCase(
+                GroupCreate(
                     currentState.groupName,
                     currentState.groupDescription
                 ),

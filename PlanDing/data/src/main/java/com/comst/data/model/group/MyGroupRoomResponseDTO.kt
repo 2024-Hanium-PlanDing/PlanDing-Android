@@ -1,6 +1,6 @@
-package com.comst.data.model.groupRoom
+package com.comst.data.model.group
 
-import com.comst.domain.model.groupRoom.GroupRoomCardModel
+import com.comst.domain.model.group.GroupCardModel
 
 data class MyGroupRoomDTO(
     val id : Long,
@@ -11,8 +11,8 @@ data class MyGroupRoomDTO(
     val thumbnailPath : String
 )
 
-fun MyGroupRoomDTO.toDomainModel(): GroupRoomCardModel {
-    return GroupRoomCardModel(
+fun MyGroupRoomDTO.toDomainModel(): GroupCardModel {
+    return GroupCardModel(
         groupId = id,
         groupCode = code,
         groupOwnerCode = ownerCode,
