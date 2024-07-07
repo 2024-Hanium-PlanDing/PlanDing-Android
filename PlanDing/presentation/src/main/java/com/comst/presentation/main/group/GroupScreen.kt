@@ -37,6 +37,7 @@ import com.comst.presentation.main.group.create.CreateGroupActivity
 import com.comst.domain.model.groupRoom.GroupRoomCardModel
 import com.comst.presentation.main.group.GroupContract.GroupUIEvent
 import com.comst.presentation.main.group.GroupContract.GroupUISideEffect
+import com.comst.presentation.main.group.detail.GroupDetailActivity
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
@@ -75,9 +76,9 @@ fun GroupScreen(
                 is GroupUISideEffect.NavigateToGroupDetailActivity -> {
                     context.startActivity(
                         Intent(
-                            context, CreateGroupActivity::class.java
+                            context, GroupDetailActivity::class.java
                         ).apply {
-                            putExtra("", effect.id)
+                            putExtra("groupId", effect.id)
                         }
                     )
                 }
@@ -107,11 +108,12 @@ fun GroupScreen(
                         count = uiState.groupCardModels.size,
                         key = { index -> uiState.groupCardModels[index].groupId }
                     ){ index ->
-                        uiState.groupCardModels[index].let {
+                        uiState.groupCardModels[index].let {groupRoomCardModel ->
                             GroupCard(
-                                groupName = it.groupName,
-                                groupDescription = it.groupDescription,
-                                groupImageUrl = it.groupImageUrl
+                                groupName = groupRoomCardModel.groupName,
+                                groupDescription = groupRoomCardModel.groupDescription,
+                                groupImageUrl = groupRoomCardModel.groupImageUrl,
+                                goGroupDetail = { viewModel.setEvent(GroupUIEvent.GroupCardClick(groupRoomCardModel.groupId)) }
                             )
 
                             Spacer(modifier = Modifier.height(12.dp))
