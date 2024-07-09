@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -35,6 +37,9 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -47,6 +52,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -66,7 +72,13 @@ import com.comst.presentation.main.schedule.ScheduleContract.ScheduleUIEvent.*
 import com.comst.presentation.main.schedule.addSchedule.AddScheduleDialog
 import com.comst.presentation.ui.theme.BackgroundColor2
 import com.comst.presentation.ui.theme.MainPurple200
+import com.comst.presentation.ui.theme.MainPurple600
 import com.comst.presentation.ui.theme.PlanDingTheme
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.pagerTabIndicatorOffset
+import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.launch
 
 @Composable
 fun ScheduleScreen(
@@ -168,104 +180,177 @@ private fun ScheduleTabs(
     todayGroupScheduleEvents: List<ScheduleEvent>,
     onUIAction: (ScheduleUIEvent) -> Unit
 ) {
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
-
-    Column {
-        Row(
-            modifier = Modifier
-                .clickable {
-                    onUIAction(OpenBottomSheetClick)
-                }
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Filled.DateRange,
-                contentDescription = "달력",
-            )
-
-            Spacer(modifier = Modifier.size(8.dp))
-
-            Text(
-                modifier = Modifier,
-                text = "$selectUIDate $selectDay",
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Icon(
-                imageVector = if (isTodayScheduleVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = "오늘의 스케줄 토글",
-                modifier = Modifier.clickable {
-                    onUIAction(ToggleTodayScheduleVisibility)
-                }
-            )
-        }
+    Column(
+        modifier = Modifier.padding(top = 8.dp, bottom = 8.dp).padding(horizontal = 16.dp)
+    ) {
+        ScheduleHeader(selectUIDate, selectDay, isTodayScheduleVisible, onUIAction)
 
         if (isTodayScheduleVisible) {
-            Spacer(modifier = Modifier.height(4.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = BackgroundColor2,
-                        shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
-                    )
-            ) {
-                TabRow(selectedTabIndex = selectedTabIndex) {
-                    Tab(
-                        selected = selectedTabIndex == 0,
-                        onClick = { selectedTabIndex = 0 }
-                    ) {
-                        Text(text = "개인일정", modifier = Modifier.padding(16.dp))
-                    }
-                    Tab(
-                        selected = selectedTabIndex == 1,
-                        onClick = { selectedTabIndex = 1 }
-                    ) {
-                        Text(text = "그룹일정", modifier = Modifier.padding(16.dp))
-                    }
-                }
+            Spacer(modifier = Modifier.height(8.dp))
+            ScheduleContent(
+                todayPersonalScheduleEvents,
+                todayGroupScheduleEvents,
+                onUIAction
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+}
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(400.dp)
-                ) {
-                    if (selectedTabIndex == 0) {
-                        if (todayPersonalScheduleEvents.isEmpty()) {
-                            NoScheduleContent()
-                        } else {
-                            ScheduleList(todayPersonalScheduleEvents)
+@Composable
+private fun ScheduleHeader(
+    selectUIDate: String,
+    selectDay: String,
+    isTodayScheduleVisible: Boolean,
+    onUIAction: (ScheduleUIEvent) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .clickable { onUIAction(OpenBottomSheetClick) },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Filled.DateRange,
+            contentDescription = "달력",
+        )
+
+        Spacer(modifier = Modifier.size(8.dp))
+
+        Text(
+            text = "$selectUIDate $selectDay",
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Icon(
+            imageVector = if (isTodayScheduleVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+            contentDescription = "오늘의 스케줄 토글",
+            modifier = Modifier.clickable { onUIAction(ToggleTodayScheduleVisibility) }
+        )
+    }
+}
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+private fun ScheduleContent(
+    todayPersonalScheduleEvents: List<ScheduleEvent>,
+    todayGroupScheduleEvents: List<ScheduleEvent>,
+    onUIAction: (ScheduleUIEvent) -> Unit
+) {
+    val pages = listOf("개인일정", "그룹일정")
+    val pagerState = rememberPagerState()
+    val coroutineScope = rememberCoroutineScope()
+    var periodIndex by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }.collect { page ->
+            periodIndex = page
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = BackgroundColor2,
+                shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
+            )
+    ) {
+        BoxWithConstraints {
+            val tabWidth = maxWidth / pages.size
+
+            TabRow(
+                selectedTabIndex = periodIndex,
+                modifier = Modifier.fillMaxWidth(),
+                indicator = { tabPositions ->
+                    Box(
+                        modifier = Modifier
+                            .tabIndicatorOffset(tabPositions[periodIndex])
+                            .width(tabWidth)
+                            .height(4.dp)
+                            .background(MaterialTheme.colorScheme.primary)
+                    )
+                },
+            ) {
+                pages.forEachIndexed { index, title ->
+                    Tab(
+                        selected = periodIndex == index,
+                        onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
                         }
-                        FloatingActionButton(
-                            modifier = Modifier
-                                .size(80.dp)
-                                .padding(16.dp)
-                                .align(Alignment.BottomEnd),
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(60.dp),
-                            onClick = {
-                                onUIAction(ShowAddScheduleDialog)
-                            },
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(32.dp),
-                                imageVector = Icons.Filled.Add,
-                                contentDescription = "Add"
-                            )
-                        }
-                    } else {
-                        if (todayGroupScheduleEvents.isEmpty()) {
-                            NoScheduleContent()
-                        } else {
-                            ScheduleList(todayGroupScheduleEvents)
-                        }
+                    ) {
+                        Text(
+                            text = title,
+                            maxLines = 1,
+                            modifier = Modifier.padding(16.dp)
+                        )
                     }
                 }
             }
         }
-        
+
+        HorizontalPager(
+            count = pages.size,
+            state = pagerState,
+            modifier = Modifier.fillMaxWidth()
+        ) { page ->
+            SchedulePageContent(
+                page = page,
+                todayPersonalScheduleEvents = todayPersonalScheduleEvents,
+                todayGroupScheduleEvents = todayGroupScheduleEvents,
+                onUIAction = onUIAction
+            )
+        }
+    }
+}
+
+@Composable
+private fun SchedulePageContent(
+    page: Int,
+    todayPersonalScheduleEvents: List<ScheduleEvent>,
+    todayGroupScheduleEvents: List<ScheduleEvent>,
+    onUIAction: (ScheduleUIEvent) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(400.dp)
+    ) {
+        when (page) {
+            0 -> {
+                if (todayPersonalScheduleEvents.isEmpty()) {
+                    NoScheduleContent()
+                } else {
+                    ScheduleList(todayPersonalScheduleEvents)
+                }
+                FloatingActionButton(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .padding(16.dp)
+                        .align(Alignment.BottomEnd),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    shape = RoundedCornerShape(60.dp),
+                    onClick = {
+                        onUIAction(ShowAddScheduleDialog)
+                    },
+                ) {
+                    Icon(
+                        modifier = Modifier.size(32.dp),
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = "Add"
+                    )
+                }
+            }
+            1 -> {
+                if (todayGroupScheduleEvents.isEmpty()) {
+                    NoScheduleContent()
+                } else {
+                    ScheduleList(todayGroupScheduleEvents)
+                }
+            }
+        }
     }
 }
 
@@ -319,6 +404,7 @@ private fun ScheduleList(
         }
     }
 }
+
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
