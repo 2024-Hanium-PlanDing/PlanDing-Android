@@ -25,8 +25,8 @@ interface GroupService {
     @GET("v1/group")
     suspend fun getMyGroup(): Response<BaseResponse<List<MyGroupRoomDTO>>>
 
-    @GET("v1/group/{groupId}")
+    @GET("v1/group/{groupCode}")
     suspend fun getGroupInformation(
-        @Path("groupId") groupId: Long
+        @Path("groupCode") groupCode: String
     ): Response<BaseResponse<GroupInformationResponseDTO>>
 }

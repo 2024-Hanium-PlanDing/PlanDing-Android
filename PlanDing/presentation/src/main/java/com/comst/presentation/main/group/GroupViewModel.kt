@@ -23,7 +23,7 @@ class GroupViewModel @Inject constructor(
 
     override suspend fun handleEvent(event: GroupUIEvent) {
         when(event){
-            is GroupUIEvent.GroupCardClick -> setEffect(GroupUISideEffect.NavigateToGroupDetailActivity(event.id))
+            is GroupUIEvent.GroupCardClick -> setEffect(GroupUISideEffect.NavigateToGroupDetailActivity(event.groupCode))
             is GroupUIEvent.GroupCreateClick -> setEffect(GroupUISideEffect.NavigateToCreateGroupActivity)
         }
     }

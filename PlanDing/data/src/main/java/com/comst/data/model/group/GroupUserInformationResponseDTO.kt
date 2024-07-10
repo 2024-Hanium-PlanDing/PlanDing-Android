@@ -4,6 +4,7 @@ import com.comst.domain.model.group.GroupUserInformationModel
 
 data class GroupUserInformationResponseDTO (
     val id: Long,
+    val userCode: String,
     val userName: String,
     val email: String,
     val profileImageUrl: String,
@@ -11,9 +12,10 @@ data class GroupUserInformationResponseDTO (
 
 fun GroupUserInformationResponseDTO.toDomainModel(): GroupUserInformationModel {
     return GroupUserInformationModel(
-        id = 0,
-        userName = "",
-        email = "",
-        profileImageUrl = ""
+        id = id,
+        userCode = userCode,
+        userName = userName,
+        email = email,
+        profileImageUrl = profileImageUrl
     )
 }

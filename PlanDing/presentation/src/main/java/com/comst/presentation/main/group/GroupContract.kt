@@ -17,11 +17,11 @@ class GroupContract {
     sealed class GroupUISideEffect: UISideEffect {
         data class ShowToast(val message: String): GroupUISideEffect()
         object NavigateToCreateGroupActivity : GroupUISideEffect()
-        data class NavigateToGroupDetailActivity(val id: Long) : GroupUISideEffect()
+        data class NavigateToGroupDetailActivity(val groupCode: String) : GroupUISideEffect()
     }
 
     sealed class GroupUIEvent: UIEvent{
-        data class GroupCardClick(val id: Long): GroupUIEvent()
+        data class GroupCardClick(val groupCode: String): GroupUIEvent()
         object GroupCreateClick: GroupUIEvent()
     }
 }

@@ -11,10 +11,10 @@ class GroupDetailActivity  : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val groupId = intent.getLongExtra("groupId", -1L)
+        val groupCode = intent.getStringExtra("groupCode") ?: ""
         setContent {
             PlanDingTheme {
-                GroupDetailScreen(groupId = groupId)
+                GroupDetailScreen(groupCode = groupCode)
             }
         }
     }

@@ -41,9 +41,9 @@ class GroupRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun getGroupInfo(groupId: Long): ApiResult<GroupInformationModel> {
+    override suspend fun getGroupInfo(groupCode: String): ApiResult<GroupInformationModel> {
         return ApiHandler.handle(
-            execute = { groupService.getGroupInformation(groupId) },
+            execute = { groupService.getGroupInformation(groupCode) },
             mapper = { response ->  response.toDomainModel()}
         )
     }

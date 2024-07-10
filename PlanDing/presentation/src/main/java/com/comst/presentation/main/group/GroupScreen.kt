@@ -78,7 +78,7 @@ fun GroupScreen(
                         Intent(
                             context, GroupDetailActivity::class.java
                         ).apply {
-                            putExtra("groupId", effect.id)
+                            putExtra("groupCode", effect.groupCode)
                         }
                     )
                 }
@@ -113,7 +113,7 @@ fun GroupScreen(
                                 groupName = groupRoomCardModel.groupName,
                                 groupDescription = groupRoomCardModel.groupDescription,
                                 groupImageUrl = groupRoomCardModel.groupImageUrl,
-                                goGroupDetail = { viewModel.setEvent(GroupUIEvent.GroupCardClick(groupRoomCardModel.groupId)) }
+                                goGroupDetail = { viewModel.setEvent(GroupUIEvent.GroupCardClick(groupRoomCardModel.groupCode)) }
                             )
 
                             Spacer(modifier = Modifier.height(12.dp))
@@ -140,15 +140,6 @@ fun GroupScreen(
 
         }
     }
-}
-
-
-@Composable
-private fun GroupScreen(
-    groupCardModels:List<GroupCardModel>,
-    onUIAction:(GroupUIEvent) -> Unit
-){
-
 }
 
 @Preview

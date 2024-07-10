@@ -8,7 +8,7 @@ import javax.inject.Inject
 data class GetGroupInformationUseCase @Inject constructor(
     private val groupRepository: GroupRepository
 ) {
-    suspend operator fun invoke(groupId: Long): ApiResult<GroupInformationModel> {
-        return groupRepository.getGroupInfo(groupId)
+    suspend operator fun invoke(groupCode: String): ApiResult<GroupInformationModel> {
+        return groupRepository.getGroupInfo(groupCode)
     }
 }

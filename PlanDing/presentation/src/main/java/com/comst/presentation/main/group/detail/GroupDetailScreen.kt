@@ -46,12 +46,12 @@ import com.comst.presentation.ui.theme.PlanDingTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GroupDetailScreen(
-    groupId : Long,
+    groupCode : String,
     viewModel: GroupDetailViewModel = hiltViewModel()
 ) {
 
-    LaunchedEffect(groupId) {
-        viewModel.initialize(groupId)
+    LaunchedEffect(groupCode) {
+        viewModel.initialize(groupCode)
     }
 
     val scrollState = rememberScrollState()
@@ -202,6 +202,6 @@ fun ViewPagerContent() {
 @Composable
 private fun GroupDetailPreview() {
     PlanDingTheme {
-        GroupDetailScreen(groupId = 6318, viewModel = hiltViewModel())
+        GroupDetailScreen(groupCode = "6318", viewModel = hiltViewModel())
     }
 }

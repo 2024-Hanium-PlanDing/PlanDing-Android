@@ -1,5 +1,6 @@
 package com.comst.presentation.main.group.detail
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.comst.domain.usecase.group.GetGroupInformationUseCase
 import com.comst.domain.util.onFailure
@@ -19,9 +20,9 @@ class GroupDetailViewModel @Inject constructor(
 
     }
 
-    fun initialize(groupId: Long)  = viewModelScope.launch {
-        getGroupInformationUseCase(groupId).onSuccess {
-
+    fun initialize(groupCode: String)  = viewModelScope.launch {
+        getGroupInformationUseCase(groupCode).onSuccess {
+            Log.d("하하", "${it}")
         }.onFailure { statusCode, message ->
 
         }

@@ -11,5 +11,5 @@ interface GroupRepository {
     suspend fun getMyGroup(): ApiResult<List<GroupCardModel>>
     suspend fun postGroup(groupCreate: GroupCreate, thumbnail: MediaImage): ApiResult<GroupCreateResponseModel>
 
-    suspend fun getGroupInfo(groupId:Long): ApiResult<GroupInformationModel>
+    suspend fun getGroupInfo(groupCode:String): ApiResult<GroupInformationModel>
 }
