@@ -202,6 +202,6 @@ fun ViewPagerContent() {
 @Composable
 private fun GroupDetailPreview() {
     PlanDingTheme {
-        GroupDetailScreen(groupId = 6318, viewModel = GroupDetailViewModel())
+        GroupDetailScreen(groupId = 6318, viewModel = hiltViewModel())
     }
 }
