@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     id("kotlin-kapt")
     alias(libs.plugins.hilt)
+    id("com.google.gms.google-services")
 }
 
 val properties = Properties()
@@ -98,4 +99,7 @@ dependencies {
     // kakao login
     implementation("com.kakao.sdk:v2-user:2.13.0")
 
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
+    implementation("com.google.firebase:firebase-analytics")
 }
