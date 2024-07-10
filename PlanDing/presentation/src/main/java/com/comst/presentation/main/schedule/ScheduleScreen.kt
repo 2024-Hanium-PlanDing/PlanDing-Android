@@ -277,6 +277,7 @@ private fun ScheduleContent(
                         selected = periodIndex == index,
                         onClick = {
                             coroutineScope.launch {
+                                periodIndex = index
                                 pagerState.animateScrollToPage(index)
                             }
                         }
