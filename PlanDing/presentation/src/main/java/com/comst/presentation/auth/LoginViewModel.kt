@@ -3,7 +3,7 @@ package com.comst.presentation.auth
 import androidx.lifecycle.viewModelScope
 import com.comst.domain.model.user.SocialLoginInfo
 import com.comst.domain.usecase.user.PostSocialLoginUseCase
-import com.comst.domain.usecase.local.SetTokenUseCase
+import com.comst.domain.usecase.local.SetUserDataUseCase
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.auth.LoginContract.*
@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val setTokenUseCase: SetTokenUseCase,
+    private val setUserDataUseCase: SetUserDataUseCase,
     private val postSocialLoginUseCase: PostSocialLoginUseCase,
 ) : BaseViewModel<LoginUIState, LoginBaseSideEffect, LoginBaseIntent, LoginBaseEvent>(LoginUIState()) {
 
@@ -49,15 +49,7 @@ class LoginViewModel @Inject constructor(
 
     private fun onLoginClick() = viewModelScope.launch {
         setState { copy(isLoading = true) }
-        val id = currentState.id
-        val password = currentState.password
-        setTokenUseCase(id, password)
-            .onSuccess {
-                setEffect(LoginBaseSideEffect.NavigateToMainActivity)
-            }
-            .onFailure {
-                setEvent(LoginBaseEvent.LoginFailure(it.message.orEmpty()))
-            }
+
         setState { copy(isLoading = false) }
     }
 
@@ -65,7 +57,7 @@ class LoginViewModel @Inject constructor(
         setState { copy(isLoading = true) }
         postSocialLoginUseCase(accountInfo)
             .onSuccess {
-                setTokenUseCase(it.accessToken, it.refreshToken)
+                setUserDataUseCase(it.accessToken, it.refreshToken, it.userCode)
                 setEffect(LoginBaseSideEffect.NavigateToMainActivity)
             }
             .onFailure {
