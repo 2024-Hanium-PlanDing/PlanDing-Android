@@ -1,8 +1,6 @@
 package com.comst.presentation.main.schedule
 
 import android.content.res.Configuration
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -42,7 +40,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -117,7 +114,7 @@ fun ScheduleScreen(
 
                         if (uiState.isTodayScheduleVisible) {
                             Spacer(modifier = Modifier.height(8.dp))
-                            ScheduleContent(
+                            ScheduleTabs(
                                 todayPersonalSchedules = uiState.todayPersonalScheduleEvents,
                                 todayGroupSchedules = uiState.todayGroupScheduleEvents,
                                 onUIAction = viewModel::setIntent
@@ -209,7 +206,7 @@ private fun ScheduleHeader(
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-private fun ScheduleContent(
+private fun ScheduleTabs(
     todayPersonalSchedules: List<Schedule>,
     todayGroupSchedules: List<Schedule>,
     onUIAction: (ScheduleIntent) -> Unit
@@ -274,7 +271,7 @@ private fun ScheduleContent(
             state = pagerState,
             modifier = Modifier.fillMaxWidth()
         ) { page ->
-            SchedulePageContent(
+            ScheduleTabsContent(
                 page = page,
                 todayPersonalSchedules = todayPersonalSchedules,
                 todayGroupSchedules = todayGroupSchedules,
@@ -285,7 +282,7 @@ private fun ScheduleContent(
 }
 
 @Composable
-private fun SchedulePageContent(
+private fun ScheduleTabsContent(
     page: Int,
     todayPersonalSchedules: List<Schedule>,
     todayGroupSchedules: List<Schedule>,
