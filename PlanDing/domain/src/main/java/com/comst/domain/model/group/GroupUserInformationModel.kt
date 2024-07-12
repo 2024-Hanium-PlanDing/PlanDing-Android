@@ -5,5 +5,6 @@ data class GroupUserInformationModel (
     val userCode: String,
     val userName: String,
     val email: String,
-    val profileImageUrl: String
+    val profileImageUrl: String,
+    val hasPermission: Boolean
 )

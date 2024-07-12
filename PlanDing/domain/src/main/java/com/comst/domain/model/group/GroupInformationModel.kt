@@ -8,4 +8,6 @@ data class GroupInformationModel(
     val thumbnailUrl: String,
     val createdBy: String,
     val users: List<GroupUserInformationModel>,
+    val isGroupAdmin: Boolean
 )
+

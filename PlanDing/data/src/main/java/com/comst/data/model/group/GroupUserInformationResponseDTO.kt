@@ -8,6 +8,7 @@ data class GroupUserInformationResponseDTO (
     val userName: String,
     val email: String,
     val profileImageUrl: String,
+    val hasPermission: Boolean
 )
 
 fun GroupUserInformationResponseDTO.toDomainModel(): GroupUserInformationModel {
@@ -16,6 +17,7 @@ fun GroupUserInformationResponseDTO.toDomainModel(): GroupUserInformationModel {
         userCode = userCode,
         userName = userName,
         email = email,
-        profileImageUrl = profileImageUrl
+        profileImageUrl = profileImageUrl,
+        hasPermission = hasPermission
     )
 }

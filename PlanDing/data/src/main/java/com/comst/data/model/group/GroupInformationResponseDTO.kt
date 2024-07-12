@@ -10,6 +10,7 @@ data class GroupInformationResponseDTO(
     val thumbnailUrl: String,
     val createdBy: String,
     val users: List<GroupUserInformationResponseDTO>,
+    val isGroupAdmin: Boolean
 )
 
 fun GroupInformationResponseDTO.toDomainModel(): GroupInformationModel{
@@ -20,6 +21,7 @@ fun GroupInformationResponseDTO.toDomainModel(): GroupInformationModel{
         description = description,
         thumbnailUrl = thumbnailUrl,
         createdBy = createdBy,
-        users = users.map { it.toDomainModel() }
+        users = users.map { it.toDomainModel() },
+        isGroupAdmin = isGroupAdmin
     )
 }
