@@ -17,6 +17,7 @@ class UserDataStore @Inject constructor(
     companion object {
         private val KEY_ACCESS_TOKEN = stringPreferencesKey("access_token")
         private val KEY_REFRESH_TOKEN = stringPreferencesKey("refresh_token")
+        private val KEY_USER_CODE = stringPreferencesKey("user_code")
     }
 
     suspend fun setAccessToken(token: String) {
@@ -37,6 +38,16 @@ class UserDataStore @Inject constructor(
 
     suspend fun getRefreshToken(): String? {
         return context.dataStore.data.map { it[KEY_REFRESH_TOKEN] }.firstOrNull()
+    }
+
+    suspend fun setUserCode(userCode: String) {
+        context.dataStore.edit { pref ->
+            pref[KEY_USER_CODE] = userCode
+        }
+    }
+
+    suspend fun getUserCode(): String? {
+        return context.dataStore.data.map { it[KEY_USER_CODE] }.firstOrNull()
     }
 
     suspend fun clear() {

@@ -1,7 +1,6 @@
 package com.comst.data.repository
 
 import com.comst.data.UserDataStore
-import com.comst.domain.model.user.LoginResponseModel
 import com.comst.domain.repository.LocalRepository
 import javax.inject.Inject
 
@@ -9,7 +8,7 @@ class LocalRepositoryImpl @Inject constructor(
     private val userDataStore: UserDataStore
 ): LocalRepository {
 
-    override suspend fun clearToken(): Result<Unit> = kotlin.runCatching{
+    override suspend fun clearUserData(): Result<Unit> = kotlin.runCatching{
         userDataStore.clear()
     }
 
@@ -17,8 +16,13 @@ class LocalRepositoryImpl @Inject constructor(
         userDataStore.getAccessToken()
     }
 
-    override suspend fun setToken(accessToken: String, refreshToken: String): Result<Unit> = kotlin.runCatching{
+    override suspend fun getUserCode(): Result<String?> = kotlin.runCatching {
+        userDataStore.getUserCode()
+    }
+
+    override suspend fun setUserData(accessToken: String, refreshToken: String, userCode: String): Result<Unit> = kotlin.runCatching{
         userDataStore.setAccessToken(accessToken)
         userDataStore.setRefreshToken(refreshToken)
+        userDataStore.setUserCode(userCode)
     }
 }

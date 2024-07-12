@@ -1,7 +1,8 @@
 package com.comst.domain.repository
 
 interface LocalRepository {
-    suspend fun clearToken(): Result<Unit>
+    suspend fun clearUserData(): Result<Unit>
     suspend fun getToken(): Result<String?>
-    suspend fun setToken(accessToken: String, refreshToken: String): Result<Unit>
+    suspend fun getUserCode(): Result<String?>
+    suspend fun setUserData(accessToken: String, refreshToken: String, userCode: String): Result<Unit>
 }

@@ -10,6 +10,7 @@ data class LoginResponseDTO (
 
 fun LoginResponseDTO.toDomainModel(): LoginResponseModel {
     return LoginResponseModel(
+        userCode = userCode,
         accessToken = accessToken,
         refreshToken = refreshToken
     )
