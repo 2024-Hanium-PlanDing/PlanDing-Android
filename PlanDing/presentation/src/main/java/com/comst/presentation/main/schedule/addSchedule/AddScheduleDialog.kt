@@ -25,12 +25,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.comst.domain.model.base.ScheduleEvent
+import com.comst.domain.model.base.Schedule
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDTextFiledOutLine
 import com.comst.presentation.component.PDTimeDropdownMenu
+import com.comst.presentation.main.schedule.addSchedule.AddScheduleContract.AddScheduleIntent
 import com.comst.presentation.main.schedule.addSchedule.AddScheduleContract.AddScheduleSideEffect
-import com.comst.presentation.main.schedule.addSchedule.AddScheduleContract.AddScheduleUIEvent
 import com.comst.presentation.ui.theme.BackgroundColor3
 import com.comst.presentation.ui.theme.PlanDingTheme
 import java.time.LocalDate
@@ -40,7 +40,7 @@ fun AddScheduleDialog(
     viewModel: AddScheduleViewModel = hiltViewModel(),
     date: LocalDate,
     onDismiss: () -> Unit,
-    onConfirm: (ScheduleEvent) -> Unit
+    onConfirm: (Schedule) -> Unit
 ) {
     LaunchedEffect(date) {
         viewModel.initialize(date)
@@ -60,7 +60,7 @@ fun AddScheduleDialog(
                     ).show()
                 }
                 is AddScheduleSideEffect.SuccessCreateSchedule -> {
-                    onConfirm(effect.scheduleEvent)
+                    onConfirm(effect.schedule)
                 }
             }
         }
@@ -85,7 +85,7 @@ fun AddScheduleDialog(
                     label = "제목을 입력해주세요",
                     value = uiState.title,
                     onValueChange = {
-                        viewModel.setEvent(AddScheduleUIEvent.TitleChange(it))
+                        viewModel.setIntent(AddScheduleIntent.TitleChange(it))
                     }
                 )
                 PDTextFiledOutLine(
@@ -96,7 +96,7 @@ fun AddScheduleDialog(
                     label = "일정 내용을 입력해주세요",
                     value = uiState.content,
                     onValueChange = {
-                        viewModel.setEvent(AddScheduleUIEvent.DescriptionChange(it))
+                        viewModel.setIntent(AddScheduleIntent.DescriptionChange(it))
                     }
                 )
                 Row(
@@ -108,7 +108,7 @@ fun AddScheduleDialog(
                     PDTimeDropdownMenu(
                         selectedTime = uiState.startTime,
                         onConfirm = {
-                            viewModel.setEvent(AddScheduleUIEvent.SelectedStartTime(it))
+                            viewModel.setIntent(AddScheduleIntent.SelectedStartTime(it))
                         }
                     )
                     Spacer(modifier = Modifier.weight(0.5f))
@@ -117,7 +117,7 @@ fun AddScheduleDialog(
                     PDTimeDropdownMenu(
                         selectedTime = uiState.endTime,
                         onConfirm = {
-                            viewModel.setEvent(AddScheduleUIEvent.SelectedEndTime(it))
+                            viewModel.setIntent(AddScheduleIntent.SelectedEndTime(it))
                         }
                     )
                     Spacer(modifier = Modifier.weight(0.5f))
@@ -126,17 +126,15 @@ fun AddScheduleDialog(
             }
         },
         confirmButton = {
-            Log.d("타임","생성 버튼")
             PDButton(
                 onClick = {
-                    viewModel.setEvent(AddScheduleUIEvent.CreateSchedule)
+                    viewModel.setIntent(AddScheduleIntent.CreateSchedule)
                 },
                 text = "생성",
                 modifier = Modifier.fillMaxWidth()
             )
         },
         dismissButton = {
-            Log.d("타임","dismiss 버튼")
             Button(
                 onClick = onDismiss,
                 modifier = Modifier.fillMaxWidth(),
@@ -162,6 +160,10 @@ fun AddScheduleDialog(
 @Composable
 private fun AddScheduleDialogPreview() {
     PlanDingTheme {
-
+        AddScheduleDialog(
+            date = LocalDate.now(),
+            onDismiss = {},
+            onConfirm = {}
+        )
     }
 }

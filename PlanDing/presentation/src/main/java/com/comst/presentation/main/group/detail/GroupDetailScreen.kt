@@ -1,6 +1,7 @@
 package com.comst.presentation.main.group.detail
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,44 +43,61 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.comst.presentation.R
+import com.comst.presentation.common.base.BaseScreen
+import com.comst.presentation.main.group.detail.GroupDetailContract.*
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GroupDetailScreen(
-    groupCode : String,
+    groupCode: String,
     viewModel: GroupDetailViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+
+    val handleEffect: (GroupDetailSideEffect) -> Unit = { effect ->
+        when (effect) {
+            is GroupDetailSideEffect.ShowToast -> {
+                Toast.makeText(
+                    context,
+                    effect.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
 
     LaunchedEffect(groupCode) {
         viewModel.initialize(groupCode)
     }
 
-    val scrollState = rememberScrollState()
+    BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
+        val scrollState = rememberScrollState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = "그룹명")
-                },
-                navigationIcon = {
-                    IconButton(onClick = {  }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(text = "그룹명")
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { /* Handle back click */ }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
                     }
-                }
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(scrollState)
-        ) {
-            CollapsingContent(viewModel)
-            TabLayout()
-            ViewPagerContent()
+                )
+            }
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .verticalScroll(scrollState)
+            ) {
+                CollapsingContent(viewModel)
+                TabLayout()
+                ViewPagerContent()
+            }
         }
     }
 }
@@ -197,6 +216,7 @@ fun ViewPagerContent() {
 
     }
 }
+
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable

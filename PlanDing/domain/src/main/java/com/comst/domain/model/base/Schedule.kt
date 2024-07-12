@@ -1,6 +1,6 @@
 package com.comst.domain.model.base
 
-data class ScheduleEvent(
+data class Schedule(
     val scheduleId: Long,
     val title: String,
     val content: String,

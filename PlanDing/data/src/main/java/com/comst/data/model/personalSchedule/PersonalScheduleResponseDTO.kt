@@ -1,6 +1,6 @@
 package com.comst.data.model.personalSchedule
 
-import com.comst.domain.model.base.ScheduleEvent
+import com.comst.domain.model.base.Schedule
 import com.comst.domain.model.base.ScheduleType
 import com.comst.domain.util.DateUtils
 
@@ -15,9 +15,9 @@ data class PersonalScheduleResponseDTO(
     val type : String,
     val day : String
 )
-fun PersonalScheduleResponseDTO.toDomainModel(): ScheduleEvent {
+fun PersonalScheduleResponseDTO.toDomainModel(): Schedule {
     val localDate = DateUtils.uiDateToLocalDate(scheduleDate,"yyyy-MM-dd")
-    return ScheduleEvent(
+    return Schedule(
         scheduleId = id,
         title = title,
         content = content,

@@ -5,7 +5,7 @@ import com.comst.data.model.base.toDomainModel
 import com.comst.data.model.personalSchedule.toDomainModel
 import com.comst.data.retrofit.ApiHandler
 import com.comst.data.retrofit.PersonalScheduleService
-import com.comst.domain.model.base.ScheduleEvent
+import com.comst.domain.model.base.Schedule
 import com.comst.domain.model.base.ScheduleModel
 import com.comst.domain.model.base.SchedulePeriodModel
 import com.comst.domain.repository.PersonalScheduleRepository
@@ -16,7 +16,7 @@ class PersonalScheduleRepositoryImpl @Inject constructor(
     private val personalScheduleService: PersonalScheduleService,
 ): PersonalScheduleRepository {
 
-    override suspend fun postPersonalSchedule(scheduleModel: ScheduleModel): ApiResult<ScheduleEvent> {
+    override suspend fun postPersonalSchedule(scheduleModel: ScheduleModel): ApiResult<Schedule> {
         val request = ScheduleParam(
             title = scheduleModel.title,
             content = scheduleModel.content,
@@ -29,7 +29,7 @@ class PersonalScheduleRepositoryImpl @Inject constructor(
             mapper = { response -> response.toDomainModel() }
         )
     }
-    override suspend fun getPersonalScheduleList(request: SchedulePeriodModel): ApiResult<List<ScheduleEvent>> {
+    override suspend fun getPersonalScheduleList(request: SchedulePeriodModel): ApiResult<List<Schedule>> {
         return ApiHandler.handle(
             execute = { personalScheduleService.getPersonalSchedule(
                 startDate = request.startDate,

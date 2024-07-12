@@ -27,14 +27,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.comst.domain.model.base.ScheduleEvent
+import com.comst.domain.model.base.Schedule
 import com.comst.domain.model.base.ScheduleType
 import com.comst.presentation.ui.theme.BackgroundColor2
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
 fun PersonalScheduleCard(
-    schedule: ScheduleEvent
+    schedule: Schedule
 ) {
     var isContentVisible by remember { mutableStateOf(false) }
 
@@ -125,7 +125,7 @@ fun PersonalScheduleCard(
 private fun PersonalScheduleCardPreview() {
     PlanDingTheme {
         PersonalScheduleCard(
-            schedule = ScheduleEvent(
+            schedule = Schedule(
                 scheduleId = 8847,
                 title = "ludus",
                 content = "maximus",

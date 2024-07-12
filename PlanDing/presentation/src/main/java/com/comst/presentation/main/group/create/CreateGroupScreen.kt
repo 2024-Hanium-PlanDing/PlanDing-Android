@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDTextFiled
 import com.comst.presentation.main.group.create.CreateGroupContract.*
 import com.comst.presentation.ui.theme.PlanDingTheme
@@ -38,97 +39,80 @@ fun CreateGroupScreen(
     viewModel: CreateGroupViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
     onFinish: () -> Unit
-){
+) {
     val context = LocalContext.current
-    val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(key1 = viewModel.effect) {
-        viewModel.effect.collect{ effect ->
-            when(effect){
-                is CreateGroupUISideEffect.SuccessGroupCreation -> onFinish()
-
-                is CreateGroupUISideEffect.ShowToast -> {
-                    Toast.makeText(
-                        context,
-                        effect.message,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+    val handleEffect: (CreateGroupSideEffect) -> Unit = { effect ->
+        when (effect) {
+            is CreateGroupSideEffect.SuccessGroupCreation -> onFinish()
+            is CreateGroupSideEffect.ShowToast -> {
+                Toast.makeText(
+                    context,
+                    effect.message,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
 
-    Surface {
-        Scaffold(
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(
-                            text = "새 그룹",
-                            style = MaterialTheme.typography.headlineSmall
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = onBackClick) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "뒤로가기"
+    BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
+        Surface {
+            Scaffold(
+                topBar = {
+                    CenterAlignedTopAppBar(
+                        title = {
+                            Text(
+                                text = "새 그룹",
+                                style = MaterialTheme.typography.headlineSmall
                             )
-                        }
-                    },
-                    actions = {
-                        TextButton(onClick = {
-                            viewModel.setEvent(CreateGroupUIEvent.CreateGroup)
-                        }) {
-                            Text(text = "생성", color = Color.Black)
-                        }
-                    },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
-                )
-            },
-            content = { paddingValues ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                ) {
-                    PDTextFiled(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        value = uiState.groupName,
-                        hint = "그룹의 이름을 적어주세요.",
-                        onValueChange = { newGroupName -> viewModel.setEvent(CreateGroupUIEvent.GroupNameChange(newGroupName)) }
+                        },
+                        navigationIcon = {
+                            IconButton(onClick = onBackClick) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "뒤로가기"
+                                )
+                            }
+                        },
+                        actions = {
+                            TextButton(onClick = {
+                                viewModel.setIntent(CreateGroupIntent.CreateGroup)
+                            }) {
+                                Text(text = "생성", color = Color.Black)
+                            }
+                        },
+                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
                     )
+                },
+                content = { paddingValues ->
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
+                    ) {
+                        PDTextFiled(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            value = uiState.groupName,
+                            hint = "그룹의 이름을 적어주세요.",
+                            onValueChange = { newGroupName -> viewModel.setIntent(CreateGroupIntent.GroupNameChange(newGroupName)) }
+                        )
 
-                    PDTextFiled(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .defaultMinSize(minHeight = 250.dp)
-                            .padding(horizontal = 16.dp),
-                        value = uiState.groupDescription,
-                        hint = "그룹의 설명을 적어주세요.",
-                        onValueChange = { newGroupDescription -> viewModel.setEvent(CreateGroupUIEvent.GroupDescriptionChange(newGroupDescription)) }
-                    )
+                        PDTextFiled(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .defaultMinSize(minHeight = 250.dp)
+                                .padding(horizontal = 16.dp),
+                            value = uiState.groupDescription,
+                            hint = "그룹의 설명을 적어주세요.",
+                            onValueChange = { newGroupDescription -> viewModel.setIntent(CreateGroupIntent.GroupDescriptionChange(newGroupDescription)) }
+                        )
+                    }
                 }
-            },
-            bottomBar = {
-
-            }
-        )
+            )
+        }
     }
-
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun CreateGroupScreen(
-    groupName: String,
-    groupDescription: String,
-    onBackClick: () -> Unit,
-    onUIAction: (CreateGroupUIEvent) -> Unit
-) {
-
 }
 
 @Preview
@@ -136,9 +120,8 @@ private fun CreateGroupScreen(
 private fun CreateGroupScreenPreview() {
     PlanDingTheme {
         CreateGroupScreen(
-            groupName = "Dawn Howard",
-            groupDescription = "vel",
             onBackClick = {},
-            onUIAction = {})
+            onFinish = {}
+        )
     }
 }

@@ -16,15 +16,21 @@ import javax.inject.Inject
 @HiltViewModel
 class AddScheduleViewModel @Inject constructor(
     private val postPersonalScheduleUseCase: PostPersonalScheduleUseCase
-) : BaseViewModel<AddScheduleUIState, AddScheduleSideEffect, AddScheduleUIEvent>(AddScheduleUIState()) {
+) : BaseViewModel<AddScheduleUIState, AddScheduleSideEffect, AddScheduleIntent, AddScheduleEvent>(AddScheduleUIState()) {
 
-    override suspend fun handleEvent(event: AddScheduleUIEvent) {
+    override fun handleIntent(intent: AddScheduleIntent) {
+        when (intent) {
+            is AddScheduleIntent.DescriptionChange -> onDescriptionChange(intent.description)
+            is AddScheduleIntent.SelectedEndTime -> onSelectedEndTime(intent.endTime)
+            is AddScheduleIntent.SelectedStartTime -> onSelectedStartTime(intent.startTime)
+            is AddScheduleIntent.TitleChange -> onTitleChange(intent.title)
+            is AddScheduleIntent.CreateSchedule -> onCreateScheduleClick()
+        }
+    }
+
+    override fun handleEvent(event: AddScheduleEvent) {
         when (event) {
-            is AddScheduleUIEvent.DescriptionChange -> onDescriptionChange(event.description)
-            is AddScheduleUIEvent.SelectedEndTime -> onSelectedEndTime(event.endTime)
-            is AddScheduleUIEvent.SelectedStartTime -> onSelectedStartTime(event.startTime)
-            is AddScheduleUIEvent.TitleChange -> onTitleChange(event.title)
-            is AddScheduleUIEvent.CreateSchedule -> onCreateScheduleClick()
+            is AddScheduleEvent.CreationFailure -> onCreationFailure(event.message)
         }
     }
 
@@ -42,37 +48,37 @@ class AddScheduleViewModel @Inject constructor(
         }
     }
 
-    private fun onTitleChange(title: String){
+    private fun onTitleChange(title: String) {
         setState {
             copy(title = title)
         }
     }
 
-    private fun onDescriptionChange(description: String){
+    private fun onDescriptionChange(description: String) {
         setState {
             copy(content = description)
         }
     }
 
-    private fun onSelectedStartTime(startTime: Int){
+    private fun onSelectedStartTime(startTime: Int) {
         setState {
             copy(startTime = startTime)
         }
     }
 
-    private fun onSelectedEndTime(endTime: Int){
+    private fun onSelectedEndTime(endTime: Int) {
         setState {
             copy(endTime = endTime)
         }
     }
 
     private fun onCreateScheduleClick() = viewModelScope.launch {
-        if (currentState.title.isEmpty() || currentState.title.isEmpty() ){
+        if (currentState.title.isEmpty() || currentState.content.isEmpty()) {
             setEffect(AddScheduleSideEffect.ShowToast("일정의 제목과 내용은 필수입니다."))
             return@launch
         }
 
-        if (currentState.startTime >= currentState.endTime){
+        if (currentState.startTime >= currentState.endTime) {
             setEffect(AddScheduleSideEffect.ShowToast("일정의 시작 시간은 끝 시간보다 크거나 같을 수 없습니다."))
             return@launch
         }
@@ -80,6 +86,7 @@ class AddScheduleViewModel @Inject constructor(
         setState {
             copy(isLoading = true)
         }
+
         postPersonalScheduleUseCase(
             ScheduleModel(
                 title = currentState.title,
@@ -90,12 +97,21 @@ class AddScheduleViewModel @Inject constructor(
             )
         ).onSuccess {
             setEffect(AddScheduleSideEffect.SuccessCreateSchedule(it))
-        }.onFailure { i, s ->
+        }.onFailure {
 
         }
+
         setState {
             copy(isLoading = false)
         }
     }
 
+    private fun onCreationFailure(message: String) {
+        setEffect(AddScheduleSideEffect.ShowToast(message))
+    }
+
+    override fun handleError(exception: Exception) {
+        super.handleError(exception)
+        setEffect(AddScheduleSideEffect.ShowToast(exception.message.orEmpty()))
+    }
 }

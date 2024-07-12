@@ -13,37 +13,50 @@ import javax.inject.Inject
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
     private val getUserProfileUseCase: GetUserProfileUseCase
-) : BaseViewModel<MyPageUIState, MyPageUISideEffect, MyPageUIEvent>(MyPageUIState()){
+) : BaseViewModel<MyPageUIState, MyPageSideEffect, MyPageIntent, MyPageEvent>(MyPageUIState()) {
 
     init {
-        load()
+        setIntent(MyPageIntent.Load)
     }
 
-    override suspend fun handleEvent(event: MyPageUIEvent) {
-        when(event){
-            else -> {}
+    override fun handleIntent(intent: MyPageIntent) {
+        when (intent) {
+            is MyPageIntent.Load -> load()
+        }
+    }
+
+    override fun handleEvent(event: MyPageEvent) {
+        when (event) {
+            is MyPageEvent.LoadFailure -> onLoadFailure(event.message)
         }
     }
 
     private fun load() = viewModelScope.launch {
         setState { copy(isLoading = true) }
-        getUserProfileUseCase().onSuccess {
-            setState {
-                copy(
-                    username = it.username,
-                    userCode = it.userCode,
-                    profileImageUrl = it.profileImage,
-                    favoriteGroupsCount = it.groupFavorite,
-                    receivedGroupRequestsCount = it.groupRequest
-                )
+        getUserProfileUseCase()
+            .onSuccess {
+                setState {
+                    copy(
+                        username = it.username,
+                        userCode = it.userCode,
+                        profileImageUrl = it.profileImage,
+                        favoriteGroupsCount = it.groupFavorite,
+                        receivedGroupRequestsCount = it.groupRequest,
+                        isLoading = false
+                    )
+                }
             }
-
-        }.onFailure { statusCode, message ->
-
-        }
+            .onFailure {
+            }
         setState { copy(isLoading = false) }
     }
 
+    private fun onLoadFailure(message: String) {
+        setEffect(MyPageSideEffect.ShowToast(message))
+    }
 
-
+    override fun handleError(exception: Exception) {
+        super.handleError(exception)
+        setEffect(MyPageSideEffect.ShowToast(exception.message.orEmpty()))
+    }
 }

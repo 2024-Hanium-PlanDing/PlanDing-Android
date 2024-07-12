@@ -17,20 +17,24 @@ import javax.inject.Inject
 class CreateGroupViewModel @Inject constructor(
     private val getImageListUseCase: GetImageListUseCase,
     private val postGroupUseCase: PostGroupUseCase
-) : BaseViewModel<CreateGroupUIState, CreateGroupUISideEffect, CreateGroupUIEvent>(CreateGroupUIState()){
+) : BaseViewModel<CreateGroupUIState, CreateGroupSideEffect, CreateGroupIntent, CreateGroupEvent>(CreateGroupUIState()) {
+
     init {
         load()
     }
 
-    override suspend fun handleEvent(event: CreateGroupUIEvent) {
-        when(event){
-            is CreateGroupUIEvent.SelectGroupImage -> onImageClick(event.image)
+    override fun handleIntent(intent: CreateGroupIntent) {
+        when (intent) {
+            is CreateGroupIntent.SelectGroupImage -> onImageClick(intent.image)
+            is CreateGroupIntent.CreateGroup -> onCreateGroupClick()
+            is CreateGroupIntent.GroupNameChange -> onGroupNameChange(intent.groupName)
+            is CreateGroupIntent.GroupDescriptionChange -> onGroupDescriptionChange(intent.groupDescription)
+        }
+    }
 
-            is CreateGroupUIEvent.CreateGroup -> onCreateGroupClick()
-
-            is CreateGroupUIEvent.GroupNameChange -> onGroupNameChange(event.groupName)
-
-            is CreateGroupUIEvent.GroupDescriptionChange -> onGroupDescriptionChange(event.groupDescription)
+    override fun handleEvent(event: CreateGroupEvent) {
+        when (event) {
+            is CreateGroupEvent.LoadFailure -> onLoadFailure(event.message)
         }
     }
 
@@ -40,11 +44,13 @@ class CreateGroupViewModel @Inject constructor(
             setState {
                 copy(
                     selectedImage = it.firstOrNull(),
-                    images = it
+                    images = it,
                 )
             }
+        }.onFailure {
         }
         setState { copy(isLoading = false) }
+
     }
 
     private fun onImageClick(image: MediaImage) {
@@ -70,26 +76,31 @@ class CreateGroupViewModel @Inject constructor(
     }
 
     private fun onCreateGroupClick() = viewModelScope.launch {
-
-        if (currentState.selectedImage == null){
-            setEffect(CreateGroupUISideEffect.ShowToast("그룹 이미지는 필수입니다."))
-        }else{
-            postGroupUseCase(
-                GroupCreate(
-                    currentState.groupName,
-                    currentState.groupDescription
-                ),
-                currentState.selectedImage!!
-            ).onSuccess {
-                setEffect(CreateGroupUISideEffect.ShowToast("그룹 생성을 성공했습니다."))
-                    setEffect(CreateGroupUISideEffect.SuccessGroupCreation)
-            }.onFailure { statusCode, message ->
-
-            }
+        if (currentState.selectedImage == null) {
+            setEffect(CreateGroupSideEffect.ShowToast("그룹 이미지는 필수입니다."))
+            return@launch
         }
-        setState { copy(isLoading = true) }
 
+        postGroupUseCase(
+            GroupCreate(
+                currentState.groupName,
+                currentState.groupDescription
+            ),
+            currentState.selectedImage!!
+        ).onSuccess {
+            setEffect(CreateGroupSideEffect.ShowToast("그룹 생성을 성공했습니다."))
+            setEffect(CreateGroupSideEffect.SuccessGroupCreation)
+        }.onFailure {
+        }
+        setState { copy(isLoading = false) }
     }
 
+    private fun onLoadFailure(message: String) {
+        setEffect(CreateGroupSideEffect.ShowToast(message))
+    }
 
+    override fun handleError(exception: Exception) {
+        super.handleError(exception)
+        setEffect(CreateGroupSideEffect.ShowToast(exception.message.orEmpty()))
+    }
 }

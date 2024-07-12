@@ -23,20 +23,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDScreenHeader
+import com.comst.presentation.main.group.GroupContract.*
 import com.comst.presentation.main.group.create.CreateGroupActivity
-import com.comst.domain.model.group.GroupCardModel
-import com.comst.presentation.main.group.GroupContract.GroupUIEvent
-import com.comst.presentation.main.group.GroupContract.GroupUISideEffect
 import com.comst.presentation.main.group.detail.GroupDetailActivity
 import com.comst.presentation.ui.theme.PlanDingTheme
 
@@ -45,11 +41,9 @@ fun GroupScreen(
     viewModel: GroupViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val uiState by viewModel.uiState.collectAsState()
-
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) {permissions ->
+    ) { permissions ->
         if (permissions.all { it.value }) {
             context.startActivity(
                 Intent(context, CreateGroupActivity::class.java)
@@ -59,85 +53,84 @@ fun GroupScreen(
         }
     }
 
-    LaunchedEffect(key1 = viewModel.effect) {
-        viewModel.effect.collect{ effect ->
-            when(effect){
-                is GroupUISideEffect.NavigateToCreateGroupActivity -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        permissionLauncher.launch(arrayOf(
-                            Manifest.permission.READ_MEDIA_IMAGES,
-                            Manifest.permission.READ_MEDIA_VIDEO
-                        ))
-                    } else {
-                        permissionLauncher.launch(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE))
+    val handleEffect: (GroupSideEffect) -> Unit = { effect ->
+        when (effect) {
+            is GroupSideEffect.NavigateToCreateGroupActivity -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    permissionLauncher.launch(arrayOf(
+                        Manifest.permission.READ_MEDIA_IMAGES,
+                        Manifest.permission.READ_MEDIA_VIDEO
+                    ))
+                } else {
+                    permissionLauncher.launch(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE))
+                }
+            }
+
+            is GroupSideEffect.NavigateToGroupDetailActivity -> {
+                context.startActivity(
+                    Intent(
+                        context, GroupDetailActivity::class.java
+                    ).apply {
+                        putExtra("groupCode", effect.groupCode)
                     }
-                }
+                )
+            }
 
-                is GroupUISideEffect.NavigateToGroupDetailActivity -> {
-                    context.startActivity(
-                        Intent(
-                            context, GroupDetailActivity::class.java
-                        ).apply {
-                            putExtra("groupCode", effect.groupCode)
-                        }
-                    )
-                }
-
-                is GroupUISideEffect.ShowToast -> {
-                    Toast.makeText(
-                        context,
-                        effect.message,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+            is GroupSideEffect.ShowToast -> {
+                Toast.makeText(
+                    context,
+                    effect.message,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
 
-    Surface {
-        Box(modifier = Modifier.fillMaxSize()){
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                PDScreenHeader(text = "나의 그룹")
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
+    BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
+        Surface {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    items(
-                        count = uiState.groupCardModels.size,
-                        key = { index -> uiState.groupCardModels[index].groupId }
-                    ){ index ->
-                        uiState.groupCardModels[index].let {groupRoomCardModel ->
-                            GroupCard(
-                                groupName = groupRoomCardModel.groupName,
-                                groupDescription = groupRoomCardModel.groupDescription,
-                                groupImageUrl = groupRoomCardModel.groupImageUrl,
-                                goGroupDetail = { viewModel.setEvent(GroupUIEvent.GroupCardClick(groupRoomCardModel.groupCode)) }
-                            )
+                    PDScreenHeader(text = "나의 그룹")
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        items(
+                            count = uiState.groupCardModels.size,
+                            key = { index -> uiState.groupCardModels[index].groupId }
+                        ) { index ->
+                            uiState.groupCardModels[index].let { groupRoomCardModel ->
+                                GroupCard(
+                                    groupName = groupRoomCardModel.groupName,
+                                    groupDescription = groupRoomCardModel.groupDescription,
+                                    groupImageUrl = groupRoomCardModel.groupImageUrl,
+                                    goGroupDetail = { viewModel.setIntent(GroupIntent.GroupCardClick(groupRoomCardModel.groupCode)) }
+                                )
 
-                            Spacer(modifier = Modifier.height(12.dp))
+                                Spacer(modifier = Modifier.height(12.dp))
+                            }
                         }
                     }
                 }
-            }
 
-            FloatingActionButton(
-                modifier = Modifier
-                    .size(100.dp)
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp),
-                containerColor = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(60.dp),
-                onClick = { viewModel.setEvent(GroupUIEvent.GroupCreateClick) },
-            ) {
-                Icon(
-                    modifier = Modifier.size(40.dp),
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = "Add"
-                )
+                FloatingActionButton(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    shape = RoundedCornerShape(60.dp),
+                    onClick = { viewModel.setIntent(GroupIntent.GroupCreateClick) },
+                ) {
+                    Icon(
+                        modifier = Modifier.size(40.dp),
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = "Add"
+                    )
+                }
             }
-
         }
     }
 }
@@ -145,7 +138,7 @@ fun GroupScreen(
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun GroupScreenPreview(){
+private fun GroupScreenPreview() {
     PlanDingTheme {
         GroupScreen()
     }

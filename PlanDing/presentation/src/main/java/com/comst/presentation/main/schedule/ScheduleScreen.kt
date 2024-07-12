@@ -1,6 +1,7 @@
 package com.comst.presentation.main.schedule
 
 import android.content.res.Configuration
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,7 +28,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -37,18 +37,14 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -65,18 +61,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.comst.presentation.component.PDCalendar
 import com.comst.presentation.component.PDScheduleChart
 import com.comst.presentation.component.PDScreenHeader
-import com.comst.domain.model.base.ScheduleEvent
+import com.comst.domain.model.base.Schedule
 import com.comst.presentation.R
+import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.main.schedule.ScheduleContract.*
-import com.comst.presentation.main.schedule.ScheduleContract.ScheduleUIEvent.*
 import com.comst.presentation.main.schedule.addSchedule.AddScheduleDialog
 import com.comst.presentation.ui.theme.BackgroundColor2
-import com.comst.presentation.ui.theme.MainPurple200
-import com.comst.presentation.ui.theme.MainPurple600
 import com.comst.presentation.ui.theme.PlanDingTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 
@@ -85,72 +78,70 @@ fun ScheduleScreen(
     viewModel: ScheduleViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val uiState by viewModel.uiState.collectAsState()
-
-    LaunchedEffect(key1 = viewModel.effect) {
-        viewModel.effect.collect { effect ->
-            when (effect) {
-                is ScheduleUISideEffect.ShowToast -> {
-                    Toast.makeText(
-                        context,
-                        effect.message,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+    val handleEffect: (ScheduleSideEffect) -> Unit = { effect ->
+        when (effect) {
+            is ScheduleSideEffect.ShowToast -> {
+                Toast.makeText(
+                    context,
+                    effect.message,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
 
-    Surface {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
-            PDScreenHeader(text = "스케줄")
-
-            Box(
+    BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
+        Surface {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .background(
-                        shape = RoundedCornerShape(8.dp),
-                        color = Color.White
-                    ),
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
             ) {
-                ScheduleTabs(
-                    selectUIDate = uiState.selectUIDate,
-                    selectDay = uiState.selectDay,
-                    isTodayScheduleVisible = uiState.isTodayScheduleVisible,
-                    todayPersonalScheduleEvents = uiState.todayPersonalScheduleEvents,
-                    todayGroupScheduleEvents = uiState.todayGroupScheduleEvents,
-                    onUIAction = viewModel::setEvent
-                )
+                PDScreenHeader(text = "스케줄")
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .background(
+                            shape = RoundedCornerShape(8.dp),
+                            color = Color.White
+                        ),
+                ) {
+                    ScheduleTabs(
+                        selectUIDate = uiState.selectUIDate,
+                        selectDay = uiState.selectDay,
+                        isTodayScheduleVisible = uiState.isTodayScheduleVisible,
+                        todayPersonalSchedules = uiState.todayPersonalScheduleEvents,
+                        todayGroupSchedules = uiState.todayGroupScheduleEvents,
+                        onUIAction = viewModel::setIntent
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                PDScheduleChart(events = uiState.selectWeekScheduleEvents, days = uiState.selectedWeekdays)
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            PDScheduleChart(events = uiState.selectWeekScheduleEvents, days = uiState.selectedWeekdays)
         }
-    }
 
-    if (uiState.isBottomSheetVisible) {
-        CalendarBottomSheet(
-            viewModel = viewModel
-        )
-    }
+        if (uiState.isBottomSheetVisible) {
+            CalendarBottomSheet(
+                viewModel = viewModel
+            )
+        }
 
-    if (uiState.isAddScheduleDialogVisible) {
-        AddScheduleDialog(
-            date = uiState.selectLocalDate,
-            onDismiss = {
-                viewModel.setEvent(HideAddScheduleDialog)
-            },
-            onConfirm = { scheduleEvent ->
-                viewModel.addSchedule(scheduleEvent = scheduleEvent)
-                viewModel.setEvent(HideAddScheduleDialog)
-            }
-        )
+        if (uiState.isAddScheduleDialogVisible) {
+            AddScheduleDialog(
+                date = uiState.selectLocalDate,
+                onDismiss = {
+                    viewModel.setIntent(ScheduleIntent.HideAddScheduleDialog)
+                },
+                onConfirm = { scheduleEvent ->
+                    viewModel.addSchedule(scheduleEvent)
+                    viewModel.setIntent(ScheduleIntent.HideAddScheduleDialog)
+                }
+            )
+        }
     }
 }
 
@@ -163,7 +154,7 @@ private fun CalendarBottomSheet(
 
     ModalBottomSheet(
         onDismissRequest = {
-            viewModel.setEvent(CloseBottomSheetClick)
+            viewModel.setIntent(ScheduleIntent.CloseBottomSheetClick)
         },
         sheetState = calendarBottomSheetState,
     ) {
@@ -176,20 +167,22 @@ private fun ScheduleTabs(
     selectUIDate: String,
     selectDay: String,
     isTodayScheduleVisible: Boolean,
-    todayPersonalScheduleEvents: List<ScheduleEvent>,
-    todayGroupScheduleEvents: List<ScheduleEvent>,
-    onUIAction: (ScheduleUIEvent) -> Unit
+    todayPersonalSchedules: List<Schedule>,
+    todayGroupSchedules: List<Schedule>,
+    onUIAction: (ScheduleIntent) -> Unit
 ) {
     Column(
-        modifier = Modifier.padding(top = 8.dp, bottom = 8.dp).padding(horizontal = 16.dp)
+        modifier = Modifier
+            .padding(top = 8.dp, bottom = 8.dp)
+            .padding(horizontal = 16.dp)
     ) {
         ScheduleHeader(selectUIDate, selectDay, isTodayScheduleVisible, onUIAction)
 
         if (isTodayScheduleVisible) {
             Spacer(modifier = Modifier.height(8.dp))
             ScheduleContent(
-                todayPersonalScheduleEvents,
-                todayGroupScheduleEvents,
+                todayPersonalSchedules,
+                todayGroupSchedules,
                 onUIAction
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -202,11 +195,11 @@ private fun ScheduleHeader(
     selectUIDate: String,
     selectDay: String,
     isTodayScheduleVisible: Boolean,
-    onUIAction: (ScheduleUIEvent) -> Unit
+    onUIAction: (ScheduleIntent) -> Unit
 ) {
     Row(
         modifier = Modifier
-            .clickable { onUIAction(OpenBottomSheetClick) },
+            .clickable { onUIAction(ScheduleIntent.OpenBottomSheetClick) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -225,7 +218,7 @@ private fun ScheduleHeader(
         Icon(
             imageVector = if (isTodayScheduleVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
             contentDescription = "오늘의 스케줄 토글",
-            modifier = Modifier.clickable { onUIAction(ToggleTodayScheduleVisibility) }
+            modifier = Modifier.clickable { onUIAction(ScheduleIntent.ToggleTodayScheduleVisibility) }
         )
     }
 }
@@ -233,9 +226,9 @@ private fun ScheduleHeader(
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 private fun ScheduleContent(
-    todayPersonalScheduleEvents: List<ScheduleEvent>,
-    todayGroupScheduleEvents: List<ScheduleEvent>,
-    onUIAction: (ScheduleUIEvent) -> Unit
+    todayPersonalSchedules: List<Schedule>,
+    todayGroupSchedules: List<Schedule>,
+    onUIAction: (ScheduleIntent) -> Unit
 ) {
     val pages = listOf("개인일정", "그룹일정")
     val pagerState = rememberPagerState()
@@ -299,8 +292,8 @@ private fun ScheduleContent(
         ) { page ->
             SchedulePageContent(
                 page = page,
-                todayPersonalScheduleEvents = todayPersonalScheduleEvents,
-                todayGroupScheduleEvents = todayGroupScheduleEvents,
+                todayPersonalSchedules = todayPersonalSchedules,
+                todayGroupSchedules = todayGroupSchedules,
                 onUIAction = onUIAction
             )
         }
@@ -310,9 +303,9 @@ private fun ScheduleContent(
 @Composable
 private fun SchedulePageContent(
     page: Int,
-    todayPersonalScheduleEvents: List<ScheduleEvent>,
-    todayGroupScheduleEvents: List<ScheduleEvent>,
-    onUIAction: (ScheduleUIEvent) -> Unit
+    todayPersonalSchedules: List<Schedule>,
+    todayGroupSchedules: List<Schedule>,
+    onUIAction: (ScheduleIntent) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -321,10 +314,10 @@ private fun SchedulePageContent(
     ) {
         when (page) {
             0 -> {
-                if (todayPersonalScheduleEvents.isEmpty()) {
+                if (todayPersonalSchedules.isEmpty()) {
                     NoScheduleContent()
                 } else {
-                    ScheduleList(todayPersonalScheduleEvents)
+                    ScheduleList(todayPersonalSchedules)
                 }
                 FloatingActionButton(
                     modifier = Modifier
@@ -334,7 +327,7 @@ private fun SchedulePageContent(
                     containerColor = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(60.dp),
                     onClick = {
-                        onUIAction(ShowAddScheduleDialog)
+                        onUIAction(ScheduleIntent.ShowAddScheduleDialog)
                     },
                 ) {
                     Icon(
@@ -345,10 +338,10 @@ private fun SchedulePageContent(
                 }
             }
             1 -> {
-                if (todayGroupScheduleEvents.isEmpty()) {
+                if (todayGroupSchedules.isEmpty()) {
                     NoScheduleContent()
                 } else {
-                    ScheduleList(todayGroupScheduleEvents)
+                    ScheduleList(todayGroupSchedules)
                 }
             }
         }
@@ -388,7 +381,7 @@ private fun NoScheduleContent() {
 
 @Composable
 private fun ScheduleList(
-    events: List<ScheduleEvent>,
+    events: List<Schedule>,
 ) {
     val sortedEvents = remember(events) { events.sortedBy { it.startTime } }
     LazyColumn(
@@ -411,8 +404,6 @@ private fun ScheduleList(
 @Composable
 private fun ScheduleScreenPreview() {
     PlanDingTheme {
-        ScheduleScreen(
-
-        )
+        ScheduleScreen()
     }
 }

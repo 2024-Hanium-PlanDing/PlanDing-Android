@@ -14,34 +14,44 @@ import javax.inject.Inject
 @HiltViewModel
 class GroupViewModel @Inject constructor(
     private val getMyGroupsUseCase: GetMyGroupsUseCase
-) : BaseViewModel<GroupUIState, GroupUISideEffect, GroupUIEvent>(GroupUIState()){
-
+) : BaseViewModel<GroupUIState, GroupSideEffect, GroupIntent, GroupEvent>(GroupUIState()) {
 
     init {
         load()
     }
 
-    override suspend fun handleEvent(event: GroupUIEvent) {
-        when(event){
-            is GroupUIEvent.GroupCardClick -> setEffect(GroupUISideEffect.NavigateToGroupDetailActivity(event.groupCode))
-            is GroupUIEvent.GroupCreateClick -> setEffect(GroupUISideEffect.NavigateToCreateGroupActivity)
+    override fun handleIntent(intent: GroupIntent) {
+        when (intent) {
+            is GroupIntent.GroupCardClick -> setEffect(GroupSideEffect.NavigateToGroupDetailActivity(intent.groupCode))
+            is GroupIntent.GroupCreateClick -> setEffect(GroupSideEffect.NavigateToCreateGroupActivity)
         }
     }
 
-    fun load() = viewModelScope.launch {
-        setState { copy(isLoading = true) }
-        getMyGroupsUseCase().onSuccess {
-            setState {
-                copy(
-                    groupCardModels = it
-                )
-            }
-        }.onFailure { statusCode, message ->
-
+    override fun handleEvent(event: GroupEvent) {
+        when (event) {
+            is GroupEvent.LoadFailure -> onLoadFailure(event.message)
         }
+    }
+
+    private fun load() = viewModelScope.launch {
+        setState { copy(isLoading = true) }
+        getMyGroupsUseCase()
+            .onSuccess {
+                setState {
+                    copy(groupCardModels = it)
+                }
+            }
+            .onFailure {
+            }
         setState { copy(isLoading = false) }
     }
 
+    private fun onLoadFailure(message: String) {
+        setEffect(GroupSideEffect.ShowToast(message))
+    }
 
-
+    override fun handleError(exception: Exception) {
+        super.handleError(exception)
+        setEffect(GroupSideEffect.ShowToast(exception.message.orEmpty()))
+    }
 }

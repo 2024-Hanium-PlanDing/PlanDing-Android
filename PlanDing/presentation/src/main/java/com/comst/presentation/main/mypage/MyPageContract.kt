@@ -1,8 +1,9 @@
 package com.comst.presentation.main.mypage
 
 import androidx.compose.runtime.Immutable
-import com.comst.presentation.common.base.UIEvent
-import com.comst.presentation.common.base.UISideEffect
+import com.comst.presentation.common.base.BaseEvent
+import com.comst.presentation.common.base.BaseIntent
+import com.comst.presentation.common.base.BaseSideEffect
 import com.comst.presentation.common.base.UIState
 
 class MyPageContract {
@@ -15,13 +16,17 @@ class MyPageContract {
         val favoriteGroupsCount: String = "-1",
         val receivedGroupRequestsCount: String = "-1",
         val isLoading: Boolean = false
-    ): UIState
+    ) : UIState
 
-    sealed class MyPageUISideEffect : UISideEffect {
-        data class ShowToast(val message: String): MyPageUISideEffect()
+    sealed class MyPageSideEffect : BaseSideEffect {
+        data class ShowToast(val message: String) : MyPageSideEffect()
     }
 
-    sealed class MyPageUIEvent : UIEvent{
+    sealed class MyPageIntent : BaseIntent {
+        object Load : MyPageIntent()
+    }
 
+    sealed class MyPageEvent : BaseEvent {
+        data class LoadFailure(val message: String) : MyPageEvent()
     }
 }

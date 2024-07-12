@@ -6,11 +6,9 @@ import com.comst.domain.usecase.user.PostSocialLoginUseCase
 import com.comst.domain.usecase.local.SetTokenUseCase
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
+import com.comst.presentation.auth.LoginContract.*
 import com.comst.presentation.common.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import com.comst.presentation.auth.LoginContract.LoginUIEvent
-import com.comst.presentation.auth.LoginContract.LoginUIState
-import com.comst.presentation.auth.LoginContract.LoginUISideEffect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,14 +16,22 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val setTokenUseCase: SetTokenUseCase,
     private val postSocialLoginUseCase: PostSocialLoginUseCase,
-) : BaseViewModel<LoginUIState, LoginUISideEffect, LoginUIEvent>(LoginUIState()) {
+) : BaseViewModel<LoginUIState, LoginBaseSideEffect, LoginBaseIntent, LoginBaseEvent>(LoginUIState()) {
 
-    override suspend fun handleEvent(event: LoginUIEvent) {
+    override fun handleIntent(intent: LoginBaseIntent) {
+        when (intent) {
+            is LoginBaseIntent.IdChange -> onIdChange(intent.id)
+            is LoginBaseIntent.PasswordChange -> onPasswordChange(intent.password)
+            is LoginBaseIntent.Login -> onLoginClick()
+            is LoginBaseIntent.SocialLogin -> onSocialLogin(intent.accountInfo)
+        }
+    }
+
+    override fun handleEvent(event: LoginBaseEvent) {
         when (event) {
-            is LoginUIEvent.IdChange -> onIdChange(event.id)
-            is LoginUIEvent.PasswordChange -> onPasswordChange(event.password)
-            is LoginUIEvent.Login -> onLoginClick()
-            is LoginUIEvent.SocialLogin -> onSocialLogin(event.accountInfo)
+            is LoginBaseEvent.LoginFailure -> {
+                setEffect(LoginBaseSideEffect.ShowToast(event.message))
+            }
         }
     }
 
@@ -47,10 +53,10 @@ class LoginViewModel @Inject constructor(
         val password = currentState.password
         setTokenUseCase(id, password)
             .onSuccess {
-                setEffect(LoginUISideEffect.NavigateToMainActivity)
+                setEffect(LoginBaseSideEffect.NavigateToMainActivity)
             }
             .onFailure {
-                setEffect(LoginUISideEffect.ShowToast(it.message.orEmpty()))
+                setEvent(LoginBaseEvent.LoginFailure(it.message.orEmpty()))
             }
         setState { copy(isLoading = false) }
     }
@@ -60,11 +66,16 @@ class LoginViewModel @Inject constructor(
         postSocialLoginUseCase(accountInfo)
             .onSuccess {
                 setTokenUseCase(it.accessToken, it.refreshToken)
-                setEffect(LoginUISideEffect.NavigateToMainActivity)
-            }.onFailure { statusCode, message ->
+                setEffect(LoginBaseSideEffect.NavigateToMainActivity)
+            }
+            .onFailure {
 
             }
         setState { copy(isLoading = false) }
     }
 
+    override fun handleError(exception: Exception) {
+        super.handleError(exception)
+        setEffect(LoginBaseSideEffect.ShowToast(exception.message.orEmpty()))
+    }
 }

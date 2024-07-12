@@ -35,6 +35,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.comst.domain.model.user.SocialLoginInfo
 import com.comst.presentation.R
 import com.comst.presentation.auth.LoginContract.*
+import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDTextFiledOutLine
 import com.comst.presentation.main.MainActivity
@@ -50,29 +51,18 @@ fun LoginScreen(
     onNavigateToSignUpScreen: () -> Unit
 ) {
     val context = LocalContext.current
-    val uiState by viewModel.uiState.collectAsState()
-
-    LaunchedEffect(key1 = viewModel.effect) {
-        viewModel.effect.collect { effect ->
-            when (effect) {
-                is LoginUISideEffect.NavigateToMainActivity -> {
-                    context.startActivity(
-                        Intent(
-                            context, MainActivity::class.java
-                        ).apply {
-                            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                        }
-                    )
-                }
-
-                is LoginUISideEffect.ShowToast -> {
-                    Toast.makeText(
-                        context,
-                        effect.message,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+    val handleEffect: (LoginBaseSideEffect) -> Unit = { effect ->
+        when (effect) {
+            is LoginBaseSideEffect.NavigateToMainActivity -> {
+                context.startActivity(
+                    Intent(
+                        context, MainActivity::class.java
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                )
             }
+            else -> {} // 기본 SideEffect는 BaseScreen에서 처리
         }
     }
 
@@ -86,97 +76,99 @@ fun LoginScreen(
 
     val onKaKaoLoginClick = { loginKakao(context, kakaoCallback) }
 
-    Surface {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 24.dp)
-                .padding(top = 60.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.app_icon),
-                contentDescription = "앱 로고",
+    BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
+        Surface {
+            Column(
                 modifier = Modifier
-                    .size(150.dp)
-                    .padding()
-            )
-
-            Spacer(Modifier.height(60.dp))
-
-            PDTextFiledOutLine(
-                modifier = Modifier.fillMaxWidth(),
-                value = uiState.id,
-                label = "아이디",
-                onValueChange = { newId -> viewModel.setEvent(LoginUIEvent.IdChange(newId)) }
-            )
-            Spacer(Modifier.height(4.dp))
-
-            PDTextFiledOutLine(
-                modifier = Modifier.fillMaxWidth(),
-                value = uiState.password,
-                label = "비밀번호",
-                visualTransformation = PasswordVisualTransformation(),
-                onValueChange = { newPassword -> viewModel.setEvent(LoginUIEvent.PasswordChange(newPassword)) }
-            )
-            Spacer(Modifier.height(20.dp))
-
-            PDButton(
-                modifier = Modifier.fillMaxWidth(),
-                text = "로그인하기",
-                onClick = { viewModel.setEvent(LoginUIEvent.Login) }
-            )
-
-            Spacer(Modifier.height(20.dp))
-            Text(
-                text = "SNS 계정으로 로그인하기",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(Modifier.height(20.dp))
-            Row(
-                modifier = Modifier,
-                horizontalArrangement = Arrangement.spacedBy(20.dp)
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 60.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
                 Image(
+                    painter = painterResource(id = R.drawable.app_icon),
+                    contentDescription = "앱 로고",
                     modifier = Modifier
-                        .size(50.dp)
-                        .clickable {
-                            onKaKaoLoginClick()
-                        },
-                    painter = painterResource(id = R.drawable.ic_login_kakao),
-                    contentDescription = "카카오 로그인 버튼",
-                    contentScale = ContentScale.Fit
+                        .size(150.dp)
+                        .padding()
                 )
 
-                Image(
-                    modifier = Modifier.height(50.dp),
-                    painter = painterResource(id = R.drawable.ic_login_google),
-                    contentDescription = "구글 로그인 버튼",
-                    contentScale = ContentScale.Fit
-                )
-            }
+                Spacer(Modifier.height(60.dp))
 
-            Spacer(modifier = Modifier.weight(1f))
-            Row(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(bottom = 24.dp)
-                    .clickable(onClick = onNavigateToSignUpScreen),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
+                PDTextFiledOutLine(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = uiState.id,
+                    label = "아이디",
+                    onValueChange = { newId -> viewModel.setIntent(LoginBaseIntent.IdChange(newId)) }
+                )
+                Spacer(Modifier.height(4.dp))
+
+                PDTextFiledOutLine(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = uiState.password,
+                    label = "비밀번호",
+                    visualTransformation = PasswordVisualTransformation(),
+                    onValueChange = { newPassword -> viewModel.setIntent(LoginBaseIntent.PasswordChange(newPassword)) }
+                )
+                Spacer(Modifier.height(20.dp))
+
+                PDButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = "로그인하기",
+                    onClick = { viewModel.setIntent(LoginBaseIntent.Login) }
+                )
+
+                Spacer(Modifier.height(20.dp))
                 Text(
-                    text = "PlanDing 회원이 아니신가요?",
+                    text = "SNS 계정으로 로그인하기",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold
                 )
-                Text(
-                    text = "Sign up",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                Spacer(Modifier.height(20.dp))
+                Row(
+                    modifier = Modifier,
+                    horizontalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    Image(
+                        modifier = Modifier
+                            .size(50.dp)
+                            .clickable {
+                                onKaKaoLoginClick()
+                            },
+                        painter = painterResource(id = R.drawable.ic_login_kakao),
+                        contentDescription = "카카오 로그인 버튼",
+                        contentScale = ContentScale.Fit
+                    )
+
+                    Image(
+                        modifier = Modifier.height(50.dp),
+                        painter = painterResource(id = R.drawable.ic_login_google),
+                        contentDescription = "구글 로그인 버튼",
+                        contentScale = ContentScale.Fit
+                    )
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(bottom = 24.dp)
+                        .clickable(onClick = onNavigateToSignUpScreen),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = "PlanDing 회원이 아니신가요?",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Sign up",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         }
     }
@@ -210,7 +202,7 @@ private fun getKakaoUserInfo(viewModel: LoginViewModel) {
                     type = SocialLoginInfo.Type.KAKAO
                 )
                 Log.d("카카오", "$socialLoginInfo")
-                viewModel.setEvent(LoginUIEvent.SocialLogin(socialLoginInfo))
+                viewModel.setIntent(LoginBaseIntent.SocialLogin(socialLoginInfo))
             }
         }
     }

@@ -2,8 +2,9 @@ package com.comst.presentation.main.group
 
 import androidx.compose.runtime.Immutable
 import com.comst.domain.model.group.GroupCardModel
-import com.comst.presentation.common.base.UIEvent
-import com.comst.presentation.common.base.UISideEffect
+import com.comst.presentation.common.base.BaseEvent
+import com.comst.presentation.common.base.BaseIntent
+import com.comst.presentation.common.base.BaseSideEffect
 import com.comst.presentation.common.base.UIState
 
 class GroupContract {
@@ -12,16 +13,20 @@ class GroupContract {
     data class GroupUIState(
         val groupCardModels: List<GroupCardModel> = emptyList(),
         val isLoading: Boolean = false
-    ): UIState
+    ) : UIState
 
-    sealed class GroupUISideEffect: UISideEffect {
-        data class ShowToast(val message: String): GroupUISideEffect()
-        object NavigateToCreateGroupActivity : GroupUISideEffect()
-        data class NavigateToGroupDetailActivity(val groupCode: String) : GroupUISideEffect()
+    sealed class GroupSideEffect : BaseSideEffect {
+        data class ShowToast(val message: String) : GroupSideEffect()
+        object NavigateToCreateGroupActivity : GroupSideEffect()
+        data class NavigateToGroupDetailActivity(val groupCode: String) : GroupSideEffect()
     }
 
-    sealed class GroupUIEvent: UIEvent{
-        data class GroupCardClick(val groupCode: String): GroupUIEvent()
-        object GroupCreateClick: GroupUIEvent()
+    sealed class GroupIntent : BaseIntent {
+        data class GroupCardClick(val groupCode: String) : GroupIntent()
+        object GroupCreateClick : GroupIntent()
+    }
+
+    sealed class GroupEvent : BaseEvent {
+        data class LoadFailure(val message: String) : GroupEvent()
     }
 }

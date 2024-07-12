@@ -14,17 +14,27 @@ import javax.inject.Inject
 @HiltViewModel
 class GroupDetailViewModel @Inject constructor(
     private val getGroupInformationUseCase: GetGroupInformationUseCase
-): BaseViewModel<GroupDetailUIState, GroupDetailUISideEffect, GroupDetailUIEvent>(GroupDetailUIState()){
+) : BaseViewModel<GroupDetailUIState, GroupDetailSideEffect, GroupDetailIntent, GroupDetailEvent>(GroupDetailUIState()) {
 
-    override suspend fun handleEvent(event: GroupDetailUIEvent) {
+    override fun handleIntent(intent: GroupDetailIntent) {
 
     }
 
-    fun initialize(groupCode: String)  = viewModelScope.launch {
+    override fun handleEvent(event: GroupDetailEvent) {
+
+    }
+
+    fun initialize(groupCode: String) = viewModelScope.launch {
         getGroupInformationUseCase(groupCode).onSuccess {
-            Log.d("하하", "${it}")
-        }.onFailure { statusCode, message ->
+            Log.d("Group Info", "$it")
+
+        }.onFailure {
 
         }
+    }
+
+    override fun handleError(exception: Exception) {
+        super.handleError(exception)
+        setEffect(GroupDetailSideEffect.ShowToast(exception.message.orEmpty()))
     }
 }

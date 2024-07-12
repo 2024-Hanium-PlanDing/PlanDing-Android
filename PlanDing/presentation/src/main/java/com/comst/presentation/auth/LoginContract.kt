@@ -2,8 +2,9 @@ package com.comst.presentation.auth
 
 import androidx.compose.runtime.Immutable
 import com.comst.domain.model.user.SocialLoginInfo
-import com.comst.presentation.common.base.UIEvent
-import com.comst.presentation.common.base.UISideEffect
+import com.comst.presentation.common.base.BaseEvent
+import com.comst.presentation.common.base.BaseIntent
+import com.comst.presentation.common.base.BaseSideEffect
 import com.comst.presentation.common.base.UIState
 
 class LoginContract {
@@ -15,15 +16,19 @@ class LoginContract {
         val isLoading: Boolean = false,
     ): UIState
 
-    sealed class LoginUISideEffect : UISideEffect {
-        data class ShowToast(val message: String) : LoginUISideEffect()
-        object NavigateToMainActivity : LoginUISideEffect()
+    sealed class LoginBaseSideEffect : BaseSideEffect {
+        data class ShowToast(val message: String) : LoginBaseSideEffect()
+        object NavigateToMainActivity : LoginBaseSideEffect()
     }
 
-    sealed class LoginUIEvent : UIEvent {
-        data class IdChange(val id: String) : LoginUIEvent()
-        data class PasswordChange(val password: String) : LoginUIEvent()
-        object Login : LoginUIEvent()
-        data class SocialLogin(val accountInfo: SocialLoginInfo) : LoginUIEvent()
+    sealed class LoginBaseIntent : BaseIntent {
+        data class IdChange(val id: String) : LoginBaseIntent()
+        data class PasswordChange(val password: String) : LoginBaseIntent()
+        object Login : LoginBaseIntent()
+        data class SocialLogin(val accountInfo: SocialLoginInfo) : LoginBaseIntent()
+    }
+
+    sealed class LoginBaseEvent : BaseEvent {
+        data class LoginFailure(val message: String) : LoginBaseEvent()
     }
 }

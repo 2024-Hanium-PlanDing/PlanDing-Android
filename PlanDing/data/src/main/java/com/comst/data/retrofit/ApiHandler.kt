@@ -19,7 +19,7 @@ object ApiHandler  {
                     if (it.success) {
                         ApiResult.Success(mapper(it.data))
                     } else {
-                        ApiResult.Failure(it.errorResponse.errorCode, it.errorResponse.message)
+                        ApiResult.Failure(it.errorResponse.errorCode)
                     }
                 } ?: run {
                     throw NullPointerException(NETWORK_EXCEPTION_BODY_IS_NULL)
@@ -33,8 +33,8 @@ object ApiHandler  {
     }
 
     private fun <T : Any> getFailApiResult(body: BaseResponse<T>?, response: Response<BaseResponse<T>>) = body?.let {
-        ApiResult.Failure(statusCode = response.code(), message = it.errorResponse.message)
+        ApiResult.Failure(statusCode = response.code())
     } ?: run {
-        ApiResult.Failure(statusCode = response.code(), message = response.message())
+        ApiResult.Failure(statusCode = response.code())
     }
 }

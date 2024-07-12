@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,8 +33,10 @@ import androidx.compose.ui.unit.dp
 import com.comst.domain.model.base.DaysOfWeek
 import com.comst.domain.util.DateUtils
 import com.comst.presentation.R
+import com.comst.presentation.main.schedule.ScheduleContract
+import com.comst.presentation.main.schedule.ScheduleContract.ScheduleEvent
+import com.comst.presentation.main.schedule.ScheduleContract.ScheduleIntent
 import com.comst.presentation.main.schedule.ScheduleViewModel
-import com.comst.presentation.main.schedule.ScheduleContract.ScheduleUIEvent.*
 import java.util.Calendar
 
 @Composable
@@ -72,7 +73,7 @@ fun PDCalendar(
                     set(Calendar.MONTH, displayedMonth)
                     set(Calendar.DAY_OF_MONTH, day)
                 }
-                viewModel.setEvent(SelectedDate(selectedCalendar.time))
+                viewModel.setIntent(ScheduleIntent.SelectDate(selectedCalendar.time))
                 selectedDate = day
             }
         )
