@@ -16,13 +16,11 @@ class MyPageViewModel @Inject constructor(
 ) : BaseViewModel<MyPageUIState, MyPageSideEffect, MyPageIntent, MyPageEvent>(MyPageUIState()) {
 
     init {
-        setIntent(MyPageIntent.Load)
+        load()
     }
 
     override fun handleIntent(intent: MyPageIntent) {
-        when (intent) {
-            is MyPageIntent.Load -> load()
-        }
+
     }
 
     override fun handleEvent(event: MyPageEvent) {

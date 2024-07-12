@@ -23,7 +23,7 @@ class MyPageContract {
     }
 
     sealed class MyPageIntent : BaseIntent {
-        object Load : MyPageIntent()
+
     }
 
     sealed class MyPageEvent : BaseEvent {
