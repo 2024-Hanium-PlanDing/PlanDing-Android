@@ -76,13 +76,6 @@ fun GroupScreen(
                 )
             }
 
-            is GroupSideEffect.ShowToast -> {
-                Toast.makeText(
-                    context,
-                    effect.message,
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
         }
     }
 

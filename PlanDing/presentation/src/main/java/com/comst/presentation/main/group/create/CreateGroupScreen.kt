@@ -45,13 +45,6 @@ fun CreateGroupScreen(
     val handleEffect: (CreateGroupSideEffect) -> Unit = { effect ->
         when (effect) {
             is CreateGroupSideEffect.SuccessGroupCreation -> onFinish()
-            is CreateGroupSideEffect.ShowToast -> {
-                Toast.makeText(
-                    context,
-                    effect.message,
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
         }
     }
 

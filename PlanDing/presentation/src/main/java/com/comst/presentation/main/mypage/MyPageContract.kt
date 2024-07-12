@@ -19,7 +19,7 @@ class MyPageContract {
     ) : UIState
 
     sealed class MyPageSideEffect : BaseSideEffect {
-        data class ShowToast(val message: String) : MyPageSideEffect()
+
     }
 
     sealed class MyPageIntent : BaseIntent {

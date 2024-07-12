@@ -16,7 +16,6 @@ class GroupContract {
     ) : UIState
 
     sealed class GroupSideEffect : BaseSideEffect {
-        data class ShowToast(val message: String) : GroupSideEffect()
         object NavigateToCreateGroupActivity : GroupSideEffect()
         data class NavigateToGroupDetailActivity(val groupCode: String) : GroupSideEffect()
     }

@@ -52,11 +52,11 @@ class MyPageViewModel @Inject constructor(
     }
 
     private fun onLoadFailure(message: String) {
-        setEffect(MyPageSideEffect.ShowToast(message))
+        setToastEffect(message)
     }
 
     override fun handleError(exception: Exception) {
         super.handleError(exception)
-        setEffect(MyPageSideEffect.ShowToast(exception.message.orEmpty()))
+        setToastEffect(exception.message.orEmpty())
     }
 }

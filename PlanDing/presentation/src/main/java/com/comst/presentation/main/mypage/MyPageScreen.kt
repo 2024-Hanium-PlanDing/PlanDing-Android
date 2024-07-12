@@ -38,20 +38,16 @@ import com.comst.presentation.ui.theme.PlanDingTheme
 fun MyPageScreen(
     viewModel: MyPageViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
-    val handleEffect: (MyPageSideEffect) -> Unit = { effect ->
+
+    val handleEffect: (MyPageSideEffect) -> Unit =  { effect ->
         when (effect) {
-            is MyPageSideEffect.ShowToast -> {
-                Toast.makeText(
-                    context,
-                    effect.message,
-                    Toast.LENGTH_SHORT
-                ).show()
+            else -> {
+
             }
         }
     }
 
-    BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
+    BaseScreen(viewModel = viewModel, handleEffect =  handleEffect) { uiState ->
         Surface {
             Column(
                 modifier = Modifier.fillMaxSize(),

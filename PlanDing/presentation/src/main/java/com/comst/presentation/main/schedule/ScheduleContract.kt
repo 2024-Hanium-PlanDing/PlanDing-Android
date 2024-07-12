@@ -27,7 +27,7 @@ class ScheduleContract {
     ): UIState
 
     sealed class ScheduleSideEffect : BaseSideEffect {
-        data class ShowToast(val message: String) : ScheduleSideEffect()
+
     }
 
     sealed class ScheduleIntent : BaseIntent {

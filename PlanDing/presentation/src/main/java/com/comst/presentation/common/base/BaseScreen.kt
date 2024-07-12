@@ -20,8 +20,8 @@ fun <S : UIState, A : BaseSideEffect, I : BaseIntent, E : BaseEvent> BaseScreen(
     LaunchedEffect(key1 = Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is BaseSideEffect.ShowError -> {
-                    Toast.makeText(context, effect.message ?: "Unknown error", Toast.LENGTH_SHORT).show()
+                is BaseSideEffect.ShowToast -> {
+                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
                 }
                 else -> handleEffect(effect)
             }

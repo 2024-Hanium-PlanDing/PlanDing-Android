@@ -77,7 +77,7 @@ class CreateGroupViewModel @Inject constructor(
 
     private fun onCreateGroupClick() = viewModelScope.launch {
         if (currentState.selectedImage == null) {
-            setEffect(CreateGroupSideEffect.ShowToast("그룹 이미지는 필수입니다."))
+            setToastEffect("그룹 이미지는 필수입니다.")
             return@launch
         }
 
@@ -88,7 +88,7 @@ class CreateGroupViewModel @Inject constructor(
             ),
             currentState.selectedImage!!
         ).onSuccess {
-            setEffect(CreateGroupSideEffect.ShowToast("그룹 생성을 성공했습니다."))
+            setToastEffect("그룹 생성을 성공했습니다.")
             setEffect(CreateGroupSideEffect.SuccessGroupCreation)
         }.onFailure {
         }
@@ -96,11 +96,11 @@ class CreateGroupViewModel @Inject constructor(
     }
 
     private fun onLoadFailure(message: String) {
-        setEffect(CreateGroupSideEffect.ShowToast(message))
+        setToastEffect(message)
     }
 
     override fun handleError(exception: Exception) {
         super.handleError(exception)
-        setEffect(CreateGroupSideEffect.ShowToast(exception.message.orEmpty()))
+        setToastEffect(exception.message.orEmpty())
     }
 }

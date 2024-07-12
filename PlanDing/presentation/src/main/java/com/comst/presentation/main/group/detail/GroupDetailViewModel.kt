@@ -35,6 +35,6 @@ class GroupDetailViewModel @Inject constructor(
 
     override fun handleError(exception: Exception) {
         super.handleError(exception)
-        setEffect(GroupDetailSideEffect.ShowToast(exception.message.orEmpty()))
+        setToastEffect(exception.message.orEmpty())
     }
 }

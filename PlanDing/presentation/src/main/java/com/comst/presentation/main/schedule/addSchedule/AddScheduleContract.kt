@@ -22,7 +22,6 @@ class AddScheduleContract {
     ) : UIState
 
     sealed class AddScheduleSideEffect : BaseSideEffect {
-        data class ShowToast(val message: String) : AddScheduleSideEffect()
         data class SuccessCreateSchedule(val schedule: Schedule) : AddScheduleSideEffect()
     }
 

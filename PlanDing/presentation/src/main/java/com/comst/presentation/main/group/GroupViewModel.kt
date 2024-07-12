@@ -47,11 +47,11 @@ class GroupViewModel @Inject constructor(
     }
 
     private fun onLoadFailure(message: String) {
-        setEffect(GroupSideEffect.ShowToast(message))
+        setToastEffect(message)
     }
 
     override fun handleError(exception: Exception) {
         super.handleError(exception)
-        setEffect(GroupSideEffect.ShowToast(exception.message.orEmpty()))
+        setToastEffect(exception.message.orEmpty())
     }
 }

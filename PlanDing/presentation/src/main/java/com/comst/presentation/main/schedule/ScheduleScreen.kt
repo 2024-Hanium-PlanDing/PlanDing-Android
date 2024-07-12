@@ -80,13 +80,7 @@ fun ScheduleScreen(
     val context = LocalContext.current
     val handleEffect: (ScheduleSideEffect) -> Unit = { effect ->
         when (effect) {
-            is ScheduleSideEffect.ShowToast -> {
-                Toast.makeText(
-                    context,
-                    effect.message,
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+            else -> {}
         }
     }
 

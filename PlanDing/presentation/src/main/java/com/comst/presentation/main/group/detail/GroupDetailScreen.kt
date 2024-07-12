@@ -57,13 +57,7 @@ fun GroupDetailScreen(
 
     val handleEffect: (GroupDetailSideEffect) -> Unit = { effect ->
         when (effect) {
-            is GroupDetailSideEffect.ShowToast -> {
-                Toast.makeText(
-                    context,
-                    effect.message,
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+            else -> {}
         }
     }
 

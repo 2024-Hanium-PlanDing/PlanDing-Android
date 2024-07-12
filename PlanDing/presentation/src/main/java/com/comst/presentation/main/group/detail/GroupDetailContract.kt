@@ -14,7 +14,7 @@ class GroupDetailContract {
     ) : UIState
 
     sealed class GroupDetailSideEffect : BaseSideEffect {
-        data class ShowToast(val message: String) : GroupDetailSideEffect()
+
     }
 
     sealed class GroupDetailIntent : BaseIntent {

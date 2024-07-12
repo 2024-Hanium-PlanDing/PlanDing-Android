@@ -60,13 +60,6 @@ fun ImageSelectScreen(
             is CreateGroupSideEffect.SuccessGroupCreation -> {
                 // Handle Success Group Creation if needed
             }
-            is CreateGroupSideEffect.ShowToast -> {
-                Toast.makeText(
-                    context,
-                    effect.message,
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
         }
     }
 

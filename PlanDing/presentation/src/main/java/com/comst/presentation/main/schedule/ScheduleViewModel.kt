@@ -154,11 +154,11 @@ class ScheduleViewModel @Inject constructor(
     }
 
     private fun onLoadFailure(message: String) {
-        setEffect(ScheduleSideEffect.ShowToast(message))
+        setToastEffect(message)
     }
 
     override fun handleError(exception: Exception) {
         super.handleError(exception)
-        setEffect(ScheduleSideEffect.ShowToast(exception.message.orEmpty()))
+        setToastEffect(exception.message.orEmpty())
     }
 }

@@ -30,7 +30,7 @@ class LoginViewModel @Inject constructor(
     override fun handleEvent(event: LoginBaseEvent) {
         when (event) {
             is LoginBaseEvent.LoginFailure -> {
-                setEffect(LoginBaseSideEffect.ShowToast(event.message))
+                setToastEffect(event.message)
             }
         }
     }
@@ -76,6 +76,6 @@ class LoginViewModel @Inject constructor(
 
     override fun handleError(exception: Exception) {
         super.handleError(exception)
-        setEffect(LoginBaseSideEffect.ShowToast(exception.message.orEmpty()))
+        setToastEffect(exception.message.orEmpty())
     }
 }

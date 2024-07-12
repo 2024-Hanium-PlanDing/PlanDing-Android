@@ -65,9 +65,14 @@ abstract class BaseViewModel<S : UIState, A : BaseSideEffect, I : BaseIntent, E 
 
     protected abstract fun handleEvent(event: E)
 
+    protected fun setToastEffect(message: String) {
+        viewModelScope.launch {
+            setEffect(BaseSideEffect.ShowToast(message) as A)
+        }
+    }
     protected open fun handleError(exception: Exception) {
         viewModelScope.launch {
-            setEffect(BaseSideEffect.ShowError(exception.message) as A)
+
         }
     }
 

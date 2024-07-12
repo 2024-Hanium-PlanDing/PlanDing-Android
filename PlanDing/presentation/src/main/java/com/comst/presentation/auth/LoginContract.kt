@@ -17,7 +17,6 @@ class LoginContract {
     ): UIState
 
     sealed class LoginBaseSideEffect : BaseSideEffect {
-        data class ShowToast(val message: String) : LoginBaseSideEffect()
         object NavigateToMainActivity : LoginBaseSideEffect()
     }
 

@@ -74,12 +74,12 @@ class AddScheduleViewModel @Inject constructor(
 
     private fun onCreateScheduleClick() = viewModelScope.launch {
         if (currentState.title.isEmpty() || currentState.content.isEmpty()) {
-            setEffect(AddScheduleSideEffect.ShowToast("일정의 제목과 내용은 필수입니다."))
+            setToastEffect("일정의 제목과 내용은 필수입니다.")
             return@launch
         }
 
         if (currentState.startTime >= currentState.endTime) {
-            setEffect(AddScheduleSideEffect.ShowToast("일정의 시작 시간은 끝 시간보다 크거나 같을 수 없습니다."))
+            setToastEffect("일정의 시작 시간은 끝 시간보다 크거나 같을 수 없습니다.")
             return@launch
         }
 
@@ -107,11 +107,11 @@ class AddScheduleViewModel @Inject constructor(
     }
 
     private fun onCreationFailure(message: String) {
-        setEffect(AddScheduleSideEffect.ShowToast(message))
+        setToastEffect(message)
     }
 
     override fun handleError(exception: Exception) {
         super.handleError(exception)
-        setEffect(AddScheduleSideEffect.ShowToast(exception.message.orEmpty()))
+        setToastEffect(exception.message.orEmpty())
     }
 }

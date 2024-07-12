@@ -62,7 +62,9 @@ fun LoginScreen(
                     }
                 )
             }
-            else -> {} // 기본 SideEffect는 BaseScreen에서 처리
+            else -> {
+
+            }
         }
     }
 
