@@ -43,20 +43,23 @@ fun AddScheduleDialog(
     onDismiss: () -> Unit,
     onConfirm: (Schedule) -> Unit
 ) {
-    LaunchedEffect(date) {
+    LaunchedEffect(Unit) {
         viewModel.initialize(date)
     }
 
     val context = LocalContext.current
     val handleEffect: (AddScheduleSideEffect) -> Unit = { effect ->
-        when(effect) {
+        when (effect) {
             is AddScheduleSideEffect.SuccessCreateSchedule -> onConfirm(effect.schedule)
         }
     }
 
     BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
         AlertDialog(
-            onDismissRequest = onDismiss,
+            onDismissRequest = {
+                viewModel.initialize(date)
+                onDismiss()
+            },
             title = { Text(text = "일정 추가") },
             text = {
                 Column(
