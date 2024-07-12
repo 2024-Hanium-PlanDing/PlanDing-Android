@@ -102,19 +102,37 @@ fun ScheduleScreen(
                             color = Color.White
                         ),
                 ) {
-                    ScheduleTabs(
-                        selectUIDate = uiState.selectUIDate,
-                        selectDay = uiState.selectDay,
-                        isTodayScheduleVisible = uiState.isTodayScheduleVisible,
-                        todayPersonalSchedules = uiState.todayPersonalScheduleEvents,
-                        todayGroupSchedules = uiState.todayGroupScheduleEvents,
-                        onUIAction = viewModel::setIntent
-                    )
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 8.dp, bottom = 8.dp)
+                            .padding(horizontal = 16.dp)
+                    ) {
+
+                        ScheduleHeader(
+                            selectUIDate = uiState.selectUIDate,
+                            selectDay = uiState.selectDay,
+                            isTodayScheduleVisible = uiState.isTodayScheduleVisible,
+                            onUIAction = viewModel::setIntent
+                        )
+
+                        if (uiState.isTodayScheduleVisible) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            ScheduleContent(
+                                todayPersonalSchedules = uiState.todayPersonalScheduleEvents,
+                                todayGroupSchedules = uiState.todayGroupScheduleEvents,
+                                onUIAction = viewModel::setIntent
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                PDScheduleChart(events = uiState.selectWeekScheduleEvents, days = uiState.selectedWeekdays)
+                PDScheduleChart(
+                    events = uiState.selectWeekScheduleEvents,
+                    days = uiState.selectedWeekdays
+                )
             }
         }
 
@@ -153,34 +171,6 @@ private fun CalendarBottomSheet(
         sheetState = calendarBottomSheetState,
     ) {
         PDCalendar(viewModel = viewModel)
-    }
-}
-
-@Composable
-private fun ScheduleTabs(
-    selectUIDate: String,
-    selectDay: String,
-    isTodayScheduleVisible: Boolean,
-    todayPersonalSchedules: List<Schedule>,
-    todayGroupSchedules: List<Schedule>,
-    onUIAction: (ScheduleIntent) -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .padding(top = 8.dp, bottom = 8.dp)
-            .padding(horizontal = 16.dp)
-    ) {
-        ScheduleHeader(selectUIDate, selectDay, isTodayScheduleVisible, onUIAction)
-
-        if (isTodayScheduleVisible) {
-            Spacer(modifier = Modifier.height(8.dp))
-            ScheduleContent(
-                todayPersonalSchedules,
-                todayGroupSchedules,
-                onUIAction
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-        }
     }
 }
 
