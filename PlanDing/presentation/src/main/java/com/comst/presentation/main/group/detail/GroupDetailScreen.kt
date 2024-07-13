@@ -1,51 +1,73 @@
 package com.comst.presentation.main.group.detail
 
 import android.content.res.Configuration
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
-import com.comst.presentation.R
+import com.comst.domain.model.base.Schedule
 import com.comst.presentation.common.base.BaseScreen
-import com.comst.presentation.main.group.detail.GroupDetailContract.*
+import com.comst.presentation.component.PDButton
+import com.comst.presentation.component.PDCalendar
+import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailSideEffect
+import com.comst.presentation.main.schedule.ScheduleContract
+import com.comst.presentation.model.group.GroupProfileUIModel
+import com.comst.presentation.ui.theme.BackgroundColor2
 import com.comst.presentation.ui.theme.PlanDingTheme
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,16 +75,15 @@ fun GroupDetailScreen(
     groupCode: String,
     viewModel: GroupDetailViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
+    LaunchedEffect(groupCode) {
+        viewModel.initialize(groupCode)
+    }
 
+    val context = LocalContext.current
     val handleEffect: (GroupDetailSideEffect) -> Unit = { effect ->
         when (effect) {
             else -> {}
         }
-    }
-
-    LaunchedEffect(groupCode) {
-        viewModel.initialize(groupCode)
     }
 
     BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
@@ -72,7 +93,7 @@ fun GroupDetailScreen(
             topBar = {
                 TopAppBar(
                     title = {
-                        Text(text = "그룹명")
+                        Text(text = uiState.groupProfile.name)
                     },
                     navigationIcon = {
                         IconButton(onClick = { /* Handle back click */ }) {
@@ -88,20 +109,47 @@ fun GroupDetailScreen(
                     .padding(paddingValues)
                     .verticalScroll(scrollState)
             ) {
-                CollapsingContent(viewModel)
-                TabLayout()
-                ViewPagerContent()
+                GroupProfile(uiState.groupProfile)
+                GroupTabs(
+                    uiState.selectWeekGroupScheduleEvents
+                )
+            }
+
+            if (uiState.isBottomSheetVisible) {
+                CalendarBottomSheet(
+                    viewModel = viewModel
+                )
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CollapsingContent(viewModel: GroupDetailViewModel) {
+private fun CalendarBottomSheet(
+    viewModel: GroupDetailViewModel
+) {
+    val calendarBottomSheetState = rememberModalBottomSheetState()
+
+    ModalBottomSheet(
+        onDismissRequest = {
+            viewModel.setIntent(ScheduleContract.ScheduleIntent.CloseBottomSheetClick)
+        },
+        sheetState = calendarBottomSheetState,
+    ) {
+        PDCalendar(viewModel = viewModel)
+    }
+}
+
+@Composable
+fun GroupProfile(
+    groupProfile: GroupProfileUIModel
+) {
+    var isDescriptionVisible by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
             .background(Color.Gray)
     ) {
         Column(
@@ -116,98 +164,155 @@ fun CollapsingContent(viewModel: GroupDetailViewModel) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Image(
-                    painter = rememberAsyncImagePainter(""),
+                    painter = rememberAsyncImagePainter(groupProfile.thumbnailUrl),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(75.dp)
-                        .padding(end = 16.dp),
+                        .width(150.dp)
+                        .height(100.dp)
+                        .clip(RoundedCornerShape(16.dp)),
                     contentScale = ContentScale.Crop
                 )
 
                 Column {
-                    if (true) {
-                        Text(
+                    if (groupProfile.isGroupAdmin) {
+                        PDButton(
                             text = "프로필 수정",
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .background(Color.LightGray)
-                                .padding(vertical = 4.dp, horizontal = 8.dp),
-                            fontSize = 14.sp
+                            onClick = {}
                         )
-
                     } else {
-                        Text(
+                        PDButton(
                             text = "그룹 탈퇴",
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .background(Color.LightGray)
-                                .padding(vertical = 4.dp, horizontal = 8.dp)
-                                .clickable {
-                                },
-                            fontSize = 14.sp
+                            onClick = {}
                         )
                     }
                 }
             }
 
-            Text(
-                text = "그룹 설명",
+            Row(
                 modifier = Modifier
-                    .padding(vertical = 16.dp)
-                    .fillMaxWidth(),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Normal
-            )
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = groupProfile.description,
+                    modifier = Modifier.weight(1f),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal,
+                    maxLines = if (isDescriptionVisible) Int.MAX_VALUE else 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Icon(
+                    imageVector = if (isDescriptionVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = if (isDescriptionVisible) "Hide Description" else "Show Description",
+                    modifier = Modifier.clickable {
+                        isDescriptionVisible = !isDescriptionVisible
+                    }
+                )
+            }
 
             Text(
-                text = "그룹 생성일",
-                modifier = Modifier
-                    .padding(vertical = 8.dp)
-                    .fillMaxWidth(),
+                text = groupProfile.createdBy,
+                modifier = Modifier.fillMaxWidth(),
                 fontSize = 12.sp,
                 color = Color.Gray
             )
 
-            IconButton(
-                onClick = {  },
-                modifier = Modifier.align(Alignment.End)
+        }
+    }
+}
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+private fun GroupTabs(
+    selectWeekGroupScheduleEvents: List<Schedule>
+){
+    val pages = listOf("그룹 일정", "그룹원")
+    val pagerState = rememberPagerState()
+    val coroutineScope = rememberCoroutineScope()
+    var periodIndex by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }.collect { page ->
+            periodIndex = page
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = BackgroundColor2,
+                shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
+            )
+    ){
+        BoxWithConstraints {
+            val tabWidth = maxWidth / pages.size
+
+            TabRow(
+                selectedTabIndex = periodIndex,
+                modifier = Modifier.fillMaxWidth(),
+                indicator = { tabPositions ->
+                    Box(
+                        modifier = Modifier
+                            .tabIndicatorOffset(tabPositions[periodIndex])
+                            .width(tabWidth)
+                            .height(4.dp)
+                            .background(MaterialTheme.colorScheme.primary)
+                    )
+                },
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_keyboard_arrow_down_24),
-                    contentDescription = null
-                )
+                pages.forEachIndexed { index, title ->
+                    Tab(
+                        selected = periodIndex == index,
+                        onClick = {
+                            coroutineScope.launch {
+                                periodIndex = index
+                                pagerState.animateScrollToPage(index)
+                            }
+                        }
+                    ) {
+                        Text(
+                            text = title,
+                            maxLines = 1,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
             }
         }
     }
-}
 
-@Composable
-fun TabLayout() {
-    TabRow(
-        selectedTabIndex = 0,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .height(60.dp)
-            .background(Color.White)
-    ) {
-        Tab(selected = true, onClick = { /*TODO*/ }) {
-            Text(text = "그룹 일정")
-        }
-        Tab(selected = false, onClick = { /*TODO*/ }) {
-            Text(text = "그룹원")
-        }
+    HorizontalPager(
+        count = pages.size,
+        state = pagerState,
+        modifier = Modifier.fillMaxWidth()
+    ){ page ->
+        GroupTabsContent(
+            page = page,
+            selectWeekGroupScheduleEvents = selectWeekGroupScheduleEvents
+        )
     }
 }
 
 @Composable
-fun ViewPagerContent() {
-    Column(
+private fun GroupTabsContent(
+    page: Int,
+    selectWeekGroupScheduleEvents: List<Schedule>
+){
+    Box(
         modifier = Modifier
-            .fillMaxSize()
-            .background(Color.LightGray)
-    ) {
+            .fillMaxWidth()
+            .height(400.dp)
+    ){
+        when (page) {
+            0 -> {
 
+            }
+            1 -> {
+
+            }
+        }
     }
 }
 
