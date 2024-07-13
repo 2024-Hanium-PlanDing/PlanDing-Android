@@ -15,7 +15,7 @@ class CommonScheduleRepositoryImpl @Inject constructor(
 
     override suspend fun getCommonScheduleTodayList(): ApiResult<List<Schedule>> {
         return ApiHandler.handle(
-            execute = { commonScheduleService.getCommonScheduleToday() },
+            execute = { commonScheduleService.getCommonScheduleTodayApi() },
             mapper = { response -> response.map { it.toDomainModel() } }
         )
     }
@@ -24,7 +24,7 @@ class CommonScheduleRepositoryImpl @Inject constructor(
         request: SchedulePeriodModel
     ): ApiResult<List<Schedule>> {
         return ApiHandler.handle(
-            execute = { commonScheduleService.getCommonScheduleWeek(
+            execute = { commonScheduleService.getCommonScheduleWeekApi(
                 startDate = request.startDate,
                 endDate = request.endDate
             ) },

@@ -9,7 +9,7 @@ import retrofit2.http.Path
 interface GroupScheduleService {
 
     @GET("v1/group-rooms/week/{groupCode}/{startDate}/{endDate}")
-    suspend fun getGroupSchedule(
+    suspend fun getGroupScheduleApi(
         @Path("groupCode") groupCode: String,
         @Path("startDate") startDate: String,
         @Path("endDate") endDate: String

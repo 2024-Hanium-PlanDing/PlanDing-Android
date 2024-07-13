@@ -9,10 +9,10 @@ import retrofit2.http.Path
 interface CommonScheduleService {
 
     @GET("v1/common/schedule/today")
-    suspend fun getCommonScheduleToday(): Response<BaseResponse<List<ScheduleResponseDTO>>>
+    suspend fun getCommonScheduleTodayApi(): Response<BaseResponse<List<ScheduleResponseDTO>>>
 
     @GET("v1/common/schedule/week/{startDate}/{endDate}")
-    suspend fun getCommonScheduleWeek(
+    suspend fun getCommonScheduleWeekApi(
         @Path("startDate") startDate: String,
         @Path("endDate") endDate: String
     ): Response<BaseResponse<List<ScheduleResponseDTO>>>

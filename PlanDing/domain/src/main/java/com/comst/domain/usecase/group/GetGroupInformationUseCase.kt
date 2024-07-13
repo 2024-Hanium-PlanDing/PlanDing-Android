@@ -9,6 +9,6 @@ data class GetGroupInformationUseCase @Inject constructor(
     private val groupRepository: GroupRepository
 ) {
     suspend operator fun invoke(groupCode: String): ApiResult<GroupInformationModel> {
-        return groupRepository.getGroupInfo(groupCode)
+        return groupRepository.getGroupInformation(groupCode)
     }
 }

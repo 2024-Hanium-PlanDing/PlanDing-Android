@@ -1,6 +1,6 @@
 package com.comst.domain.model.user
 
-data class SocialLoginInfo(
+data class SocialLoginInformation(
     val profileNickname: String,
     val accountEmail: String,
     val profileImage: String,

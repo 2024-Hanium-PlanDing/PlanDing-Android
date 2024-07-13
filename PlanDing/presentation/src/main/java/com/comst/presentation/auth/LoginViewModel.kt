@@ -1,7 +1,7 @@
 package com.comst.presentation.auth
 
 import androidx.lifecycle.viewModelScope
-import com.comst.domain.model.user.SocialLoginInfo
+import com.comst.domain.model.user.SocialLoginInformation
 import com.comst.domain.usecase.user.PostSocialLoginUseCase
 import com.comst.domain.usecase.local.SetUserDataUseCase
 import com.comst.domain.util.onFailure
@@ -23,7 +23,7 @@ class LoginViewModel @Inject constructor(
             is LoginBaseIntent.IdChange -> onIdChange(intent.id)
             is LoginBaseIntent.PasswordChange -> onPasswordChange(intent.password)
             is LoginBaseIntent.Login -> onLoginClick()
-            is LoginBaseIntent.SocialLogin -> onSocialLogin(intent.accountInfo)
+            is LoginBaseIntent.SocialLogin -> onSocialLogin(intent.accountInformation)
         }
     }
 
@@ -53,9 +53,9 @@ class LoginViewModel @Inject constructor(
         setState { copy(isLoading = false) }
     }
 
-    private fun onSocialLogin(accountInfo: SocialLoginInfo) = viewModelScope.launch {
+    private fun onSocialLogin(accountInformation: SocialLoginInformation) = viewModelScope.launch {
         setState { copy(isLoading = true) }
-        postSocialLoginUseCase(accountInfo)
+        postSocialLoginUseCase(accountInformation)
             .onSuccess {
                 setUserDataUseCase(it.accessToken, it.refreshToken, it.userCode)
                 setEffect(LoginBaseSideEffect.NavigateToMainActivity)

@@ -21,7 +21,7 @@ class GroupRepositoryImpl @Inject constructor(
 
     override suspend fun getMyGroup(): ApiResult<List<GroupCardModel>> {
         return ApiHandler.handle(
-            execute = { groupService.getMyGroup() },
+            execute = { groupService.getMyGroupApi() },
             mapper = { response -> response.map { it.toDomainModel() } }
         )
     }
@@ -35,15 +35,15 @@ class GroupRepositoryImpl @Inject constructor(
                 )
                 val multipartBodyPart = mediaImageMultipartConverter.toMultipartBodyPart(thumbnail, "thumbnail")
                     ?: throw IllegalArgumentException("Invalid file URI")
-                groupService.postGroup(requestBody = request, thumbnail = multipartBodyPart)
+                groupService.postGroupApi(requestBody = request, thumbnail = multipartBodyPart)
             },
             mapper = { response -> response.toDomainModel() }
         )
     }
 
-    override suspend fun getGroupInfo(groupCode: String): ApiResult<GroupInformationModel> {
+    override suspend fun getGroupInformation(groupCode: String): ApiResult<GroupInformationModel> {
         return ApiHandler.handle(
-            execute = { groupService.getGroupInformation(groupCode) },
+            execute = { groupService.getGroupInformationApi(groupCode) },
             mapper = { response ->  response.toDomainModel()}
         )
     }

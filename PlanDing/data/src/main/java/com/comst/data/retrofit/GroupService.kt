@@ -17,16 +17,16 @@ interface GroupService {
 
     @Multipart
     @POST("v1/group")
-    suspend fun postGroup(
+    suspend fun postGroupApi(
         @Part("request") requestBody: GroupCreateParam,
         @Part thumbnail: MultipartBody.Part
     ): Response<BaseResponse<GroupCreateResponseDTO>>
 
     @GET("v1/group")
-    suspend fun getMyGroup(): Response<BaseResponse<List<MyGroupRoomDTO>>>
+    suspend fun getMyGroupApi(): Response<BaseResponse<List<MyGroupRoomDTO>>>
 
     @GET("v1/group/{groupCode}")
-    suspend fun getGroupInformation(
+    suspend fun getGroupInformationApi(
         @Path("groupCode") groupCode: String
     ): Response<BaseResponse<GroupInformationResponseDTO>>
 }

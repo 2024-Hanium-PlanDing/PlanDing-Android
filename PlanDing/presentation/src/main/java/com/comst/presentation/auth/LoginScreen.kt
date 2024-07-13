@@ -3,7 +3,6 @@ package com.comst.presentation.auth
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,9 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -32,7 +28,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.comst.domain.model.user.SocialLoginInfo
+import com.comst.domain.model.user.SocialLoginInformation
 import com.comst.presentation.R
 import com.comst.presentation.auth.LoginContract.*
 import com.comst.presentation.common.base.BaseScreen
@@ -72,7 +68,7 @@ fun LoginScreen(
         if (error != null) {
             Log.e("Kakao", "카카오 계정 로그인 실패", error)
         } else if (token != null) {
-            getKakaoUserInfo(viewModel)
+            getKakaoUserInformation(viewModel)
         }
     }
 
@@ -184,7 +180,7 @@ private fun LoginScreenPreview() {
     }
 }
 
-private fun getKakaoUserInfo(viewModel: LoginViewModel) {
+private fun getKakaoUserInformation(viewModel: LoginViewModel) {
     UserApiClient.instance.me { user, error ->
         when {
             error != null -> {
@@ -196,15 +192,15 @@ private fun getKakaoUserInfo(viewModel: LoginViewModel) {
                 val email = user.kakaoAccount?.email ?: ""
                 val profileUrl = user.kakaoAccount?.profile?.thumbnailImageUrl ?: ""
 
-                val socialLoginInfo = SocialLoginInfo(
+                val socialLoginInformation = SocialLoginInformation(
                     profileNickname = user.kakaoAccount?.profile?.nickname.toString(),
                     accountEmail = user.kakaoAccount?.email ?: "",
                     profileImage = user.kakaoAccount?.profile?.thumbnailImageUrl ?: "",
                     socialId = user.id.toString(),
-                    type = SocialLoginInfo.Type.KAKAO
+                    type = SocialLoginInformation.Type.KAKAO
                 )
-                Log.d("카카오", "$socialLoginInfo")
-                viewModel.setIntent(LoginBaseIntent.SocialLogin(socialLoginInfo))
+                Log.d("카카오", "$socialLoginInformation")
+                viewModel.setIntent(LoginBaseIntent.SocialLogin(socialLoginInformation))
             }
         }
     }

@@ -1,7 +1,7 @@
 package com.comst.presentation.auth
 
 import androidx.compose.runtime.Immutable
-import com.comst.domain.model.user.SocialLoginInfo
+import com.comst.domain.model.user.SocialLoginInformation
 import com.comst.presentation.common.base.BaseEvent
 import com.comst.presentation.common.base.BaseIntent
 import com.comst.presentation.common.base.BaseSideEffect
@@ -24,7 +24,7 @@ class LoginContract {
         data class IdChange(val id: String) : LoginBaseIntent()
         data class PasswordChange(val password: String) : LoginBaseIntent()
         object Login : LoginBaseIntent()
-        data class SocialLogin(val accountInfo: SocialLoginInfo) : LoginBaseIntent()
+        data class SocialLogin(val accountInformation: SocialLoginInformation) : LoginBaseIntent()
     }
 
     sealed class LoginBaseEvent : BaseEvent {

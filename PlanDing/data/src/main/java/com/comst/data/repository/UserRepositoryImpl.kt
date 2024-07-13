@@ -5,7 +5,7 @@ import com.comst.data.model.user.toDomainModel
 import com.comst.data.retrofit.ApiHandler
 import com.comst.data.retrofit.UserService
 import com.comst.domain.model.user.LoginResponseModel
-import com.comst.domain.model.user.SocialLoginInfo
+import com.comst.domain.model.user.SocialLoginInformation
 import com.comst.domain.model.user.UserProfile
 import com.comst.domain.repository.UserRepository
 import com.comst.domain.util.ApiResult
@@ -17,22 +17,22 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun getUserProfile(): ApiResult<UserProfile> {
         return ApiHandler.handle(
-            execute = { userService.getUserProfile() },
+            execute = { userService.getUserProfileApi() },
             mapper = { response -> response.toDomainModel()}
         )
     }
 
-    override suspend fun postSocialLogin(socialLoginInfo: SocialLoginInfo): ApiResult<LoginResponseModel> {
+    override suspend fun postSocialLogin(socialLoginInformation: SocialLoginInformation): ApiResult<LoginResponseModel> {
 
         val requestBody = SocialLoginParam(
-            profileNickname = socialLoginInfo.profileNickname,
-            accountEmail = socialLoginInfo.accountEmail,
-            profileImage = socialLoginInfo.profileImage,
-            socialId = socialLoginInfo.socialId
+            profileNickname = socialLoginInformation.profileNickname,
+            accountEmail = socialLoginInformation.accountEmail,
+            profileImage = socialLoginInformation.profileImage,
+            socialId = socialLoginInformation.socialId
         )
 
         return ApiHandler.handle(
-            execute = { userService.postSocialLogin(requestBody) },
+            execute = { userService.postSocialLoginApi(requestBody) },
             mapper = { response -> response.toDomainModel() }
         )
     }

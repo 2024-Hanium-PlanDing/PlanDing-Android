@@ -18,7 +18,7 @@ class GroupScheduleRepositoryImpl @Inject constructor(
         schedulePeriodModel: SchedulePeriodModel
     ): ApiResult<List<Schedule>> {
         return ApiHandler.handle(
-            execute = { groupScheduleService.getGroupSchedule(
+            execute = { groupScheduleService.getGroupScheduleApi(
                 groupCode = groupCode,
                 startDate = schedulePeriodModel.startDate,
                 endDate = schedulePeriodModel.endDate

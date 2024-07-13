@@ -13,12 +13,12 @@ import retrofit2.http.Path
 interface PersonalScheduleService {
 
     @POST("v1/schedule")
-    suspend fun postPersonalSchedule(
+    suspend fun postPersonalScheduleApi(
         @Body requestBody: ScheduleParam
     ): Response<BaseResponse<ScheduleResponseDTO>>
 
     @GET("v1/schedule/week/{startDate}/{endDate}")
-    suspend fun getPersonalSchedule(
+    suspend fun getPersonalScheduleApi(
         @Path("startDate") startDate: String,
         @Path("endDate") endDate: String
     ): Response<BaseResponse<List<PersonalScheduleResponseDTO>>>

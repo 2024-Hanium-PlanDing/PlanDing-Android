@@ -25,13 +25,13 @@ class PersonalScheduleRepositoryImpl @Inject constructor(
             endTime = scheduleModel.endTime
         )
         return ApiHandler.handle(
-            execute = { personalScheduleService.postPersonalSchedule(request) },
+            execute = { personalScheduleService.postPersonalScheduleApi(request) },
             mapper = { response -> response.toDomainModel() }
         )
     }
     override suspend fun getPersonalScheduleList(request: SchedulePeriodModel): ApiResult<List<Schedule>> {
         return ApiHandler.handle(
-            execute = { personalScheduleService.getPersonalSchedule(
+            execute = { personalScheduleService.getPersonalScheduleApi(
                 startDate = request.startDate,
                 endDate = request.endDate
             ) },
