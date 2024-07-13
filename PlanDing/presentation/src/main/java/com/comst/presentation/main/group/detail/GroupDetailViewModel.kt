@@ -2,6 +2,7 @@ package com.comst.presentation.main.group.detail
 
 import androidx.lifecycle.viewModelScope
 import com.comst.domain.usecase.group.GetGroupInformationUseCase
+import com.comst.domain.usecase.groupSchedule.GetGroupScheduleUseCase
 import com.comst.domain.util.DateUtils
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
@@ -17,6 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class GroupDetailViewModel @Inject constructor(
     private val getGroupInformationUseCase: GetGroupInformationUseCase,
+    private val getGroupScheduleUseCase: GetGroupScheduleUseCase
 ) : BaseViewModel<GroupDetailUIState, GroupDetailSideEffect, GroupDetailIntent, GroupDetailEvent>(GroupDetailUIState()) {
 
     override fun handleIntent(intent: GroupDetailIntent) {
@@ -35,11 +37,19 @@ class GroupDetailViewModel @Inject constructor(
 
     fun initialize(groupCode: String) = viewModelScope.launch {
         setState { copy(isLoading = true) }
-        getGroupInformationUseCase(groupCode).onSuccess {
-            setState {
-                copy(
-                    groupProfile =  it.toUIModel()
-                )
+        getGroupInformationUseCase(groupCode).onSuccess { groupInformation ->
+            getGroupScheduleUseCase(
+                groupCode = groupInformation.groupCode,
+                schedulePeriodModel = DateUtils.getWeekStartAndEnd(currentState.selectLocalDate)
+            ).onSuccess { groupSchedules ->
+                setState {
+                    copy(
+                        groupProfile =  groupInformation.toUIModel(),
+                        selectWeekGroupScheduleEvents = groupSchedules
+                    )
+                }
+            }.onFailure {
+
             }
         }.onFailure {
 
@@ -62,7 +72,10 @@ class GroupDetailViewModel @Inject constructor(
     private fun onSelectDate(date: Date) {
         val selectedLocalDate = DateUtils.dateToLocalDate(date)
         setState {
-            copy(selectLocalDate = selectedLocalDate)
+            copy(
+                selectLocalDate = selectedLocalDate,
+                isBottomSheetVisible = false
+            )
         }
         setEvent(GroupDetailEvent.DateSelected(selectedLocalDate))
     }
@@ -71,6 +84,23 @@ class GroupDetailViewModel @Inject constructor(
         val newSelectLocalDate = date
         val weeklySchedulePeriod = DateUtils.getWeekStartAndEnd(newSelectLocalDate)
         val dailyPeriod = DateUtils.getDayStartAndEnd(newSelectLocalDate)
+
+        getGroupScheduleUseCase(
+            groupCode = currentState.groupProfile.groupCode,
+            schedulePeriodModel = weeklySchedulePeriod
+        ).onSuccess {
+            setState {
+                copy(
+                    selectLocalDate = newSelectLocalDate,
+                    selectUIDate = DateUtils.localDateToUIDate(newSelectLocalDate),
+                    selectDay = DateUtils.getDayOfWeek(newSelectLocalDate),
+                    selectedWeekdays = DateUtils.getWeekDays(newSelectLocalDate)
+                )
+            }
+        }.onFailure {
+
+        }
+
 
     }
 

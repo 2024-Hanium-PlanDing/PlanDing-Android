@@ -3,14 +3,17 @@ package com.comst.data.di
 import com.comst.data.converter.MediaImageMultipartConverter
 import com.comst.data.repository.CommonScheduleRepositoryImpl
 import com.comst.data.repository.GroupRepositoryImpl
+import com.comst.data.repository.GroupScheduleRepositoryImpl
 import com.comst.data.repository.PersonalScheduleRepositoryImpl
 import com.comst.data.repository.UserRepositoryImpl
 import com.comst.data.retrofit.CommonScheduleService
+import com.comst.data.retrofit.GroupScheduleService
 import com.comst.data.retrofit.GroupService
 import com.comst.data.retrofit.PersonalScheduleService
 import com.comst.data.retrofit.UserService
 import com.comst.domain.repository.CommonScheduleRepository
 import com.comst.domain.repository.GroupRepository
+import com.comst.domain.repository.GroupScheduleRepository
 import com.comst.domain.repository.PersonalScheduleRepository
 import com.comst.domain.repository.UserRepository
 import dagger.Module
@@ -54,5 +57,13 @@ object ViewModelRepositoryModule {
         personalScheduleService: PersonalScheduleService,
     ): PersonalScheduleRepository {
         return PersonalScheduleRepositoryImpl(personalScheduleService)
+    }
+
+    @Provides
+    @ViewModelScoped
+    fun provideGroupScheduleRepository(
+        groupScheduleService: GroupScheduleService
+    ): GroupScheduleRepository {
+        return GroupScheduleRepositoryImpl(groupScheduleService)
     }
 }

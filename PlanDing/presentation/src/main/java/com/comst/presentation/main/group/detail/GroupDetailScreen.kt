@@ -9,30 +9,31 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,11 +57,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.comst.domain.model.base.Schedule
+import com.comst.domain.util.DateUtils
 import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
-import com.comst.presentation.component.PDCalendar
+import com.comst.presentation.component.PDCalendarBottomSheet
+import com.comst.presentation.component.PDScheduleChart
+import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailIntent
 import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailSideEffect
-import com.comst.presentation.main.schedule.ScheduleContract
 import com.comst.presentation.model.group.GroupProfileUIModel
 import com.comst.presentation.ui.theme.BackgroundColor2
 import com.comst.presentation.ui.theme.PlanDingTheme
@@ -111,33 +114,26 @@ fun GroupDetailScreen(
             ) {
                 GroupProfile(uiState.groupProfile)
                 GroupTabs(
-                    uiState.selectWeekGroupScheduleEvents
+                    uiState.selectWeekGroupScheduleEvents,
+                    selectUIDate = uiState.selectUIDate,
+                    selectDay = uiState.selectDay,
+                    selectedWeekdays = uiState.selectedWeekdays,
+                    onUIAction = viewModel::setIntent
                 )
             }
 
             if (uiState.isBottomSheetVisible) {
-                CalendarBottomSheet(
-                    viewModel = viewModel
+                PDCalendarBottomSheet(
+                    date = DateUtils.uiDateToDate(uiState.selectUIDate),
+                    onCloseBottomSheet = {
+                        viewModel.setIntent(GroupDetailIntent.CloseBottomSheetClick)
+                    },
+                    onDateSelected = { date ->
+                        viewModel.setIntent(GroupDetailIntent.SelectDate(date))
+                    }
                 )
             }
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun CalendarBottomSheet(
-    viewModel: GroupDetailViewModel
-) {
-    val calendarBottomSheetState = rememberModalBottomSheetState()
-
-    ModalBottomSheet(
-        onDismissRequest = {
-            viewModel.setIntent(ScheduleContract.ScheduleIntent.CloseBottomSheetClick)
-        },
-        sheetState = calendarBottomSheetState,
-    ) {
-        PDCalendar(viewModel = viewModel)
     }
 }
 
@@ -222,11 +218,16 @@ fun GroupProfile(
         }
     }
 }
+
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 private fun GroupTabs(
-    selectWeekGroupScheduleEvents: List<Schedule>
-){
+    selectWeekGroupScheduleEvents: List<Schedule>,
+    selectedWeekdays: List<String>,
+    selectUIDate: String,
+    selectDay: String,
+    onUIAction: (GroupDetailIntent) -> Unit
+) {
     val pages = listOf("그룹 일정", "그룹원")
     val pagerState = rememberPagerState()
     val coroutineScope = rememberCoroutineScope()
@@ -245,7 +246,7 @@ private fun GroupTabs(
                 color = BackgroundColor2,
                 shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
             )
-    ){
+    ) {
         BoxWithConstraints {
             val tabWidth = maxWidth / pages.size
 
@@ -287,10 +288,14 @@ private fun GroupTabs(
         count = pages.size,
         state = pagerState,
         modifier = Modifier.fillMaxWidth()
-    ){ page ->
+    ) { page ->
         GroupTabsContent(
             page = page,
-            selectWeekGroupScheduleEvents = selectWeekGroupScheduleEvents
+            selectUIDate = selectUIDate ,
+            selectDay = selectDay,
+            selectWeekGroupScheduleEvents = selectWeekGroupScheduleEvents,
+            selectedWeekdays = selectedWeekdays,
+            onUIAction = onUIAction
         )
     }
 }
@@ -298,21 +303,71 @@ private fun GroupTabs(
 @Composable
 private fun GroupTabsContent(
     page: Int,
-    selectWeekGroupScheduleEvents: List<Schedule>
-){
+    selectUIDate: String,
+    selectDay: String,
+    selectWeekGroupScheduleEvents: List<Schedule>,
+    selectedWeekdays: List<String>,
+    onUIAction: (GroupDetailIntent) -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(400.dp)
-    ){
+    ) {
         when (page) {
             0 -> {
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    ScheduleHeader(
+                        selectUIDate = selectUIDate,
+                        selectDay = selectDay,
+                        onUIAction = onUIAction
+                    )
 
+                    PDScheduleChart(
+                        events = selectWeekGroupScheduleEvents,
+                        days = selectedWeekdays
+                    )
+                }
             }
+
             1 -> {
 
             }
         }
+    }
+}
+
+@Composable
+private fun ScheduleHeader(
+    selectUIDate: String,
+    selectDay: String,
+    onUIAction: (GroupDetailIntent) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp, bottom = 16.dp)
+            .padding(horizontal = 16.dp)
+            .background(
+                shape = RoundedCornerShape(8.dp),
+                color = Color.White
+            )
+            .padding(vertical = 8.dp, horizontal = 16.dp)
+            .clickable { onUIAction(GroupDetailIntent.OpenBottomSheetClick) },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Icon(
+            imageVector = Icons.Filled.DateRange,
+            contentDescription = "달력",
+        )
+
+        Spacer(modifier = Modifier.size(8.dp))
+
+        Text(
+            text = "$selectUIDate $selectDay",
+        )
     }
 }
 
