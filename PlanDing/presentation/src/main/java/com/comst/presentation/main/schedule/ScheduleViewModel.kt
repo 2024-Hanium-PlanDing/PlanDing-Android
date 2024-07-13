@@ -1,6 +1,5 @@
 package com.comst.presentation.main.schedule
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.comst.domain.model.base.Schedule
 import com.comst.domain.util.DateUtils
@@ -124,18 +123,17 @@ class ScheduleViewModel @Inject constructor(
     }
 
     private fun onDateSelected(date: LocalDate) = viewModelScope.launch {
-        val newSelectLocalDate = date
-        val weeklySchedulePeriod = DateUtils.getWeekStartAndEnd(newSelectLocalDate)
-        val dailyPeriod = DateUtils.getDayStartAndEnd(newSelectLocalDate)
+        val weeklySchedulePeriod = DateUtils.getWeekStartAndEnd(date)
+        val dailyPeriod = DateUtils.getDayStartAndEnd(date)
 
         getCommonScheduleWeekListUseCase(weeklySchedulePeriod)
             .onSuccess {
                 setState {
                     copy(
-                        selectLocalDate = newSelectLocalDate,
-                        selectUIDate = DateUtils.localDateToUIDate(newSelectLocalDate),
-                        selectDay = DateUtils.getDayOfWeek(newSelectLocalDate),
-                        selectedWeekdays = DateUtils.getWeekDays(newSelectLocalDate),
+                        selectLocalDate = date,
+                        selectUIDate = DateUtils.localDateToUIDate(date),
+                        selectDay = DateUtils.getDayOfWeek(date),
+                        selectedWeekdays = DateUtils.getWeekDays(date),
                         selectWeekScheduleEvents = it
                     )
                 }

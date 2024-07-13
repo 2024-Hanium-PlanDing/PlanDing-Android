@@ -81,9 +81,8 @@ class GroupDetailViewModel @Inject constructor(
     }
 
     private fun onDateSelected(date: LocalDate) = viewModelScope.launch {
-        val newSelectLocalDate = date
-        val weeklySchedulePeriod = DateUtils.getWeekStartAndEnd(newSelectLocalDate)
-        val dailyPeriod = DateUtils.getDayStartAndEnd(newSelectLocalDate)
+        val weeklySchedulePeriod = DateUtils.getWeekStartAndEnd(date)
+        val dailyPeriod = DateUtils.getDayStartAndEnd(date)
 
         getGroupScheduleUseCase(
             groupCode = currentState.groupProfile.groupCode,
@@ -91,10 +90,10 @@ class GroupDetailViewModel @Inject constructor(
         ).onSuccess {
             setState {
                 copy(
-                    selectLocalDate = newSelectLocalDate,
-                    selectUIDate = DateUtils.localDateToUIDate(newSelectLocalDate),
-                    selectDay = DateUtils.getDayOfWeek(newSelectLocalDate),
-                    selectedWeekdays = DateUtils.getWeekDays(newSelectLocalDate)
+                    selectLocalDate = date,
+                    selectUIDate = DateUtils.localDateToUIDate(date),
+                    selectDay = DateUtils.getDayOfWeek(date),
+                    selectedWeekdays = DateUtils.getWeekDays(date)
                 )
             }
         }.onFailure {
