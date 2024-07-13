@@ -38,14 +38,14 @@ import com.comst.presentation.main.schedule.ScheduleContract.ScheduleEvent
 import com.comst.presentation.main.schedule.ScheduleContract.ScheduleIntent
 import com.comst.presentation.main.schedule.ScheduleViewModel
 import java.util.Calendar
+import java.util.Date
 
 @Composable
 fun PDCalendar(
     modifier: Modifier = Modifier.fillMaxSize(),
-    viewModel: ScheduleViewModel,
+    initialDate: Date,
+    onDateSelected: (Date) -> Unit,
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    val initialDate = remember { DateUtils.uiDateToDate(uiState.selectUIDate) }
     val calendar = remember { Calendar.getInstance().apply { time = initialDate } }
     var displayedMonth by remember { mutableIntStateOf(calendar.get(Calendar.MONTH)) }
     var displayedYear by remember { mutableIntStateOf(calendar.get(Calendar.YEAR)) }
@@ -73,7 +73,7 @@ fun PDCalendar(
                     set(Calendar.MONTH, displayedMonth)
                     set(Calendar.DAY_OF_MONTH, day)
                 }
-                viewModel.setIntent(ScheduleIntent.SelectDate(selectedCalendar.time))
+                onDateSelected(selectedCalendar.time)
                 selectedDate = day
             }
         )

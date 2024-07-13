@@ -27,17 +27,14 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -55,13 +52,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.comst.presentation.component.PDCalendar
-import com.comst.presentation.component.PDScheduleChart
-import com.comst.presentation.component.PDScreenHeader
 import com.comst.domain.model.base.Schedule
+import com.comst.domain.util.DateUtils
 import com.comst.presentation.R
 import com.comst.presentation.common.base.BaseScreen
-import com.comst.presentation.main.schedule.ScheduleContract.*
+import com.comst.presentation.component.PDCalendarBottomSheet
+import com.comst.presentation.component.PDScheduleChart
+import com.comst.presentation.component.PDScreenHeader
+import com.comst.presentation.main.schedule.ScheduleContract.ScheduleIntent
+import com.comst.presentation.main.schedule.ScheduleContract.ScheduleSideEffect
 import com.comst.presentation.main.schedule.addSchedule.AddScheduleDialog
 import com.comst.presentation.ui.theme.BackgroundColor2
 import com.comst.presentation.ui.theme.PlanDingTheme
@@ -134,8 +133,14 @@ fun ScheduleScreen(
         }
 
         if (uiState.isBottomSheetVisible) {
-            CalendarBottomSheet(
-                viewModel = viewModel
+            PDCalendarBottomSheet(
+                date = DateUtils.uiDateToDate(uiState.selectUIDate),
+                onCloseBottomSheet = {
+                    viewModel.setIntent(ScheduleIntent.CloseBottomSheetClick)
+                },
+                onDateSelected = { date ->
+                    viewModel.setIntent(ScheduleIntent.SelectDate(date))
+                }
             )
         }
 
@@ -151,23 +156,6 @@ fun ScheduleScreen(
                 }
             )
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun CalendarBottomSheet(
-    viewModel: ScheduleViewModel
-) {
-    val calendarBottomSheetState = rememberModalBottomSheetState()
-
-    ModalBottomSheet(
-        onDismissRequest = {
-            viewModel.setIntent(ScheduleIntent.CloseBottomSheetClick)
-        },
-        sheetState = calendarBottomSheetState,
-    ) {
-        PDCalendar(viewModel = viewModel)
     }
 }
 

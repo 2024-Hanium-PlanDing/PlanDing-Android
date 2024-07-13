@@ -99,7 +99,10 @@ class ScheduleViewModel @Inject constructor(
     private fun onSelectDate(date: Date) {
         val selectedLocalDate = DateUtils.dateToLocalDate(date)
         setState {
-            copy(selectLocalDate = selectedLocalDate)
+            copy(
+                selectLocalDate = selectedLocalDate,
+                isBottomSheetVisible = false
+            )
         }
         setEvent(ScheduleEvent.DateSelected(selectedLocalDate))
     }
@@ -133,8 +136,7 @@ class ScheduleViewModel @Inject constructor(
                         selectUIDate = DateUtils.localDateToUIDate(newSelectLocalDate),
                         selectDay = DateUtils.getDayOfWeek(newSelectLocalDate),
                         selectedWeekdays = DateUtils.getWeekDays(newSelectLocalDate),
-                        selectWeekScheduleEvents = it,
-                        isBottomSheetVisible = false
+                        selectWeekScheduleEvents = it
                     )
                 }
             }
