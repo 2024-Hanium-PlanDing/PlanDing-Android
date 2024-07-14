@@ -3,7 +3,8 @@ package com.comst.data.repository
 import com.comst.data.model.user.SocialLoginParam
 import com.comst.data.model.user.toDomainModel
 import com.comst.data.retrofit.ApiHandler
-import com.comst.data.retrofit.UserService
+import com.comst.data.retrofit.AuthenticatedUserService
+import com.comst.data.retrofit.UnAuthenticatedUserService
 import com.comst.domain.model.user.LoginResponseModel
 import com.comst.domain.model.user.SocialLoginInformation
 import com.comst.domain.model.user.UserProfile
@@ -12,12 +13,13 @@ import com.comst.domain.util.ApiResult
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
-    private val userService: UserService,
+    private val unAuthenticatedUserService: UnAuthenticatedUserService,
+    private val authenticatedUserService: AuthenticatedUserService,
 ): UserRepository {
 
     override suspend fun getUserProfile(): ApiResult<UserProfile> {
         return ApiHandler.handle(
-            execute = { userService.getUserProfileApi() },
+            execute = { authenticatedUserService.getUserProfileApi() },
             mapper = { response -> response.toDomainModel()}
         )
     }
@@ -32,7 +34,7 @@ class UserRepositoryImpl @Inject constructor(
         )
 
         return ApiHandler.handle(
-            execute = { userService.postSocialLoginApi(requestBody) },
+            execute = { unAuthenticatedUserService.postSocialLoginApi(requestBody) },
             mapper = { response -> response.toDomainModel() }
         )
     }

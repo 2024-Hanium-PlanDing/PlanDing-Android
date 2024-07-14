@@ -10,7 +10,8 @@ import com.comst.data.retrofit.CommonScheduleService
 import com.comst.data.retrofit.GroupScheduleService
 import com.comst.data.retrofit.GroupService
 import com.comst.data.retrofit.PersonalScheduleService
-import com.comst.data.retrofit.UserService
+import com.comst.data.retrofit.AuthenticatedUserService
+import com.comst.data.retrofit.UnAuthenticatedUserService
 import com.comst.domain.repository.CommonScheduleRepository
 import com.comst.domain.repository.GroupRepository
 import com.comst.domain.repository.GroupScheduleRepository
@@ -38,9 +39,13 @@ object ViewModelRepositoryModule {
     @Provides
     @ViewModelScoped
     fun provideUserRepository(
-        userService: UserService,
+        unAuthenticatedUserService: UnAuthenticatedUserService,
+        authenticatedUserService: AuthenticatedUserService,
     ): UserRepository {
-        return UserRepositoryImpl(userService)
+        return UserRepositoryImpl(
+            unAuthenticatedUserService,
+            authenticatedUserService
+        )
     }
 
     @Provides

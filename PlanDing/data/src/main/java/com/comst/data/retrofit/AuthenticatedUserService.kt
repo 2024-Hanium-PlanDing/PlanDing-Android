@@ -9,14 +9,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 
-interface UserService {
-
-    @POST("v1/login/android/kakao")
-    suspend fun postSocialLoginApi(
-        @Body requestBody: SocialLoginParam
-    ):Response<BaseResponse<LoginResponseDTO>>
-
-
+interface AuthenticatedUserService {
     @GET("v1/profile")
     suspend fun getUserProfileApi():Response<BaseResponse<UserProfileResponseDTO>>
 }

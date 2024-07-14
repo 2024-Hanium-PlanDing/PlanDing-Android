@@ -4,40 +4,44 @@ import com.comst.data.retrofit.CommonScheduleService
 import com.comst.data.retrofit.GroupScheduleService
 import com.comst.data.retrofit.GroupService
 import com.comst.data.retrofit.PersonalScheduleService
-import com.comst.data.retrofit.UserService
+import com.comst.data.retrofit.AuthenticatedUserService
+import com.comst.data.retrofit.UnAuthenticatedUserService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
-import retrofit2.create
 
 @Module
 @InstallIn(SingletonComponent::class)
 object ServiceModule {
 
     @Provides
-    fun provideUserService(retrofit: Retrofit): UserService {
-        return retrofit.create(UserService::class.java)
+    fun provideUnAuthenticatedUserService(@RetrofitModule.UnAuthenticatedRetrofit retrofit: Retrofit): UnAuthenticatedUserService {
+        return retrofit.create(UnAuthenticatedUserService::class.java)
+    }
+    @Provides
+    fun provideAuthenticatedUserService(@RetrofitModule.AuthenticatedRetrofit retrofit: Retrofit): AuthenticatedUserService {
+        return retrofit.create(AuthenticatedUserService::class.java)
     }
 
     @Provides
-    fun provideGroupService(retrofit: Retrofit): GroupService {
+    fun provideGroupService(@RetrofitModule.AuthenticatedRetrofit retrofit: Retrofit): GroupService {
         return retrofit.create(GroupService::class.java)
     }
 
     @Provides
-    fun provideCommonScheduleService(retrofit: Retrofit): CommonScheduleService {
+    fun provideCommonScheduleService(@RetrofitModule.AuthenticatedRetrofit retrofit: Retrofit): CommonScheduleService {
         return retrofit.create(CommonScheduleService::class.java)
     }
 
     @Provides
-    fun providePersonalScheduleService(retrofit: Retrofit): PersonalScheduleService {
+    fun providePersonalScheduleService(@RetrofitModule.AuthenticatedRetrofit retrofit: Retrofit): PersonalScheduleService {
         return retrofit.create(PersonalScheduleService::class.java)
     }
 
     @Provides
-    fun provideGroupScheduleService(retrofit: Retrofit): GroupScheduleService {
+    fun provideGroupScheduleService(@RetrofitModule.AuthenticatedRetrofit retrofit: Retrofit): GroupScheduleService {
         return retrofit.create(GroupScheduleService::class.java)
     }
 }
