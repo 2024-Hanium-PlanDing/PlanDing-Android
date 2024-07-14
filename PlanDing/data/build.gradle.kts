@@ -72,7 +72,8 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.serialization)
     implementation(libs.okhttp)
-    implementation (libs.converter.gson)
+    implementation(libs.converter.gson)
+    implementation(libs.retrofit.converter.moshi)
 
     // datastore
     implementation(libs.datastore)
@@ -80,4 +81,14 @@ dependencies {
     // test coroutines
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
     androidTestImplementation("androidx.test:runner:1.5.2")
+
+    // Krossbow(WebSocket, STOMP)
+    implementation("org.hildan.krossbow:krossbow-stomp-core:7.1.0")
+    implementation("org.hildan.krossbow:krossbow-websocket-okhttp:7.1.0")
+    implementation("org.hildan.krossbow:krossbow-stomp-moshi:7.1.0")
+
+    // Moshi
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
+    implementation("com.squareup.moshi:moshi:1.15.1")
+
 }
