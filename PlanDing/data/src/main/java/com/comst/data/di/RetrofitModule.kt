@@ -66,7 +66,6 @@ object RetrofitModule {
     @Singleton
     @UnAuthenticatedOkHttpClient
     fun providesUnAuthenticatedOkHttpClient(
-        interceptor: TokenInterceptor,
         networkConnectionInterceptor: NetworkConnectionInterceptor
     ): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -79,7 +78,6 @@ object RetrofitModule {
             .writeTimeout(5, TimeUnit.SECONDS)
             .addInterceptor(networkConnectionInterceptor)
             .addInterceptor(loggingInterceptor)
-            .addInterceptor(interceptor)
             .retryOnConnectionFailure(false)
             .build()
     }
