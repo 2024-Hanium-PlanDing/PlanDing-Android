@@ -35,6 +35,7 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -82,6 +83,13 @@ fun GroupDetailScreen(
         viewModel.initialize(groupCode)
     }
 
+    DisposableEffect(Unit) {
+
+        onDispose {
+            viewModel.cancelStomp()
+        }
+    }
+
     val context = LocalContext.current
     val handleEffect: (GroupDetailSideEffect) -> Unit = { effect ->
         when (effect) {
@@ -95,6 +103,9 @@ fun GroupDetailScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
+                    modifier = Modifier.clickable {
+                        viewModel.postSchedule()
+                    },
                     title = {
                         Text(text = uiState.groupProfile.name)
                     },
