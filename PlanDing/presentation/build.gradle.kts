@@ -21,6 +21,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
 
+        buildConfigField("String", "STOMP_ENDPOINT", "${properties.getProperty("stomp_end_point")}")
         manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = properties["kakao_native_app_key_no_quotes"] as String
     }
 
@@ -46,6 +47,9 @@ android {
 
     composeOptions{
         kotlinCompilerExtensionVersion = "1.4.3"
+    }
+    buildFeatures{
+        buildConfig = true
     }
 }
 
@@ -91,4 +95,13 @@ dependencies {
     // scroll, viewpager
     implementation ("com.google.accompanist:accompanist-pager:0.20.1")
     implementation ("com.google.accompanist:accompanist-pager-indicators:0.20.1")
+
+    // Krossbow(WebSocket, STOMP)
+    implementation("org.hildan.krossbow:krossbow-stomp-core:7.1.0")
+    implementation("org.hildan.krossbow:krossbow-websocket-okhttp:7.1.0")
+    implementation("org.hildan.krossbow:krossbow-stomp-moshi:7.1.0")
+
+    // Moshi
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
+    implementation("com.squareup.moshi:moshi:1.15.1")
 }
