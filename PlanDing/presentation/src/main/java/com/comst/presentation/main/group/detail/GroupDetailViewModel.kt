@@ -13,9 +13,10 @@ import com.comst.domain.util.onSuccess
 import com.comst.presentation.BuildConfig.STOMP_ENDPOINT
 import com.comst.presentation.common.base.BaseViewModel
 import com.comst.presentation.main.group.detail.GroupDetailContract.*
-import com.comst.presentation.model.group.BaseResponse
-import com.comst.presentation.model.group.ReceiveScheduleDTO
-import com.comst.presentation.model.group.SendScheduleDTO
+import com.comst.presentation.model.group.socket.ReceiveScheduleDTO
+import com.comst.presentation.model.group.socket.SendScheduleDTO
+import com.comst.presentation.model.group.socket.WebSocketResponse
+import com.comst.presentation.model.group.socket.toDomainModel
 import com.comst.presentation.model.group.toUIModel
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
@@ -57,9 +58,6 @@ class GroupDetailViewModel @Inject constructor(
         .build()
 
     private lateinit var newSchedule: Flow<StompFrame.Message>
-
-    private lateinit var scheduleList: List<Schedule>
-    var originalChatList: Flow<List<Schedule>>? = null
 
     override fun handleIntent(intent: GroupDetailIntent) {
         when(intent){
@@ -175,23 +173,17 @@ class GroupDetailViewModel @Inject constructor(
                         .add(KotlinJsonAdapterFactory())
                         .build()
 
-                    val type = Types.newParameterizedType(BaseResponse::class.java, ReceiveScheduleDTO::class.java)
-                    val adapter = moshi.adapter<BaseResponse<ReceiveScheduleDTO>>(type)
+                    val type = Types.newParameterizedType(WebSocketResponse::class.java, ReceiveScheduleDTO::class.java)
+                    val adapter = moshi.adapter<WebSocketResponse<ReceiveScheduleDTO>>(type)
                     val response = adapter.fromJson(scheduleJson)
 
                     if (response?.success == true && response.data != null) {
                         val schedule = response.data
                         Log.d(TAG, "Parsed schedule: $schedule")
-
-                        // 파싱된 schedule을 안전하게 처리
-                        if (schedule != null) {
-                            // setState {
-                            //     copy(
-                            //         selectWeekGroupScheduleEvents = selectWeekGroupScheduleEvents + schedule.toDomainModel()
-                            //     )
-                            // }
-                        } else {
-                            Log.e(TAG, "Parsed schedule is null")
+                        setState {
+                            copy(
+                                newScheduleEvents = newScheduleEvents + schedule.toDomainModel()
+                            )
                         }
                     } else {
                         Log.e(TAG, "Received error response: ${response?.errorResponse}")
@@ -230,10 +222,10 @@ class GroupDetailViewModel @Inject constructor(
                     userCode = userCode,
                     title = "학교놀러와",
                     content = "학교놀러와",
-                    scheduleDate = "2024-07-22",
+                    scheduleDate = "2024-09-03",
                     startTime = 9,
                     endTime = 13,
-                    action = "CREATE" // enum 타입으로 Action.CREATE 사용
+                    action = "CREATE"
                 )
 
                 stompSession.withMoshi(moshi).convertAndSend(
@@ -292,7 +284,9 @@ class GroupDetailViewModel @Inject constructor(
                     selectLocalDate = date,
                     selectUIDate = DateUtils.localDateToUIDate(date),
                     selectDay = DateUtils.getDayOfWeek(date),
-                    selectedWeekdays = DateUtils.getWeekDays(date)
+                    selectedWeekdays = DateUtils.getWeekDays(date),
+                    selectWeekGroupScheduleEvents = it,
+                    newScheduleEvents = emptyList()
                 )
             }
         }.onFailure {

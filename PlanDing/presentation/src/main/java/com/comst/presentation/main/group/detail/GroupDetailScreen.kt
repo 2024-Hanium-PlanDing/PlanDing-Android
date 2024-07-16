@@ -125,7 +125,7 @@ fun GroupDetailScreen(
             ) {
                 GroupProfile(uiState.groupProfile)
                 GroupTabs(
-                    uiState.selectWeekGroupScheduleEvents,
+                    selectWeekGroupScheduleEvents = uiState.selectWeekGroupScheduleEvents + uiState.newScheduleEvents,
                     selectUIDate = uiState.selectUIDate,
                     selectDay = uiState.selectDay,
                     selectedWeekdays = uiState.selectedWeekdays,

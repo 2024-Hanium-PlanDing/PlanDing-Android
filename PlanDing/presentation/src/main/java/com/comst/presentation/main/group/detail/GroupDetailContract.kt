@@ -28,6 +28,7 @@ class GroupDetailContract {
         val selectDay: String = DateUtils.getDayOfWeek(selectLocalDate),
         val selectedWeekdays: List<String> = DateUtils.getWeekDays(selectLocalDate),
         val selectWeekGroupScheduleEvents: List<Schedule> = emptyList(),
+        val newScheduleEvents: List<Schedule> = emptyList(),
         val isBottomSheetVisible: Boolean = false,
         val isLoading: Boolean = false
     ) : UIState
