@@ -51,7 +51,7 @@ class ScheduleViewModel @Inject constructor(
         getCommonScheduleWeekListUseCase(weeklySchedulePeriod)
             .onSuccess {
                 setState {
-                    copy(selectWeekScheduleEvents = it)
+                    copy(selectWeekScheduleList = it)
                 }
             }
             .onFailure {
@@ -61,7 +61,7 @@ class ScheduleViewModel @Inject constructor(
         getPersonalScheduleListUseCase(dailyPeriod)
             .onSuccess {
                 setState {
-                    copy(todayPersonalScheduleEvents = it)
+                    copy(todayPersonalScheduleList = it)
                 }
             }
             .onFailure {
@@ -71,8 +71,8 @@ class ScheduleViewModel @Inject constructor(
     fun addSchedule(scheduleEvent: Schedule) {
         setState {
             copy(
-                todayPersonalScheduleEvents = currentState.todayPersonalScheduleEvents + scheduleEvent,
-                selectWeekScheduleEvents = currentState.selectWeekScheduleEvents + scheduleEvent
+                todayPersonalScheduleList = currentState.todayPersonalScheduleList + scheduleEvent,
+                selectWeekScheduleList = currentState.selectWeekScheduleList + scheduleEvent
             )
         }
     }
@@ -134,7 +134,7 @@ class ScheduleViewModel @Inject constructor(
                         selectUIDate = DateUtils.localDateToUIDate(date),
                         selectDay = DateUtils.getDayOfWeek(date),
                         selectedWeekdays = DateUtils.getWeekDays(date),
-                        selectWeekScheduleEvents = it
+                        selectWeekScheduleList = it
                     )
                 }
             }
@@ -145,7 +145,7 @@ class ScheduleViewModel @Inject constructor(
         getPersonalScheduleListUseCase(dailyPeriod)
             .onSuccess {
                 setState {
-                    copy(todayPersonalScheduleEvents = it)
+                    copy(todayPersonalScheduleList = it)
                 }
             }
             .onFailure {

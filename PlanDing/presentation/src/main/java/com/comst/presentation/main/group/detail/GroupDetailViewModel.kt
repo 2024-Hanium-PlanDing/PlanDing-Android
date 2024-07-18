@@ -117,7 +117,7 @@ class GroupDetailViewModel @Inject constructor(
 
         groupScheduleResult.onSuccess { groupSchedules ->
             setState {
-                copy(selectWeekGroupScheduleEvents = groupSchedules)
+                copy(selectWeekGroupScheduleList = groupSchedules)
             }
         }.onFailure {
             isSuccess = false
@@ -195,7 +195,7 @@ class GroupDetailViewModel @Inject constructor(
                         }
                         setState {
                             copy(
-                                newScheduleEvents = newScheduleEvents + newSchedule.toDomainModel()
+                                newScheduleList = newScheduleList + newSchedule.toDomainModel()
                             )
                         }
                     } else {
@@ -296,8 +296,8 @@ class GroupDetailViewModel @Inject constructor(
                     selectUIDate = DateUtils.localDateToUIDate(date),
                     selectDay = DateUtils.getDayOfWeek(date),
                     selectedWeekdays = DateUtils.getWeekDays(date),
-                    selectWeekGroupScheduleEvents = it,
-                    newScheduleEvents = emptyList()
+                    selectWeekGroupScheduleList = it,
+                    newScheduleList = emptyList()
                 )
             }
         }.onFailure {

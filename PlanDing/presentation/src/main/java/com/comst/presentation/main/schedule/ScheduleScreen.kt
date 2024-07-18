@@ -114,8 +114,8 @@ fun ScheduleScreen(
                         if (uiState.isTodayScheduleVisible) {
                             Spacer(modifier = Modifier.height(8.dp))
                             ScheduleTabs(
-                                todayPersonalSchedules = uiState.todayPersonalScheduleEvents,
-                                todayGroupSchedules = uiState.todayGroupScheduleEvents,
+                                todayPersonalSchedules = uiState.todayPersonalScheduleList,
+                                todayGroupSchedules = uiState.todayGroupScheduleList,
                                 onUIAction = viewModel::setIntent
                             )
                             Spacer(modifier = Modifier.height(8.dp))
@@ -126,7 +126,7 @@ fun ScheduleScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 PDScheduleBarChart(
-                    events = uiState.selectWeekScheduleEvents,
+                    scheduleList = uiState.selectWeekScheduleList,
                     days = uiState.selectedWeekdays
                 )
             }
@@ -350,17 +350,17 @@ private fun NoScheduleContent() {
 
 @Composable
 private fun ScheduleList(
-    events: List<Schedule>,
+    scheduleList: List<Schedule>,
 ) {
-    val sortedEvents = remember(events) { events.sortedBy { it.startTime } }
+    val sortedScheduleList = remember(scheduleList) { scheduleList.sortedBy { it.startTime } }
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         items(
-            count = sortedEvents.size,
-            key = { index -> sortedEvents[index].scheduleId }
+            count = sortedScheduleList.size,
+            key = { index -> sortedScheduleList[index].scheduleId }
         ) { index ->
-            sortedEvents[index].let {
+            sortedScheduleList[index].let {
                 PersonalScheduleCard(schedule = it)
             }
             Divider()

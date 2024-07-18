@@ -27,8 +27,8 @@ class GroupDetailContract {
         val selectUIDate: String = DateUtils.localDateToUIDate(selectLocalDate),
         val selectDay: String = DateUtils.getDayOfWeek(selectLocalDate),
         val selectedWeekdays: List<String> = DateUtils.getWeekDays(selectLocalDate),
-        val selectWeekGroupScheduleEvents: List<Schedule> = emptyList(),
-        val newScheduleEvents: List<Schedule> = emptyList(),
+        val selectWeekGroupScheduleList: List<Schedule> = emptyList(),
+        val newScheduleList: List<Schedule> = emptyList(),
         val isBottomSheetVisible: Boolean = false,
         val isBarChartView: Boolean = true,
         val isLoading: Boolean = false

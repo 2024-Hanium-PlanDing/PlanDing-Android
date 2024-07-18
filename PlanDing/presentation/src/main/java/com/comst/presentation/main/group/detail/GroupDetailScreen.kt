@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -25,7 +24,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -69,7 +67,6 @@ import com.comst.presentation.component.PDCalendarBottomSheet
 import com.comst.presentation.component.PDScheduleBarChart
 import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailIntent
 import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailSideEffect
-import com.comst.presentation.main.schedule.PersonalScheduleCard
 import com.comst.presentation.model.group.GroupProfileUIModel
 import com.comst.presentation.ui.theme.BackgroundColor2
 import com.comst.presentation.ui.theme.PlanDingTheme
@@ -129,7 +126,7 @@ fun GroupDetailScreen(
             ) {
                 GroupProfile(uiState.groupProfile)
                 GroupTabs(
-                    selectWeekGroupScheduleEvents = uiState.selectWeekGroupScheduleEvents + uiState.newScheduleEvents,
+                    selectWeekGroupScheduleList = uiState.selectWeekGroupScheduleList + uiState.newScheduleList,
                     selectUIDate = uiState.selectUIDate,
                     selectDay = uiState.selectDay,
                     selectedWeekdays = uiState.selectedWeekdays,
@@ -238,7 +235,7 @@ fun GroupProfile(
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 private fun GroupTabs(
-    selectWeekGroupScheduleEvents: List<Schedule>,
+    selectWeekGroupScheduleList: List<Schedule>,
     selectedWeekdays: List<String>,
     selectUIDate: String,
     selectDay: String,
@@ -310,7 +307,7 @@ private fun GroupTabs(
             page = page,
             selectUIDate = selectUIDate ,
             selectDay = selectDay,
-            selectWeekGroupScheduleEvents = selectWeekGroupScheduleEvents,
+            selectWeekGroupScheduleList = selectWeekGroupScheduleList,
             selectedWeekdays = selectedWeekdays,
             isChartView = isChartView,
             onUIAction = onUIAction
@@ -323,7 +320,7 @@ private fun GroupTabsContent(
     page: Int,
     selectUIDate: String,
     selectDay: String,
-    selectWeekGroupScheduleEvents: List<Schedule>,
+    selectWeekGroupScheduleList: List<Schedule>,
     selectedWeekdays: List<String>,
     isChartView: Boolean,
     onUIAction: (GroupDetailIntent) -> Unit
@@ -373,7 +370,7 @@ private fun GroupTabsContent(
                     }
                     if (isChartView){
                         PDScheduleBarChart(
-                            events = selectWeekGroupScheduleEvents,
+                            scheduleList = selectWeekGroupScheduleList,
                             days = selectedWeekdays
                         )
                     }else{
@@ -425,7 +422,7 @@ private fun ScheduleHeader(
 }
 
 @Composable
-fun PDScheduleBarChart(events: List<Schedule>, days: List<String>) {
+fun PDScheduleBarChart(scheduleList: List<Schedule>, days: List<String>) {
     val hours = (6..24).toList()
     val borderColor = Color.Gray
     val textColor = Color.Black

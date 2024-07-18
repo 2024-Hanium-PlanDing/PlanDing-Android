@@ -30,7 +30,7 @@ import com.comst.presentation.ui.util.bottomBorder
 import com.comst.presentation.ui.util.endBorder
 
 @Composable
-fun PDScheduleBarChart(events: List<Schedule>, days: List<String>) {
+fun PDScheduleBarChart(scheduleList: List<Schedule>, days: List<String>) {
     val hours = (6..24).toList()
     val borderColor = Color.Gray
     val borderWidth = 0.5.dp
@@ -128,7 +128,7 @@ fun PDScheduleBarChart(events: List<Schedule>, days: List<String>) {
                                 }
                             }
 
-                            events.filter { it.day == day }.forEach { event ->
+                            scheduleList.filter { it.day == day }.forEach { event ->
                                 val topPadding = (event.startTime - 6) * 48.dp
                                 val height = (event.endTime - event.startTime) * 48.dp
                                 Box(
@@ -156,7 +156,7 @@ fun PDScheduleBarChart(events: List<Schedule>, days: List<String>) {
 private fun PDScheduleChartPreview(){
     PlanDingTheme {
         PDScheduleBarChart(
-            events = listOf(),
+            scheduleList = listOf(),
             days = listOf()
         )
     }
