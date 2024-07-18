@@ -52,13 +52,14 @@ fun PersonalScheduleCard(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
             ) {
                 Text(
                     text = schedule.title,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier
-                        .padding(bottom = 8.dp)
                         .weight(1f)
                 )
 
