@@ -26,7 +26,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -105,7 +104,7 @@ fun ScheduleScreen(
                             .padding(horizontal = 16.dp)
                     ) {
 
-                        ScheduleHeader(
+                        DateSelectTab(
                             selectUIDate = uiState.selectUIDate,
                             selectDay = uiState.selectDay,
                             isTodayScheduleVisible = uiState.isTodayScheduleVisible,
@@ -161,7 +160,7 @@ fun ScheduleScreen(
 }
 
 @Composable
-private fun ScheduleHeader(
+private fun DateSelectTab(
     selectUIDate: String,
     selectDay: String,
     isTodayScheduleVisible: Boolean,
