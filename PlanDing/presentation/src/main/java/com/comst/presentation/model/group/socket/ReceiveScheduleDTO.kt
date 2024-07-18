@@ -14,7 +14,8 @@ data class ReceiveScheduleDTO(
     val scheduleDate: String,
     val startTime: Int,
     val title: String,
-    val type: String
+    val type: String,
+    val action: String
 )
 
 
