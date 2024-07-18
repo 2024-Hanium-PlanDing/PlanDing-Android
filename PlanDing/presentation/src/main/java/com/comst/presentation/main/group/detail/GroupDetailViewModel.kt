@@ -66,6 +66,7 @@ class GroupDetailViewModel @Inject constructor(
             is GroupDetailIntent.CloseBottomSheetClick -> onCloseBottomSheet()
             is GroupDetailIntent.SelectDate -> onSelectDate(intent.date)
             is GroupDetailIntent.ToggleView -> onToggleView()
+            is GroupDetailIntent.SelectDay -> onSelectDay(intent.index)
         }
     }
 
@@ -290,27 +291,46 @@ class GroupDetailViewModel @Inject constructor(
         }
         setEvent(GroupDetailEvent.DateSelected(selectedLocalDate))
     }
-
     private fun onDateSelected(date: LocalDate) = viewModelScope.launch {
-        val weeklySchedulePeriod = DateUtils.getWeekStartAndEnd(date)
-        val dailyPeriod = DateUtils.getDayStartAndEnd(date)
+        val newSelectedWeekdays = DateUtils.getWeekDays(date)
+        val selectUIDate = DateUtils.localDateToUIDate(date)
+        val selectDay = DateUtils.getDayOfWeek(date)
+        // 현재 선택된 요일 목록과 새로운 요일 목록을 값으로 비교
+        if (currentState.selectedWeekdays != newSelectedWeekdays) {
+            val weeklySchedulePeriod = DateUtils.getWeekStartAndEnd(date)
 
-        getGroupScheduleUseCase(
-            groupCode = currentState.groupProfile.groupCode,
-            schedulePeriodModel = weeklySchedulePeriod
-        ).onSuccess {
+            getGroupScheduleUseCase(
+                groupCode = currentState.groupProfile.groupCode,
+                schedulePeriodModel = weeklySchedulePeriod
+            ).onSuccess {
+                setState {
+                    copy(
+                        selectLocalDate = date,
+                        selectUIDate = selectUIDate,
+                        selectDay = selectDay,
+                        selectedWeekdays = newSelectedWeekdays,
+                        selectWeekGroupScheduleList = it,
+                        newScheduleList = UniqueList({ it.scheduleId }),
+                        selectedDayIndex = newSelectedWeekdays.indexOfFirst {
+                            it.firstOrNull() == selectDay.firstOrNull()
+                        }
+                    )
+                }
+            }.onFailure {
+                // 실패 처리 로직 추가 가능
+            }
+        } else {
+            // 동일한 주라면 날짜와 요일만 업데이트
             setState {
                 copy(
                     selectLocalDate = date,
-                    selectUIDate = DateUtils.localDateToUIDate(date),
-                    selectDay = DateUtils.getDayOfWeek(date),
-                    selectedWeekdays = DateUtils.getWeekDays(date),
-                    selectWeekGroupScheduleList = it,
-                    newScheduleList = UniqueList({ it.scheduleId })
+                    selectUIDate = selectUIDate,
+                    selectDay = selectDay,
+                    selectedDayIndex = newSelectedWeekdays.indexOfFirst {
+                        it.firstOrNull() == selectDay.firstOrNull()
+                    }
                 )
             }
-        }.onFailure {
-
         }
     }
 
@@ -318,6 +338,18 @@ class GroupDetailViewModel @Inject constructor(
         setState {
             copy(
                 isBarChartView = !isBarChartView
+            )
+        }
+    }
+
+    private fun onSelectDay(index: Int){
+        val newSelectedLocalDate = DateUtils.getDateFromWeekdayIndex(currentState.selectLocalDate, index)
+
+        setState {
+            copy(
+                selectUIDate = DateUtils.localDateToUIDate(newSelectedLocalDate),
+                selectDay = DateUtils.getDayOfWeek(newSelectedLocalDate),
+                selectedDayIndex = index
             )
         }
     }

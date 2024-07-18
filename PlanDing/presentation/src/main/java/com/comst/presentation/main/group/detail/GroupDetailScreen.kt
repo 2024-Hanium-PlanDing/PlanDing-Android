@@ -16,15 +16,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -49,9 +50,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -64,9 +65,9 @@ import com.comst.presentation.R
 import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDCalendarBottomSheet
+import com.comst.presentation.component.PDGroupScheduleCard
 import com.comst.presentation.component.PDScheduleBarChart
 import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailIntent
-import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailSideEffect
 import com.comst.presentation.model.group.GroupProfileUIModel
 import com.comst.presentation.ui.theme.BackgroundColor2
 import com.comst.presentation.ui.theme.PlanDingTheme
@@ -91,69 +92,59 @@ fun GroupDetailScreen(
         }
     }
 
-    val context = LocalContext.current
-    val handleEffect: (GroupDetailSideEffect) -> Unit = { effect ->
+    BaseScreen(viewModel = viewModel, handleEffect = { effect ->
         when (effect) {
             else -> {}
         }
-    }
-
-    BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
-        val scrollState = rememberScrollState()
-
+    }) { uiState ->
         Scaffold(
             topBar = {
                 TopAppBar(
-                    modifier = Modifier.clickable {
-                        viewModel.postSchedule()
-                    },
-                    title = {
-                        Text(text = uiState.groupProfile.name)
-                    },
+                    modifier = Modifier.clickable { viewModel.postSchedule() },
+                    title = { Text(text = uiState.groupProfile.name) },
                     navigationIcon = {
-                        IconButton(onClick = { /* Handle back click */ }) {
+                        IconButton(onClick = { }) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
                     }
                 )
             }
         ) { paddingValues ->
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .verticalScroll(scrollState)
             ) {
-                GroupProfile(uiState.groupProfile)
-                GroupTabs(
-                    selectWeekGroupScheduleList = uiState.selectWeekGroupScheduleList + uiState.newScheduleList.toList(),
-                    selectUIDate = uiState.selectUIDate,
-                    selectDay = uiState.selectDay,
-                    selectedWeekdays = uiState.selectedWeekdays,
-                    isChartView = uiState.isBarChartView,
-                    onUIAction = viewModel::setIntent
-                )
+                item { GroupProfile(uiState.groupProfile) }
+                item {
+                    GroupTabs(
+                        selectWeekGroupScheduleList = uiState.selectWeekGroupScheduleList + uiState.newScheduleList.toList(),
+                        selectUIDate = uiState.selectUIDate,
+                        selectDay = uiState.selectDay,
+                        selectedWeekdays = uiState.selectedWeekdays,
+                        isChartView = uiState.isBarChartView,
+                        selectedDayIndex = uiState.selectedDayIndex,
+                        onUIAction = viewModel::setIntent
+                    )
+                }
             }
-
-            if (uiState.isBottomSheetVisible) {
-                PDCalendarBottomSheet(
-                    date = DateUtils.uiDateToDate(uiState.selectUIDate),
-                    onCloseBottomSheet = {
-                        viewModel.setIntent(GroupDetailIntent.CloseBottomSheetClick)
-                    },
-                    onDateSelected = { date ->
-                        viewModel.setIntent(GroupDetailIntent.SelectDate(date))
-                    }
-                )
-            }
+        }
+        if (uiState.isBottomSheetVisible) {
+            PDCalendarBottomSheet(
+                date = DateUtils.uiDateToDate(uiState.selectUIDate),
+                onCloseBottomSheet = {
+                    viewModel.setIntent(GroupDetailIntent.CloseBottomSheetClick)
+                },
+                onDateSelected = { date ->
+                    viewModel.setIntent(GroupDetailIntent.SelectDate(date))
+                }
+            )
         }
     }
 }
 
 @Composable
-fun GroupProfile(
-    groupProfile: GroupProfileUIModel
-) {
+fun GroupProfile(groupProfile: GroupProfileUIModel) {
     var isDescriptionVisible by remember { mutableStateOf(false) }
 
     Box(
@@ -183,17 +174,10 @@ fun GroupProfile(
                 )
 
                 Column {
-                    if (groupProfile.isGroupAdmin) {
-                        PDButton(
-                            text = "프로필 수정",
-                            onClick = {}
-                        )
-                    } else {
-                        PDButton(
-                            text = "그룹 탈퇴",
-                            onClick = {}
-                        )
-                    }
+                    PDButton(
+                        text = if (groupProfile.isGroupAdmin) "프로필 수정" else "그룹 탈퇴",
+                        onClick = {}
+                    )
                 }
             }
 
@@ -227,7 +211,6 @@ fun GroupProfile(
                 fontSize = 12.sp,
                 color = Color.Gray
             )
-
         }
     }
 }
@@ -240,6 +223,7 @@ private fun GroupTabs(
     selectUIDate: String,
     selectDay: String,
     isChartView: Boolean,
+    selectedDayIndex: Int,
     onUIAction: (GroupDetailIntent) -> Unit
 ) {
     val pages = listOf("그룹 일정", "그룹원")
@@ -296,22 +280,23 @@ private fun GroupTabs(
                 }
             }
         }
-    }
 
-    HorizontalPager(
-        count = pages.size,
-        state = pagerState,
-        modifier = Modifier.fillMaxWidth()
-    ) { page ->
-        GroupTabsContent(
-            page = page,
-            selectUIDate = selectUIDate ,
-            selectDay = selectDay,
-            selectWeekGroupScheduleList = selectWeekGroupScheduleList,
-            selectedWeekdays = selectedWeekdays,
-            isChartView = isChartView,
-            onUIAction = onUIAction
-        )
+        HorizontalPager(
+            count = pages.size,
+            state = pagerState,
+            modifier = Modifier.fillMaxWidth()
+        ) { page ->
+            GroupTabsContent(
+                page = page,
+                selectUIDate = selectUIDate,
+                selectDay = selectDay,
+                selectWeekGroupScheduleList = selectWeekGroupScheduleList,
+                selectedWeekdays = selectedWeekdays,
+                isChartView = isChartView,
+                selectedDayIndex = selectedDayIndex,
+                onUIAction = onUIAction
+            )
+        }
     }
 }
 
@@ -323,6 +308,7 @@ private fun GroupTabsContent(
     selectWeekGroupScheduleList: List<Schedule>,
     selectedWeekdays: List<String>,
     isChartView: Boolean,
+    selectedDayIndex: Int,
     onUIAction: (GroupDetailIntent) -> Unit
 ) {
     Box(
@@ -334,63 +320,121 @@ private fun GroupTabsContent(
                 Column(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        ScheduleHeader(
-                            modifier = Modifier.weight(1f),
-                            selectUIDate = selectUIDate,
-                            selectDay = selectDay,
+                    ScheduleHeaderRow(
+                        selectUIDate = selectUIDate,
+                        selectDay = selectDay,
+                        isChartView = isChartView,
+                        onUIAction = onUIAction
+                    )
+                    if (isChartView) {
+                        PDScheduleBarChart(scheduleList = selectWeekGroupScheduleList, days = selectedWeekdays)
+                    } else {
+                        GroupScheduleList(
+                            selectedDayIndex = selectedDayIndex,
+                            selectedWeekdays = selectedWeekdays,
+                            selectWeekGroupScheduleList = selectWeekGroupScheduleList,
                             onUIAction = onUIAction
                         )
-
-                        IconButton(
-                            onClick = { onUIAction(GroupDetailIntent.ToggleView) }
-                        ) {
-                            Icon(
-                                painter = painterResource(id = if (isChartView) R.drawable.ic_table_chart_24 else R.drawable.ic_bar_chart_24),
-                                contentDescription = "Toggle View",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-
-                        IconButton(
-                            onClick = {  }
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_schedule_add_24),
-                                contentDescription = "Add Schedule",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
                     }
-                    if (isChartView){
-                        PDScheduleBarChart(
-                            scheduleList = selectWeekGroupScheduleList,
-                            days = selectedWeekdays
-                        )
-                    }else{
-//                        ScheduleTable(
-//                            events = selectWeekGroupScheduleEvents
-//                        )
-                    }
-
                 }
             }
-
             1 -> {
-
+                // 그룹원 관련 내용 추가
             }
         }
     }
 }
 
 @Composable
-private fun ScheduleHeader(
+fun ScheduleHeaderRow(
+    selectUIDate: String,
+    selectDay: String,
+    isChartView: Boolean,
+    onUIAction: (GroupDetailIntent) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        DateSelectTab(
+            modifier = Modifier.weight(1f),
+            selectUIDate = selectUIDate,
+            selectDay = selectDay,
+            onUIAction = onUIAction
+        )
+
+        IconButton(onClick = { onUIAction(GroupDetailIntent.ToggleView) }) {
+            Icon(
+                painter = painterResource(id = if (isChartView) R.drawable.ic_table_chart_24 else R.drawable.ic_bar_chart_24),
+                contentDescription = "Toggle View",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+
+        IconButton(onClick = {  }) {
+            Icon(
+                painter = painterResource(R.drawable.ic_schedule_add_24),
+                contentDescription = "Add Schedule",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}
+
+@Composable
+fun GroupScheduleList(
+    selectedDayIndex: Int,
+    selectedWeekdays: List<String>,
+    selectWeekGroupScheduleList: List<Schedule>,
+    onUIAction: (GroupDetailIntent) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            items(selectedWeekdays.size) { index ->
+                Text(
+                    text = selectedWeekdays[index],
+                    fontSize = 14.sp,
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .clickable { onUIAction(GroupDetailIntent.SelectDay(index)) },
+                    textAlign = TextAlign.Center,
+                    fontWeight = if (index == selectedDayIndex) FontWeight.Bold else FontWeight.Normal,
+                    color = if (index == selectedDayIndex) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                )
+            }
+        }
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(800.dp)
+        ) {
+            items(
+                count = selectWeekGroupScheduleList.filter { it.day == selectedWeekdays[selectedDayIndex] }.size,
+                key = { index -> selectWeekGroupScheduleList.filter { it.day == selectedWeekdays[selectedDayIndex] }[index].scheduleId }
+            ) { index ->
+                val schedule = selectWeekGroupScheduleList.filter { it.day == selectedWeekdays[selectedDayIndex] }[index]
+                PDGroupScheduleCard(
+                    schedule = schedule,
+                    tasks = emptyList()
+                )
+                HorizontalDivider()
+            }
+        }
+    }
+}
+
+@Composable
+private fun DateSelectTab(
     modifier: Modifier,
     selectUIDate: String,
     selectDay: String,
@@ -419,14 +463,6 @@ private fun ScheduleHeader(
             text = "$selectUIDate $selectDay",
         )
     }
-}
-
-@Composable
-fun PDScheduleBarChart(scheduleList: List<Schedule>, days: List<String>) {
-    val hours = (6..24).toList()
-    val borderColor = Color.Gray
-    val textColor = Color.Black
-
 }
 
 @Preview

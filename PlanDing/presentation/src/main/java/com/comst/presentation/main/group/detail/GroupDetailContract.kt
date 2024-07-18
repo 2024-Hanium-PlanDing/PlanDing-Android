@@ -32,7 +32,10 @@ class GroupDetailContract {
         val newScheduleList: UniqueList<Schedule, Long> = UniqueList({ it.scheduleId }),
         val isBottomSheetVisible: Boolean = false,
         val isBarChartView: Boolean = true,
-        val isLoading: Boolean = false
+        val isLoading: Boolean = false,
+        val selectedDayIndex: Int = selectedWeekdays.indexOfFirst {
+            it.firstOrNull() == selectDay.firstOrNull()
+        }
     ) : UIState
 
     sealed class GroupDetailSideEffect : BaseSideEffect {
@@ -40,13 +43,13 @@ class GroupDetailContract {
     }
 
     sealed class GroupDetailIntent : BaseIntent {
-        object OpenBottomSheetClick: GroupDetailIntent()
-        object CloseBottomSheetClick: GroupDetailIntent()
+        object OpenBottomSheetClick : GroupDetailIntent()
+        object CloseBottomSheetClick : GroupDetailIntent()
 
-        object ToggleView: GroupDetailIntent()
-
+        object ToggleView : GroupDetailIntent()
         data class SelectDate(val date: Date) : GroupDetailIntent()
 
+        data class SelectDay(val index: Int): GroupDetailIntent()
     }
 
 
