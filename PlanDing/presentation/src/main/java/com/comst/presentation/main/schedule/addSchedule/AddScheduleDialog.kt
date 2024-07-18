@@ -50,7 +50,10 @@ fun AddScheduleDialog(
     val context = LocalContext.current
     val handleEffect: (AddScheduleSideEffect) -> Unit = { effect ->
         when (effect) {
-            is AddScheduleSideEffect.SuccessCreateSchedule -> onConfirm(effect.schedule)
+            is AddScheduleSideEffect.SuccessCreateSchedule -> {
+                onConfirm(effect.schedule)
+                viewModel.initialize(date)
+            }
         }
     }
 
@@ -128,7 +131,10 @@ fun AddScheduleDialog(
             },
             dismissButton = {
                 Button(
-                    onClick = onDismiss,
+                    onClick = {
+                        viewModel.initialize(date)
+                        onDismiss()
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
