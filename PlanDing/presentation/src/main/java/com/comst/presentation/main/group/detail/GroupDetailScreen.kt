@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,6 +52,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,12 +62,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.comst.domain.model.base.Schedule
 import com.comst.domain.util.DateUtils
+import com.comst.presentation.R
 import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDCalendarBottomSheet
-import com.comst.presentation.component.PDScheduleChart
+import com.comst.presentation.component.PDScheduleBarChart
 import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailIntent
 import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailSideEffect
+import com.comst.presentation.main.schedule.PersonalScheduleCard
 import com.comst.presentation.model.group.GroupProfileUIModel
 import com.comst.presentation.ui.theme.BackgroundColor2
 import com.comst.presentation.ui.theme.PlanDingTheme
@@ -84,7 +89,6 @@ fun GroupDetailScreen(
     }
 
     DisposableEffect(Unit) {
-
         onDispose {
             viewModel.cancelStomp()
         }
@@ -129,6 +133,7 @@ fun GroupDetailScreen(
                     selectUIDate = uiState.selectUIDate,
                     selectDay = uiState.selectDay,
                     selectedWeekdays = uiState.selectedWeekdays,
+                    isChartView = uiState.isBarChartView,
                     onUIAction = viewModel::setIntent
                 )
             }
@@ -237,6 +242,7 @@ private fun GroupTabs(
     selectedWeekdays: List<String>,
     selectUIDate: String,
     selectDay: String,
+    isChartView: Boolean,
     onUIAction: (GroupDetailIntent) -> Unit
 ) {
     val pages = listOf("그룹 일정", "그룹원")
@@ -306,6 +312,7 @@ private fun GroupTabs(
             selectDay = selectDay,
             selectWeekGroupScheduleEvents = selectWeekGroupScheduleEvents,
             selectedWeekdays = selectedWeekdays,
+            isChartView = isChartView,
             onUIAction = onUIAction
         )
     }
@@ -318,6 +325,7 @@ private fun GroupTabsContent(
     selectDay: String,
     selectWeekGroupScheduleEvents: List<Schedule>,
     selectedWeekdays: List<String>,
+    isChartView: Boolean,
     onUIAction: (GroupDetailIntent) -> Unit
 ) {
     Box(
@@ -329,16 +337,51 @@ private fun GroupTabsContent(
                 Column(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    ScheduleHeader(
-                        selectUIDate = selectUIDate,
-                        selectDay = selectDay,
-                        onUIAction = onUIAction
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ScheduleHeader(
+                            modifier = Modifier.weight(1f),
+                            selectUIDate = selectUIDate,
+                            selectDay = selectDay,
+                            onUIAction = onUIAction
+                        )
 
-                    PDScheduleChart(
-                        events = selectWeekGroupScheduleEvents,
-                        days = selectedWeekdays
-                    )
+                        IconButton(
+                            onClick = { onUIAction(GroupDetailIntent.ToggleView) }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = if (isChartView) R.drawable.ic_table_chart_24 else R.drawable.ic_bar_chart_24),
+                                contentDescription = "Toggle View",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        IconButton(
+                            onClick = {  }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_schedule_add_24),
+                                contentDescription = "Add Schedule",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                    if (isChartView){
+                        PDScheduleBarChart(
+                            events = selectWeekGroupScheduleEvents,
+                            days = selectedWeekdays
+                        )
+                    }else{
+//                        ScheduleTable(
+//                            events = selectWeekGroupScheduleEvents
+//                        )
+                    }
+
                 }
             }
 
@@ -351,15 +394,14 @@ private fun GroupTabsContent(
 
 @Composable
 private fun ScheduleHeader(
+    modifier: Modifier,
     selectUIDate: String,
     selectDay: String,
     onUIAction: (GroupDetailIntent) -> Unit
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(top = 16.dp, bottom = 16.dp)
-            .padding(horizontal = 16.dp)
             .background(
                 shape = RoundedCornerShape(8.dp),
                 color = Color.White
@@ -380,6 +422,14 @@ private fun ScheduleHeader(
             text = "$selectUIDate $selectDay",
         )
     }
+}
+
+@Composable
+fun PDScheduleBarChart(events: List<Schedule>, days: List<String>) {
+    val hours = (6..24).toList()
+    val borderColor = Color.Gray
+    val textColor = Color.Black
+
 }
 
 @Preview

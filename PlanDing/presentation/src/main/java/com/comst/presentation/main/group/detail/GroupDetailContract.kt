@@ -21,7 +21,7 @@ class GroupDetailContract {
             description = "iusto",
             thumbnailUrl = "https://search.yahoo.com/search?p=doming",
             createdBy = "mnesarchum",
-            false
+            true
         ),
         val selectLocalDate: LocalDate = LocalDate.now(),
         val selectUIDate: String = DateUtils.localDateToUIDate(selectLocalDate),
@@ -30,6 +30,7 @@ class GroupDetailContract {
         val selectWeekGroupScheduleEvents: List<Schedule> = emptyList(),
         val newScheduleEvents: List<Schedule> = emptyList(),
         val isBottomSheetVisible: Boolean = false,
+        val isBarChartView: Boolean = true,
         val isLoading: Boolean = false
     ) : UIState
 
@@ -40,6 +41,8 @@ class GroupDetailContract {
     sealed class GroupDetailIntent : BaseIntent {
         object OpenBottomSheetClick: GroupDetailIntent()
         object CloseBottomSheetClick: GroupDetailIntent()
+
+        object ToggleView: GroupDetailIntent()
 
         data class SelectDate(val date: Date) : GroupDetailIntent()
 

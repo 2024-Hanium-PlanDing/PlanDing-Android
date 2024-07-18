@@ -2,7 +2,6 @@ package com.comst.presentation.main.group.detail
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.comst.domain.model.base.Schedule
 import com.comst.domain.usecase.group.GetGroupInformationUseCase
 import com.comst.domain.usecase.groupSchedule.GetGroupScheduleUseCase
 import com.comst.domain.usecase.local.GetTokenUseCase
@@ -14,7 +13,8 @@ import com.comst.presentation.BuildConfig.STOMP_ENDPOINT
 import com.comst.presentation.common.base.BaseViewModel
 import com.comst.presentation.main.group.detail.GroupDetailContract.*
 import com.comst.presentation.model.group.socket.ReceiveScheduleDTO
-import com.comst.presentation.model.group.socket.SendScheduleDTO
+import com.comst.presentation.model.group.socket.SendCreateScheduleDTO
+import com.comst.presentation.model.group.socket.WebSocketAction
 import com.comst.presentation.model.group.socket.WebSocketResponse
 import com.comst.presentation.model.group.socket.toDomainModel
 import com.comst.presentation.model.group.toUIModel
@@ -64,6 +64,7 @@ class GroupDetailViewModel @Inject constructor(
             is GroupDetailIntent.OpenBottomSheetClick -> onOpenBottomSheet()
             is GroupDetailIntent.CloseBottomSheetClick -> onCloseBottomSheet()
             is GroupDetailIntent.SelectDate -> onSelectDate(intent.date)
+            is GroupDetailIntent.ToggleView -> onToggleView()
         }
     }
 
@@ -178,11 +179,23 @@ class GroupDetailViewModel @Inject constructor(
                     val response = adapter.fromJson(scheduleJson)
 
                     if (response?.success == true && response.data != null) {
-                        val schedule = response.data
-                        Log.d(TAG, "Parsed schedule: $schedule")
+                        val newSchedule = response.data
+                        Log.d(TAG, "Parsed schedule: $newSchedule")
+
+                        when(newSchedule.action){
+                            WebSocketAction.CREATE.name -> {
+                                Log.d(TAG, "크리에이트")
+                            }
+                            WebSocketAction.UPDATE.name -> {
+                                Log.d(TAG, "크리에이트")
+                            }
+                            WebSocketAction.DELETE.name -> {
+                                Log.d(TAG, "크리에이트")
+                            }
+                        }
                         setState {
                             copy(
-                                newScheduleEvents = newScheduleEvents + schedule.toDomainModel()
+                                newScheduleEvents = newScheduleEvents + newSchedule.toDomainModel()
                             )
                         }
                     } else {
@@ -205,7 +218,7 @@ class GroupDetailViewModel @Inject constructor(
     fun postSchedule() {
         viewModelScope.launch {
             try {
-                val fullUrl = "$SEND_URL${currentState.groupProfile.groupCode}"
+                val fullUrl = "$SEND_CREATE_URL${currentState.groupProfile.groupCode}"
                 Log.d(TAG, fullUrl)
 
                 val headers = StompSendHeaders(
@@ -216,16 +229,14 @@ class GroupDetailViewModel @Inject constructor(
                     )
                 )
 
-                val schedule = SendScheduleDTO(
+                val schedule = SendCreateScheduleDTO(
                     groupCode = currentState.groupProfile.groupCode,
-                    scheduleId = null,
                     userCode = userCode,
                     title = "학교놀러와",
                     content = "학교놀러와",
-                    scheduleDate = "2024-09-03",
+                    scheduleDate = "2024-09-04",
                     startTime = 9,
                     endTime = 13,
-                    action = "CREATE"
                 )
 
                 stompSession.withMoshi(moshi).convertAndSend(
@@ -292,8 +303,14 @@ class GroupDetailViewModel @Inject constructor(
         }.onFailure {
 
         }
+    }
 
-
+    private fun onToggleView(){
+        setState {
+            copy(
+                isBarChartView = !isBarChartView
+            )
+        }
     }
 
     override fun handleError(exception: Exception) {
@@ -305,7 +322,9 @@ class GroupDetailViewModel @Inject constructor(
         const val HEADER_AUTHORIZATION = "Authorization"
         const val HEADER_GROUP_CODE = "groupCode"
 
-        const val SEND_URL = "/pub/schedule/"
+        const val SEND_CREATE_URL = "/pub/schedule/create/"
+        const val SEND_UPDATE_URL = "/pub/schedule/update/"
+        const val SEND_DELETE_URL = "/pub/schedule/delete/"
         const val SUBSCRIBE_URL = "/sub/schedule/"
     }
 }
