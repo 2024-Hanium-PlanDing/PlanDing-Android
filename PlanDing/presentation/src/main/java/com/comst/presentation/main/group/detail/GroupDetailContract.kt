@@ -7,6 +7,7 @@ import com.comst.presentation.common.base.BaseEvent
 import com.comst.presentation.common.base.BaseIntent
 import com.comst.presentation.common.base.BaseSideEffect
 import com.comst.presentation.common.base.UIState
+import com.comst.presentation.common.util.UniqueList
 import com.comst.presentation.model.group.GroupProfileUIModel
 import java.time.LocalDate
 import java.util.Date
@@ -28,7 +29,7 @@ class GroupDetailContract {
         val selectDay: String = DateUtils.getDayOfWeek(selectLocalDate),
         val selectedWeekdays: List<String> = DateUtils.getWeekDays(selectLocalDate),
         val selectWeekGroupScheduleList: List<Schedule> = emptyList(),
-        val newScheduleList: List<Schedule> = emptyList(),
+        val newScheduleList: UniqueList<Schedule, Long> = UniqueList({ it.scheduleId }),
         val isBottomSheetVisible: Boolean = false,
         val isBarChartView: Boolean = true,
         val isLoading: Boolean = false

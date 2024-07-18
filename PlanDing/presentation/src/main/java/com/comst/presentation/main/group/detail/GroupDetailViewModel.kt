@@ -11,6 +11,7 @@ import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.BuildConfig.STOMP_ENDPOINT
 import com.comst.presentation.common.base.BaseViewModel
+import com.comst.presentation.common.util.UniqueList
 import com.comst.presentation.main.group.detail.GroupDetailContract.*
 import com.comst.presentation.model.group.socket.ReceiveScheduleDTO
 import com.comst.presentation.model.group.socket.SendCreateScheduleDTO
@@ -178,28 +179,10 @@ class GroupDetailViewModel @Inject constructor(
                     val adapter = moshi.adapter<WebSocketResponse<ReceiveScheduleDTO>>(type)
                     val response = adapter.fromJson(scheduleJson)
 
-                    if (response?.success == true && response.data != null) {
-                        val newSchedule = response.data
-                        Log.d(TAG, "Parsed schedule: $newSchedule")
-
-                        when(newSchedule.action){
-                            WebSocketAction.CREATE.name -> {
-                                Log.d(TAG, "크리에이트")
-                            }
-                            WebSocketAction.UPDATE.name -> {
-                                Log.d(TAG, "크리에이트")
-                            }
-                            WebSocketAction.DELETE.name -> {
-                                Log.d(TAG, "크리에이트")
-                            }
-                        }
-                        setState {
-                            copy(
-                                newScheduleList = newScheduleList + newSchedule.toDomainModel()
-                            )
-                        }
+                    if (response != null) {
+                        handleWebSocketMessage(response)
                     } else {
-                        Log.e(TAG, "Received error response: ${response?.errorResponse}")
+                        Log.e(TAG, "Failed to parse response")
                     }
                 } catch (e: JsonDataException) {
                     Log.e(TAG, "JSON parsing error", e)
@@ -234,7 +217,7 @@ class GroupDetailViewModel @Inject constructor(
                     userCode = userCode,
                     title = "학교놀러와",
                     content = "학교놀러와",
-                    scheduleDate = "2024-09-04",
+                    scheduleDate = "2024-09-06",
                     startTime = 9,
                     endTime = 13,
                 )
@@ -256,6 +239,32 @@ class GroupDetailViewModel @Inject constructor(
             }
         } catch (e: Exception) {
             Log.d(TAG, "cancelStomp: ${e.message}")
+        }
+    }
+
+    private fun handleWebSocketMessage(response: WebSocketResponse<ReceiveScheduleDTO>) {
+        if (response.success && response.data != null) {
+            val newSchedule = response.data
+            Log.d(TAG, "Parsed schedule: $newSchedule")
+
+            when (newSchedule.action) {
+                WebSocketAction.CREATE.name, WebSocketAction.UPDATE.name -> {
+                    setState {
+                        copy(
+                            newScheduleList = newScheduleList.addOrUpdate(newSchedule.toDomainModel())
+                        )
+                    }
+                }
+                WebSocketAction.DELETE.name -> {
+                    setState {
+                        copy(
+                            newScheduleList = newScheduleList.remove(newSchedule.toDomainModel())
+                        )
+                    }
+                }
+            }
+        } else {
+            Log.e(TAG, "Received error response: ${response.errorResponse}")
         }
     }
 
@@ -297,7 +306,7 @@ class GroupDetailViewModel @Inject constructor(
                     selectDay = DateUtils.getDayOfWeek(date),
                     selectedWeekdays = DateUtils.getWeekDays(date),
                     selectWeekGroupScheduleList = it,
-                    newScheduleList = emptyList()
+                    newScheduleList = UniqueList({ it.scheduleId })
                 )
             }
         }.onFailure {
