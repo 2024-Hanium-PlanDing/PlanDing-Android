@@ -62,23 +62,20 @@ fun PersonalScheduleCard(
                         .weight(1f)
                 )
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Complete: ",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                Text(
+                    text = "Complete: ",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                )
+
+                Checkbox(
+                    checked = schedule.complete,
+                    onCheckedChange = null,
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = MaterialTheme.colorScheme.primary,
+                        uncheckedColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                     )
-                    Checkbox(
-                        checked = schedule.complete,
-                        onCheckedChange = null,
-                        colors = CheckboxDefaults.colors(
-                            checkedColor = MaterialTheme.colorScheme.primary,
-                            uncheckedColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-                        )
-                    )
-                }
+                )
             }
 
             Text(
