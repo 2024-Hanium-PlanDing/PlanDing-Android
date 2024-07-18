@@ -57,7 +57,7 @@ import com.comst.domain.util.DateUtils
 import com.comst.presentation.R
 import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDCalendarBottomSheet
-import com.comst.presentation.component.PDScheduleChart
+import com.comst.presentation.component.PDScheduleBarChart
 import com.comst.presentation.component.PDScreenHeader
 import com.comst.presentation.main.schedule.ScheduleContract.ScheduleIntent
 import com.comst.presentation.main.schedule.ScheduleContract.ScheduleSideEffect
@@ -125,7 +125,7 @@ fun ScheduleScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                PDScheduleChart(
+                PDScheduleBarChart(
                     events = uiState.selectWeekScheduleEvents,
                     days = uiState.selectedWeekdays
                 )

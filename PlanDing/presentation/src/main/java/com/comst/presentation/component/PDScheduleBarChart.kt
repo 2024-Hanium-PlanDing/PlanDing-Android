@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -26,39 +25,50 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import com.comst.domain.model.base.Schedule
-import com.comst.presentation.ui.theme.BackgroundColor3
 import com.comst.presentation.ui.theme.PlanDingTheme
+import com.comst.presentation.ui.util.bottomBorder
+import com.comst.presentation.ui.util.endBorder
 
 @Composable
-fun PDScheduleChart(events: List<Schedule>, days: List<String>) {
+fun PDScheduleBarChart(events: List<Schedule>, days: List<String>) {
     val hours = (6..24).toList()
     val borderColor = Color.Gray
-    val textColor = Color.Black
+    val borderWidth = 0.5.dp
 
     Surface {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
-                .background(BackgroundColor3)
+                .background(Color.White)
+                .border(borderWidth, borderColor)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(32.dp)
-                    .border(0.5.dp, borderColor),
+                    .border(borderWidth / 2, borderColor),
                 horizontalArrangement = Arrangement.Start
             ) {
-                Box(modifier = Modifier.width(48.dp))
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .border(borderWidth / 2, borderColor)
+                        .bottomBorder(borderWidth / 2, borderColor)
+                        .endBorder(borderWidth / 2, borderColor)
+                )
                 days.forEach { day ->
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
-                            .border(0.5.dp, borderColor),
+                            .border(borderWidth / 2, borderColor)
+                            .bottomBorder(borderWidth / 2, borderColor)
+                            .endBorder(borderWidth / 2, borderColor),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = day, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = textColor)
+                        Text(text = day, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                     }
                 }
             }
@@ -70,8 +80,10 @@ fun PDScheduleChart(events: List<Schedule>, days: List<String>) {
             ) {
                 Column(
                     modifier = Modifier
-                        .width(48.dp)
-                        .fillMaxHeight(),
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .border(borderWidth / 2, borderColor)
+                        .endBorder(borderWidth / 2, borderColor),
                     verticalArrangement = Arrangement.SpaceEvenly,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -80,34 +92,38 @@ fun PDScheduleChart(events: List<Schedule>, days: List<String>) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(48.dp)
-                                .border(0.5.dp, borderColor),
+                                .border(borderWidth / 2, borderColor)
+                                .bottomBorder(borderWidth / 2, borderColor)
+                                .endBorder(borderWidth / 2, borderColor),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(text = String.format("%02d:00",hour), fontSize = 12.sp, color = textColor)
+                            Text(text = String.format("%02d:00", hour), fontSize = 12.sp, color = Color.Black)
                         }
                     }
                 }
 
-                days.forEach { day ->
+                days.forEachIndexed { dayIndex, day ->
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
+                            .border(borderWidth / 2, borderColor)
+                            .endBorder(borderWidth / 2, borderColor)
                     ) {
                         Box(modifier = Modifier.fillMaxSize()) {
                             Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .border(0.5.dp, borderColor),
+                                modifier = Modifier.fillMaxSize(),
                                 verticalArrangement = Arrangement.spacedBy(0.dp)
                             ) {
-                                hours.forEach { _ ->
+                                hours.forEachIndexed { hourIndex, _ ->
                                     Box(
                                         modifier = Modifier
                                             .height(48.dp)
                                             .fillMaxWidth()
-                                            .background(BackgroundColor3)
-                                            .border(0.5.dp, borderColor)
+                                            .background(Color.White)
+                                            .border(borderWidth / 2, borderColor)
+                                            .bottomBorder(borderWidth / 2, borderColor)
+                                            .endBorder(borderWidth / 2, borderColor),
                                     )
                                 }
                             }
@@ -139,7 +155,7 @@ fun PDScheduleChart(events: List<Schedule>, days: List<String>) {
 @Composable
 private fun PDScheduleChartPreview(){
     PlanDingTheme {
-        PDScheduleChart(
+        PDScheduleBarChart(
             events = listOf(),
             days = listOf()
         )
