@@ -140,4 +140,14 @@ object DateUtils {
     fun getServerFormat(date: Date, format: String = "yyyy-MM-dd"): String {
         return getServerFormat(dateToLocalDate(date), format)
     }
+
+    fun getDateFromWeekdayIndex(date: LocalDate, index: Int): LocalDate {
+        val dayOfWeek = date.dayOfWeek.value % 7
+        val startOfWeek = date.minusDays(dayOfWeek.toLong())
+        return startOfWeek.plusDays(index.toLong())
+    }
+
+    fun getDateFromWeekdayIndex(date: Date, index: Int): LocalDate {
+        return getDateFromWeekdayIndex(dateToLocalDate(date), index)
+    }
 }
