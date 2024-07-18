@@ -46,7 +46,7 @@ fun GroupScreen(
     ) { permissions ->
         if (permissions.all { it.value }) {
             context.startActivity(
-                Intent(context, CreateGroupActivity::class.java)
+                CreateGroupActivity.createGroupIntent(context)
             )
         } else {
             Toast.makeText(context, "필요한 권한이 부여되지 않았습니다.", Toast.LENGTH_SHORT).show()
@@ -68,11 +68,10 @@ fun GroupScreen(
 
             is GroupSideEffect.NavigateToGroupDetailActivity -> {
                 context.startActivity(
-                    Intent(
-                        context, GroupDetailActivity::class.java
-                    ).apply {
-                        putExtra("groupCode", effect.groupCode)
-                    }
+                    GroupDetailActivity.groupDetailIntent(
+                        context,
+                        effect.groupCode
+                    )
                 )
             }
 

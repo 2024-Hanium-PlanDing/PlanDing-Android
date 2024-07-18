@@ -1,5 +1,7 @@
 package com.comst.presentation.auth
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
@@ -17,5 +19,12 @@ class AuthActivity : AppCompatActivity() {
                 LoginNavHost()
             }
         }
+    }
+
+    companion object {
+        fun authIntent(context: Context) = Intent(
+            context,
+            AuthActivity::class.java
+        )
     }
 }

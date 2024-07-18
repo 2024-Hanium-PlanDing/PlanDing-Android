@@ -51,9 +51,7 @@ fun LoginScreen(
         when (effect) {
             is LoginBaseSideEffect.NavigateToMainActivity -> {
                 context.startActivity(
-                    Intent(
-                        context, MainActivity::class.java
-                    ).apply {
+                    MainActivity.mainIntent(context).apply {
                         flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                     }
                 )

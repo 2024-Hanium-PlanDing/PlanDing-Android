@@ -1,5 +1,7 @@
 package com.comst.presentation.main.group.create
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
@@ -16,5 +18,12 @@ class CreateGroupActivity : AppCompatActivity() {
                 CreateGroupNavHost { finish() }
             }
         }
+    }
+
+    companion object {
+        fun createGroupIntent(context: Context) = Intent(
+            context,
+            CreateGroupActivity::class.java
+        )
     }
 }

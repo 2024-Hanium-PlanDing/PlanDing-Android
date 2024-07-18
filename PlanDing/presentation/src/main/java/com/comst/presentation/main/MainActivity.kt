@@ -1,5 +1,7 @@
 package com.comst.presentation.main
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -11,7 +13,6 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -19,6 +20,13 @@ class MainActivity : AppCompatActivity() {
                 MainNavHost()
             }
         }
+    }
+
+    companion object {
+        fun mainIntent(context: Context) = Intent(
+            context,
+            MainActivity::class.java
+        )
     }
 }
 
