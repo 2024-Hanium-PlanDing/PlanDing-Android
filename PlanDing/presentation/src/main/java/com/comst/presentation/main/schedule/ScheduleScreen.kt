@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -363,7 +364,7 @@ private fun ScheduleList(
             sortedScheduleList[index].let {
                 PersonalScheduleCard(schedule = it)
             }
-            Divider()
+            HorizontalDivider()
         }
     }
 }
