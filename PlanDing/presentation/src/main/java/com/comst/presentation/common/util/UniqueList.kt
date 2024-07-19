@@ -10,7 +10,7 @@ class UniqueList<T : Any, K>(private val keySelector: (T) -> K, private val list
         } else {
             newList.add(item)
         }
-        return UniqueList(keySelector, newList) // Return a new instance
+        return UniqueList(keySelector, newList)
     }
 
     fun remove(item: T): UniqueList<T, K> {
@@ -19,10 +19,14 @@ class UniqueList<T : Any, K>(private val keySelector: (T) -> K, private val list
         if (existingIndex >= 0) {
             newList.removeAt(existingIndex)
         }
-        return UniqueList(keySelector, newList) // Return a new instance
+        return UniqueList(keySelector, newList)
     }
 
     fun toList(): List<T> {
         return list.toList()
+    }
+
+    fun contains(item: T): Boolean {
+        return list.any { keySelector(it) == keySelector(item) }
     }
 }
