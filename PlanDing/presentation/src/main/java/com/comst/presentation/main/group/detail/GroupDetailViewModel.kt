@@ -119,7 +119,7 @@ class GroupDetailViewModel @Inject constructor(
 
         groupScheduleResult.onSuccess { groupSchedules ->
             setState {
-                copy(selectWeekGroupScheduleList = groupSchedules)
+                copy(selectWeekGroupScheduleList = UniqueList({ it.scheduleId }, groupSchedules))
             }
         }.onFailure {
             isSuccess = false
@@ -245,22 +245,45 @@ class GroupDetailViewModel @Inject constructor(
 
     private fun handleWebSocketMessage(response: WebSocketResponse<ReceiveScheduleDTO>) {
         if (response.success && response.data != null) {
-            val newSchedule = response.data
+            val newSchedule = response.data.toDomainModel()
             Log.d(TAG, "Parsed schedule: $newSchedule")
 
-            when (newSchedule.action) {
-                WebSocketAction.CREATE.name, WebSocketAction.UPDATE.name -> {
+            when (response.data.action) {
+                WebSocketAction.CREATE.name -> {
                     setState {
                         copy(
-                            newScheduleList = newScheduleList.addOrUpdate(newSchedule.toDomainModel())
+                            newScheduleList = newScheduleList.addOrUpdate(newSchedule)
                         )
                     }
                 }
+                WebSocketAction.UPDATE.name -> {
+                    if (currentState.selectWeekGroupScheduleList.contains(newSchedule)) {
+                        setState {
+                            copy(
+                                selectWeekGroupScheduleList = selectWeekGroupScheduleList.addOrUpdate(newSchedule)
+                            )
+                        }
+                    } else {
+                        setState {
+                            copy(
+                                newScheduleList = newScheduleList.addOrUpdate(newSchedule)
+                            )
+                        }
+                    }
+                }
                 WebSocketAction.DELETE.name -> {
-                    setState {
-                        copy(
-                            newScheduleList = newScheduleList.remove(newSchedule.toDomainModel())
-                        )
+                    if (currentState.selectWeekGroupScheduleList.contains(newSchedule)) {
+                        setState {
+                            copy(
+                                selectWeekGroupScheduleList = selectWeekGroupScheduleList.remove(newSchedule)
+                            )
+                        }
+                    } else {
+                        setState {
+                            copy(
+                                newScheduleList = newScheduleList.remove(newSchedule)
+                            )
+                        }
                     }
                 }
             }
@@ -302,14 +325,14 @@ class GroupDetailViewModel @Inject constructor(
             getGroupScheduleUseCase(
                 groupCode = currentState.groupProfile.groupCode,
                 schedulePeriodModel = weeklySchedulePeriod
-            ).onSuccess {
+            ).onSuccess { scheduleList ->
                 setState {
                     copy(
                         selectLocalDate = date,
                         selectUIDate = selectUIDate,
                         selectDay = selectDay,
                         selectedWeekdays = newSelectedWeekdays,
-                        selectWeekGroupScheduleList = it,
+                        selectWeekGroupScheduleList = UniqueList({ it.scheduleId }, scheduleList),
                         newScheduleList = UniqueList({ it.scheduleId }),
                         selectedDayIndex = newSelectedWeekdays.indexOfFirst {
                             it.firstOrNull() == selectDay.firstOrNull()
