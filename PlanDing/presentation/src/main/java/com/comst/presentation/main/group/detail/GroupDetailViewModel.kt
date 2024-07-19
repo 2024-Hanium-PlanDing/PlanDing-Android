@@ -119,7 +119,7 @@ class GroupDetailViewModel @Inject constructor(
 
         groupScheduleResult.onSuccess { groupSchedules ->
             setState {
-                copy(selectWeekGroupScheduleList = UniqueList({ it.scheduleId }, groupSchedules))
+                copy(selectWeekGroupScheduleOriginalList = UniqueList({ it.scheduleId }, groupSchedules))
             }
         }.onFailure {
             isSuccess = false
@@ -257,10 +257,10 @@ class GroupDetailViewModel @Inject constructor(
                     }
                 }
                 WebSocketAction.UPDATE.name -> {
-                    if (currentState.selectWeekGroupScheduleList.contains(newSchedule)) {
+                    if (currentState.selectWeekGroupScheduleOriginalList.contains(newSchedule)) {
                         setState {
                             copy(
-                                selectWeekGroupScheduleList = selectWeekGroupScheduleList.addOrUpdate(newSchedule)
+                                selectWeekGroupScheduleOriginalList = selectWeekGroupScheduleOriginalList.addOrUpdate(newSchedule)
                             )
                         }
                     } else {
@@ -272,10 +272,10 @@ class GroupDetailViewModel @Inject constructor(
                     }
                 }
                 WebSocketAction.DELETE.name -> {
-                    if (currentState.selectWeekGroupScheduleList.contains(newSchedule)) {
+                    if (currentState.selectWeekGroupScheduleOriginalList.contains(newSchedule)) {
                         setState {
                             copy(
-                                selectWeekGroupScheduleList = selectWeekGroupScheduleList.remove(newSchedule)
+                                selectWeekGroupScheduleOriginalList = selectWeekGroupScheduleOriginalList.remove(newSchedule)
                             )
                         }
                     } else {
@@ -332,7 +332,7 @@ class GroupDetailViewModel @Inject constructor(
                         selectUIDate = selectUIDate,
                         selectDay = selectDay,
                         selectedWeekdays = newSelectedWeekdays,
-                        selectWeekGroupScheduleList = UniqueList({ it.scheduleId }, scheduleList),
+                        selectWeekGroupScheduleOriginalList = UniqueList({ it.scheduleId }, scheduleList),
                         newScheduleList = UniqueList({ it.scheduleId }),
                         selectedDayIndex = newSelectedWeekdays.indexOfFirst {
                             it.firstOrNull() == selectDay.firstOrNull()
