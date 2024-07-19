@@ -7,29 +7,29 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class ReceiveScheduleDTO(
-    val content: String,
-    val endTime: Int,
-    val groupName: String,
+    val content: String? = null,
+    val endTime: Int? = null,
+    val groupName: String? = null,
     val id: Long,
-    val scheduleDate: String,
-    val startTime: Int,
-    val title: String,
-    val type: String,
+    val scheduleDate: String? = null,
+    val startTime: Int? = null,
+    val title: String? = null,
+    val type: String? = null,
     val action: String
 )
 
 
 fun ReceiveScheduleDTO.toDomainModel(): Schedule {
-    val localDate = DateUtils.uiDateToLocalDate(scheduleDate,"yyyy-MM-dd")
+    val localDate = scheduleDate?.let { DateUtils.uiDateToLocalDate(it, "yyyy-MM-dd") }
     return Schedule(
         scheduleId = id,
-        title = title,
-        content = content,
-        startTime = startTime,
-        endTime = endTime,
-        day = DateUtils.getDayOfWeekUIFormat(localDate),
+        title = title.orEmpty(),
+        content = content.orEmpty(),
+        startTime = startTime ?: 0,
+        endTime = endTime ?: 0,
+        day = localDate?.let { DateUtils.getDayOfWeekUIFormat(it) }.orEmpty(),
         complete = false,
-        groupName = "",
+        groupName = groupName.orEmpty(),
         type = ScheduleType.GROUP
     )
 }
