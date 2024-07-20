@@ -92,7 +92,7 @@ fun ScheduleScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(vertical = 8.dp, horizontal = 16.dp)
                         .background(
                             shape = RoundedCornerShape(8.dp),
                             color = Color.White
@@ -100,7 +100,6 @@ fun ScheduleScreen(
                 ) {
                     Column(
                         modifier = Modifier
-                            .padding(top = 8.dp, bottom = 8.dp)
                             .padding(horizontal = 16.dp)
                     ) {
 
@@ -112,13 +111,11 @@ fun ScheduleScreen(
                         )
 
                         if (uiState.isTodayScheduleVisible) {
-                            Spacer(modifier = Modifier.height(8.dp))
                             ScheduleTabs(
                                 todayPersonalSchedules = uiState.todayPersonalScheduleList,
                                 todayGroupSchedules = uiState.todayGroupScheduleList,
                                 onUIAction = viewModel::setIntent
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 }
@@ -168,6 +165,7 @@ private fun DateSelectTab(
 ) {
     Row(
         modifier = Modifier
+            .height(40.dp)
             .clickable { onUIAction(ScheduleIntent.OpenBottomSheetClick) },
         verticalAlignment = Alignment.CenterVertically
     ) {
