@@ -60,7 +60,7 @@ import com.comst.presentation.component.PDCalendarBottomSheet
 import com.comst.presentation.component.PDScheduleBarChart
 import com.comst.presentation.component.PDScreenHeader
 import com.comst.presentation.main.schedule.ScheduleContract.*
-import com.comst.presentation.main.schedule.addSchedule.AddScheduleDialog
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleDialog
 import com.comst.presentation.ui.theme.BackgroundColor2
 import com.comst.presentation.ui.theme.PlanDingTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -141,7 +141,7 @@ fun ScheduleScreen(
         }
 
         if (uiState.isAddScheduleDialogVisible) {
-            AddScheduleDialog(
+            AddPersonalScheduleDialog(
                 date = uiState.selectLocalDate,
                 onDismiss = {
                     viewModel.setIntent(ScheduleIntent.HideAddScheduleDialog)

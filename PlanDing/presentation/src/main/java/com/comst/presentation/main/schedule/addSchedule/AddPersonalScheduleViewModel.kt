@@ -7,30 +7,30 @@ import com.comst.domain.util.DateUtils
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
-import com.comst.presentation.main.schedule.addSchedule.AddScheduleContract.*
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
-class AddScheduleViewModel @Inject constructor(
+class AddPersonalScheduleViewModel @Inject constructor(
     private val postPersonalScheduleUseCase: PostPersonalScheduleUseCase
-) : BaseViewModel<AddScheduleUIState, AddScheduleSideEffect, AddScheduleIntent, AddScheduleEvent>(AddScheduleUIState()) {
+) : BaseViewModel<AddPersonalScheduleUIState, AddPersonalScheduleSideEffect, AddPersonalScheduleIntent, AddPersonalScheduleEvent>(AddPersonalScheduleUIState()) {
 
-    override fun handleIntent(intent: AddScheduleIntent) {
+    override fun handleIntent(intent: AddPersonalScheduleIntent) {
         when (intent) {
-            is AddScheduleIntent.DescriptionChange -> onDescriptionChange(intent.description)
-            is AddScheduleIntent.SelectedEndTime -> onSelectedEndTime(intent.endTime)
-            is AddScheduleIntent.SelectedStartTime -> onSelectedStartTime(intent.startTime)
-            is AddScheduleIntent.TitleChange -> onTitleChange(intent.title)
-            is AddScheduleIntent.CreateSchedule -> onCreateScheduleClick()
+            is AddPersonalScheduleIntent.DescriptionChange -> onDescriptionChange(intent.description)
+            is AddPersonalScheduleIntent.SelectedEndTime -> onSelectedEndTime(intent.endTime)
+            is AddPersonalScheduleIntent.SelectedStartTime -> onSelectedStartTime(intent.startTime)
+            is AddPersonalScheduleIntent.TitleChange -> onTitleChange(intent.title)
+            is AddPersonalScheduleIntent.CreatePersonalSchedule -> onCreateScheduleClick()
         }
     }
 
-    override fun handleEvent(event: AddScheduleEvent) {
+    override fun handleEvent(event: AddPersonalScheduleEvent) {
         when (event) {
-            is AddScheduleEvent.CreationFailure -> onCreationFailure(event.message)
+            is AddPersonalScheduleEvent.CreationFailure -> onCreationFailure(event.message)
         }
     }
 
@@ -96,7 +96,7 @@ class AddScheduleViewModel @Inject constructor(
                 endTime = currentState.endTime
             )
         ).onSuccess {
-            setEffect(AddScheduleSideEffect.SuccessCreateSchedule(it))
+            setEffect(AddPersonalScheduleSideEffect.SuccessCreatePersonalSchedule(it))
         }.onFailure {
 
         }

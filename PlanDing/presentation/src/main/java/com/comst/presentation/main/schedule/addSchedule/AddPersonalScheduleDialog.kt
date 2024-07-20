@@ -1,8 +1,6 @@
 package com.comst.presentation.main.schedule.addSchedule
 
 import android.content.res.Configuration
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,8 +15,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,15 +26,15 @@ import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDTextFiledOutLine
 import com.comst.presentation.component.PDTimeDropdownMenu
-import com.comst.presentation.main.schedule.addSchedule.AddScheduleContract.AddScheduleIntent
-import com.comst.presentation.main.schedule.addSchedule.AddScheduleContract.AddScheduleSideEffect
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleIntent
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleSideEffect
 import com.comst.presentation.ui.theme.BackgroundColor3
 import com.comst.presentation.ui.theme.PlanDingTheme
 import java.time.LocalDate
 
 @Composable
-fun AddScheduleDialog(
-    viewModel: AddScheduleViewModel = hiltViewModel(),
+fun AddPersonalScheduleDialog(
+    viewModel: AddPersonalScheduleViewModel = hiltViewModel(),
     date: LocalDate,
     onDismiss: () -> Unit,
     onConfirm: (Schedule) -> Unit
@@ -48,9 +44,9 @@ fun AddScheduleDialog(
     }
 
     val context = LocalContext.current
-    val handleEffect: (AddScheduleSideEffect) -> Unit = { effect ->
+    val handleEffect: (AddPersonalScheduleSideEffect) -> Unit = { effect ->
         when (effect) {
-            is AddScheduleSideEffect.SuccessCreateSchedule -> {
+            is AddPersonalScheduleSideEffect.SuccessCreatePersonalSchedule -> {
                 onConfirm(effect.schedule)
                 viewModel.initialize(date)
             }
@@ -80,7 +76,7 @@ fun AddScheduleDialog(
                         label = "제목을 입력해주세요",
                         value = uiState.title,
                         onValueChange = {
-                            viewModel.setIntent(AddScheduleIntent.TitleChange(it))
+                            viewModel.setIntent(AddPersonalScheduleIntent.TitleChange(it))
                         }
                     )
                     PDTextFiledOutLine(
@@ -91,7 +87,7 @@ fun AddScheduleDialog(
                         label = "일정 내용을 입력해주세요",
                         value = uiState.content,
                         onValueChange = {
-                            viewModel.setIntent(AddScheduleIntent.DescriptionChange(it))
+                            viewModel.setIntent(AddPersonalScheduleIntent.DescriptionChange(it))
                         }
                     )
                     Row(
@@ -103,7 +99,7 @@ fun AddScheduleDialog(
                         PDTimeDropdownMenu(
                             selectedTime = uiState.startTime,
                             onConfirm = {
-                                viewModel.setIntent(AddScheduleIntent.SelectedStartTime(it))
+                                viewModel.setIntent(AddPersonalScheduleIntent.SelectedStartTime(it))
                             }
                         )
                         Spacer(modifier = Modifier.weight(0.5f))
@@ -112,7 +108,7 @@ fun AddScheduleDialog(
                         PDTimeDropdownMenu(
                             selectedTime = uiState.endTime,
                             onConfirm = {
-                                viewModel.setIntent(AddScheduleIntent.SelectedEndTime(it))
+                                viewModel.setIntent(AddPersonalScheduleIntent.SelectedEndTime(it))
                             }
                         )
                         Spacer(modifier = Modifier.weight(0.5f))
@@ -123,7 +119,7 @@ fun AddScheduleDialog(
             confirmButton = {
                 PDButton(
                     onClick = {
-                        viewModel.setIntent(AddScheduleIntent.CreateSchedule)
+                        viewModel.setIntent(AddPersonalScheduleIntent.CreatePersonalSchedule)
                     },
                     text = "생성",
                     modifier = Modifier.fillMaxWidth()
@@ -159,7 +155,7 @@ fun AddScheduleDialog(
 @Composable
 private fun AddScheduleDialogPreview() {
     PlanDingTheme {
-        AddScheduleDialog(
+        AddPersonalScheduleDialog(
             date = LocalDate.now(),
             onDismiss = {},
             onConfirm = {}
