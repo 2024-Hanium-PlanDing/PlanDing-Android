@@ -7,6 +7,7 @@ import com.comst.presentation.common.base.BaseIntent
 import com.comst.presentation.common.base.BaseSideEffect
 import com.comst.presentation.common.base.UIState
 import com.comst.presentation.model.group.GroupProfileUIModel
+import com.comst.presentation.model.group.socket.SendCreateScheduleDTO
 import java.time.LocalDate
 
 class AddGroupScheduleContract {
@@ -32,7 +33,7 @@ class AddGroupScheduleContract {
     ) : UIState
 
     sealed class AddGroupScheduleSideEffect : BaseSideEffect {
-        data class SuccessCreateGroupSchedule(val schedule: Schedule) : AddGroupScheduleSideEffect()
+        data class SuccessCreateGroupSchedule(val schedule: SendCreateScheduleDTO) : AddGroupScheduleSideEffect()
     }
 
     sealed class AddGroupScheduleIntent : BaseIntent {

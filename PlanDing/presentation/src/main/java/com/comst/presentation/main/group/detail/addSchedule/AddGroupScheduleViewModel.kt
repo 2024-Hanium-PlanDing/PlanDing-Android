@@ -2,12 +2,14 @@ package com.comst.presentation.main.group.detail.addSchedule
 
 import androidx.lifecycle.viewModelScope
 import com.comst.domain.model.base.ScheduleModel
+import com.comst.domain.usecase.local.GetUserCodeUseCase
 import com.comst.domain.util.DateUtils
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
 import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract.*
 import com.comst.presentation.model.group.GroupProfileUIModel
+import com.comst.presentation.model.group.socket.SendCreateScheduleDTO
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -15,9 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddGroupScheduleViewModel @Inject constructor(
-
+    private val getUserCodeUseCase: GetUserCodeUseCase
 ) : BaseViewModel<AddGroupScheduleUIState, AddGroupScheduleSideEffect, AddGroupScheduleIntent, AddGroupScheduleEvent>(AddGroupScheduleUIState()) {
-
     override fun handleIntent(intent: AddGroupScheduleIntent) {
         when (intent) {
             is AddGroupScheduleIntent.DescriptionChange -> onDescriptionChange(intent.description)
@@ -87,7 +88,29 @@ class AddGroupScheduleViewModel @Inject constructor(
         setState {
             copy(isLoading = true)
         }
-        
+        getUserCodeUseCase().onSuccess { userCode ->
+            userCode?.let {
+                setEffect(
+                    AddGroupScheduleSideEffect.SuccessCreateGroupSchedule(
+                        SendCreateScheduleDTO(
+                            groupCode = currentState.groupProfile.groupCode,
+                            userCode = it,
+                            title = currentState.title,
+                            content = currentState.content,
+                            scheduleDate = DateUtils.getServerFormat(currentState.date),
+                            startTime = currentState.startTime,
+                            endTime = currentState.endTime
+                        )
+                    )
+                )
+            } ?: run {
+                // 재로그인?
+            }
+        }.onFailure {
+
+        }
+
+
         setState {
             copy(isLoading = false)
         }

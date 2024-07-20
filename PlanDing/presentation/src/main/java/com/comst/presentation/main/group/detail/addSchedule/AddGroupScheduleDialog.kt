@@ -2,7 +2,6 @@ package com.comst.presentation.main.group.detail.addSchedule
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
@@ -29,13 +27,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
-import com.comst.domain.model.base.Schedule
 import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDTextFiledOutLine
 import com.comst.presentation.component.PDTimeDropdownMenu
-import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract.*
+import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract.AddGroupScheduleIntent
+import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract.AddGroupScheduleSideEffect
 import com.comst.presentation.model.group.GroupProfileUIModel
+import com.comst.presentation.model.group.socket.SendCreateScheduleDTO
 import com.comst.presentation.ui.theme.BackgroundColor3
 import com.comst.presentation.ui.theme.PlanDingTheme
 import java.time.LocalDate
@@ -46,7 +45,7 @@ fun AddGroupScheduleDialog(
     groupProfile: GroupProfileUIModel,
     date: LocalDate,
     onDismiss: () -> Unit,
-    onConfirm: (Schedule) -> Unit
+    onConfirm: (SendCreateScheduleDTO) -> Unit
 ) {
     LaunchedEffect(Unit) {
         viewModel.initialize(
