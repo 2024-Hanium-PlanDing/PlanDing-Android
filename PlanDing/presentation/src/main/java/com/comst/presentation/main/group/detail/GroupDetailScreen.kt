@@ -3,6 +3,7 @@ package com.comst.presentation.main.group.detail
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -68,8 +69,11 @@ import com.comst.presentation.component.PDCalendarBottomSheet
 import com.comst.presentation.component.PDGroupScheduleCard
 import com.comst.presentation.component.PDScheduleBarChart
 import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailIntent
+import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleDialog
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleDialog
 import com.comst.presentation.model.group.GroupProfileUIModel
-import com.comst.presentation.ui.theme.BackgroundColor2
+import com.comst.presentation.ui.theme.BackgroundColor3
+import com.comst.presentation.ui.theme.MainPurple400
 import com.comst.presentation.ui.theme.PlanDingTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -100,7 +104,6 @@ fun GroupDetailScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    modifier = Modifier.clickable { viewModel.postSchedule() },
                     title = { Text(text = uiState.groupProfile.name) },
                     navigationIcon = {
                         IconButton(onClick = { }) {
@@ -137,6 +140,20 @@ fun GroupDetailScreen(
                 },
                 onDateSelected = { date ->
                     viewModel.setIntent(GroupDetailIntent.SelectDate(date))
+                }
+            )
+        }
+
+        if (uiState.isAddScheduleDialogVisible) {
+            AddGroupScheduleDialog(
+                groupProfile = uiState.groupProfile,
+                date = uiState.selectLocalDate,
+                onDismiss = {
+                    viewModel.setIntent(GroupDetailIntent.HideAddScheduleDialog)
+                },
+                onConfirm = { schedule ->
+                    viewModel.postSchedule(schedule)
+                    viewModel.setIntent(GroupDetailIntent.HideAddScheduleDialog)
                 }
             )
         }
@@ -240,10 +257,6 @@ private fun GroupTabs(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                color = BackgroundColor2,
-                shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
-            )
     ) {
         BoxWithConstraints {
             val tabWidth = maxWidth / pages.size
@@ -327,7 +340,10 @@ private fun GroupTabsContent(
                         onUIAction = onUIAction
                     )
                     if (isChartView) {
-                        PDScheduleBarChart(scheduleList = selectWeekGroupScheduleList, days = selectedWeekdays)
+                        PDScheduleBarChart(
+                            scheduleList = selectWeekGroupScheduleList,
+                            days = selectedWeekdays
+                        )
                     } else {
                         GroupScheduleList(
                             selectedDayIndex = selectedDayIndex,
@@ -338,6 +354,7 @@ private fun GroupTabsContent(
                     }
                 }
             }
+
             1 -> {
                 // 그룹원 관련 내용 추가
             }
@@ -354,9 +371,9 @@ fun ScheduleHeaderRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.End,
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
         DateSelectTab(
@@ -366,7 +383,16 @@ fun ScheduleHeaderRow(
             onUIAction = onUIAction
         )
 
-        IconButton(onClick = { onUIAction(GroupDetailIntent.ToggleView) }) {
+        Spacer(modifier = Modifier.width(8.dp))
+
+
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .border(1.dp, MainPurple400, shape = RoundedCornerShape(8.dp))
+                .clickable {onUIAction(GroupDetailIntent.ToggleView)  },
+            contentAlignment = Alignment.Center
+        ) {
             Icon(
                 painter = painterResource(id = if (isChartView) R.drawable.ic_table_chart_24 else R.drawable.ic_bar_chart_24),
                 contentDescription = "Toggle View",
@@ -374,13 +400,22 @@ fun ScheduleHeaderRow(
             )
         }
 
-        IconButton(onClick = {  }) {
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .border(1.dp, MainPurple400, shape = RoundedCornerShape(8.dp))
+                .clickable { onUIAction(GroupDetailIntent.ShowAddScheduleDialog)  },
+            contentAlignment = Alignment.Center
+        ) {
             Icon(
                 painter = painterResource(R.drawable.ic_schedule_add_24),
                 contentDescription = "Add Schedule",
                 tint = MaterialTheme.colorScheme.primary
             )
         }
+
     }
 }
 
@@ -409,7 +444,9 @@ fun GroupScheduleList(
                         .clickable { onUIAction(GroupDetailIntent.SelectDay(index)) },
                     textAlign = TextAlign.Center,
                     fontWeight = if (index == selectedDayIndex) FontWeight.Bold else FontWeight.Normal,
-                    color = if (index == selectedDayIndex) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                    color = if (index == selectedDayIndex) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground.copy(
+                        alpha = 0.6f
+                    )
                 )
             }
         }
@@ -422,7 +459,8 @@ fun GroupScheduleList(
                 count = selectWeekGroupScheduleList.filter { it.day == selectedWeekdays[selectedDayIndex] }.size,
                 key = { index -> selectWeekGroupScheduleList.filter { it.day == selectedWeekdays[selectedDayIndex] }[index].scheduleId }
             ) { index ->
-                val schedule = selectWeekGroupScheduleList.filter { it.day == selectedWeekdays[selectedDayIndex] }[index]
+                val schedule =
+                    selectWeekGroupScheduleList.filter { it.day == selectedWeekdays[selectedDayIndex] }[index]
                 PDGroupScheduleCard(
                     schedule = schedule,
                     tasks = emptyList()
@@ -442,10 +480,10 @@ private fun DateSelectTab(
 ) {
     Row(
         modifier = modifier
-            .fillMaxWidth()
+            .height(40.dp)
             .background(
                 shape = RoundedCornerShape(8.dp),
-                color = Color.White
+                color = BackgroundColor3
             )
             .padding(vertical = 8.dp, horizontal = 16.dp)
             .clickable { onUIAction(GroupDetailIntent.OpenBottomSheetClick) },

@@ -2,6 +2,7 @@ package com.comst.presentation.main.group.detail
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.comst.domain.model.base.Schedule
 import com.comst.domain.usecase.group.GetGroupInformationUseCase
 import com.comst.domain.usecase.groupSchedule.GetGroupScheduleUseCase
 import com.comst.domain.usecase.local.GetTokenUseCase
@@ -67,12 +68,15 @@ class GroupDetailViewModel @Inject constructor(
             is GroupDetailIntent.SelectDate -> onSelectDate(intent.date)
             is GroupDetailIntent.ToggleView -> onToggleView()
             is GroupDetailIntent.SelectDay -> onSelectDay(intent.index)
+            is GroupDetailIntent.ShowAddScheduleDialog -> onShowAddScheduleDialog()
+            is GroupDetailIntent.HideAddScheduleDialog -> onHideAddScheduleDialog()
         }
     }
 
     override fun handleEvent(event: GroupDetailEvent) {
         when (event){
             is GroupDetailEvent.DateSelected -> onDateSelected(event.date)
+            is GroupDetailEvent.AddGroupSchedule -> onAddGroupSchedule(event.schedule)
         }
     }
 
@@ -199,7 +203,7 @@ class GroupDetailViewModel @Inject constructor(
 
     }
 
-    fun postSchedule() {
+    fun postSchedule(sendCreateScheduleDTO: SendCreateScheduleDTO) {
         viewModelScope.launch {
             try {
                 val fullUrl = "$SEND_CREATE_URL${currentState.groupProfile.groupCode}"
@@ -212,20 +216,9 @@ class GroupDetailViewModel @Inject constructor(
                         HEADER_GROUP_CODE to currentState.groupProfile.groupCode
                     )
                 )
-
-                val schedule = SendCreateScheduleDTO(
-                    groupCode = currentState.groupProfile.groupCode,
-                    userCode = userCode,
-                    title = "학교놀러와",
-                    content = "학교놀러와",
-                    scheduleDate = "2024-09-06",
-                    startTime = 9,
-                    endTime = 13,
-                )
-
                 stompSession.withMoshi(moshi).convertAndSend(
                     headers = headers,
-                    body = schedule
+                    body = sendCreateScheduleDTO
                 )
                 Log.d(TAG, "Message sent successfully")
             } catch (e: Exception) {
@@ -377,9 +370,30 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
+    private fun onShowAddScheduleDialog() {
+        setState {
+            copy(isAddScheduleDialogVisible = true)
+        }
+    }
+
+    private fun onHideAddScheduleDialog() {
+        setState {
+            copy(isAddScheduleDialogVisible = false)
+        }
+    }
+
+
     override fun handleError(exception: Exception) {
         super.handleError(exception)
         setToastEffect(exception.message.orEmpty())
+    }
+
+    private fun onAddGroupSchedule(schedule: Schedule) {
+        setState {
+            copy(
+
+            )
+        }
     }
 
     companion object{

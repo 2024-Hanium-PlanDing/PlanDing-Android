@@ -35,7 +35,8 @@ class GroupDetailContract {
         val isLoading: Boolean = false,
         val selectedDayIndex: Int = selectedWeekdays.indexOfFirst {
             it.firstOrNull() == selectDay.firstOrNull()
-        }
+        },
+        val isAddScheduleDialogVisible: Boolean = false,
     ) : UIState
 
     sealed class GroupDetailSideEffect : BaseSideEffect {
@@ -48,12 +49,14 @@ class GroupDetailContract {
 
         object ToggleView : GroupDetailIntent()
         data class SelectDate(val date: Date) : GroupDetailIntent()
-
         data class SelectDay(val index: Int): GroupDetailIntent()
+        object ShowAddScheduleDialog : GroupDetailIntent()
+        object HideAddScheduleDialog : GroupDetailIntent()
     }
 
 
     sealed class GroupDetailEvent : BaseEvent {
         data class DateSelected(val date: LocalDate) : GroupDetailEvent()
+        data class AddGroupSchedule(val schedule: Schedule) : GroupDetailEvent()
     }
 }
