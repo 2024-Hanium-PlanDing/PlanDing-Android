@@ -33,7 +33,6 @@ class ScheduleViewModel @Inject constructor(
             is ScheduleIntent.CloseBottomSheetClick -> onCloseBottomSheet()
             is ScheduleIntent.SelectDate -> onSelectDate(intent.date)
             is ScheduleIntent.ToggleTodayScheduleVisibility -> onToggleTextViewVisibility()
-            is ScheduleIntent.AddTodaySchedule -> onAddTodaySchedule()
             is ScheduleIntent.ShowAddScheduleDialog -> onShowAddScheduleDialog()
             is ScheduleIntent.HideAddScheduleDialog -> onHideAddScheduleDialog()
         }
@@ -43,6 +42,7 @@ class ScheduleViewModel @Inject constructor(
         when (event) {
             is ScheduleEvent.DateSelected -> onDateSelected(event.date)
             is ScheduleEvent.LoadFailure -> onLoadFailure(event.message)
+            is ScheduleEvent.AddTodaySchedule -> onAddTodaySchedule(event.schedule)
         }
     }
 
@@ -66,15 +66,6 @@ class ScheduleViewModel @Inject constructor(
             }
             .onFailure {
             }
-    }
-
-    fun addSchedule(scheduleEvent: Schedule) {
-        setState {
-            copy(
-                todayPersonalScheduleList = currentState.todayPersonalScheduleList + scheduleEvent,
-                selectWeekScheduleList = currentState.selectWeekScheduleList + scheduleEvent
-            )
-        }
     }
 
     private fun onOpenBottomSheet() {
@@ -118,8 +109,13 @@ class ScheduleViewModel @Inject constructor(
         }
     }
 
-    private fun onAddTodaySchedule() {
-        // Add schedule logic
+    private fun onAddTodaySchedule(schedule: Schedule) {
+        setState {
+            copy(
+                todayPersonalScheduleList = currentState.todayPersonalScheduleList + schedule,
+                selectWeekScheduleList = currentState.selectWeekScheduleList + schedule
+            )
+        }
     }
 
     private fun onDateSelected(date: LocalDate) = viewModelScope.launch {

@@ -59,8 +59,7 @@ import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDCalendarBottomSheet
 import com.comst.presentation.component.PDScheduleBarChart
 import com.comst.presentation.component.PDScreenHeader
-import com.comst.presentation.main.schedule.ScheduleContract.ScheduleIntent
-import com.comst.presentation.main.schedule.ScheduleContract.ScheduleSideEffect
+import com.comst.presentation.main.schedule.ScheduleContract.*
 import com.comst.presentation.main.schedule.addSchedule.AddScheduleDialog
 import com.comst.presentation.ui.theme.BackgroundColor2
 import com.comst.presentation.ui.theme.PlanDingTheme
@@ -147,8 +146,8 @@ fun ScheduleScreen(
                 onDismiss = {
                     viewModel.setIntent(ScheduleIntent.HideAddScheduleDialog)
                 },
-                onConfirm = { scheduleEvent ->
-                    viewModel.addSchedule(scheduleEvent)
+                onConfirm = { schedule ->
+                    viewModel.setEvent(ScheduleEvent.AddTodaySchedule(schedule))
                     viewModel.setIntent(ScheduleIntent.HideAddScheduleDialog)
                 }
             )

@@ -35,13 +35,13 @@ class ScheduleContract {
         object CloseBottomSheetClick : ScheduleIntent()
         data class SelectDate(val date: Date) : ScheduleIntent()
         object ToggleTodayScheduleVisibility : ScheduleIntent()
-        object AddTodaySchedule : ScheduleIntent()
         object ShowAddScheduleDialog : ScheduleIntent()
         object HideAddScheduleDialog : ScheduleIntent()
     }
 
     sealed class ScheduleEvent : BaseEvent {
         data class DateSelected(val date: LocalDate) : ScheduleEvent()
+        data class AddTodaySchedule(val schedule: Schedule) : ScheduleEvent()
         data class LoadFailure(val message: String) : ScheduleEvent()
     }
 }
