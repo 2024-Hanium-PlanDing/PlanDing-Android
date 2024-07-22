@@ -36,7 +36,7 @@ class PDFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun handleNotification(remoteMessage: RemoteMessage) {
-        //sendNotification()
+        sendNotification(remoteMessage, "테스트", "테스트")
     }
 
     private fun sendNotification(remoteMessage: RemoteMessage, channelId: String, channelName: String) {
