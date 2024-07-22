@@ -38,18 +38,6 @@ object ViewModelRepositoryModule {
 
     @Provides
     @ViewModelScoped
-    fun provideUserRepository(
-        unAuthenticatedUserService: UnAuthenticatedUserService,
-        authenticatedUserService: AuthenticatedUserService,
-    ): UserRepository {
-        return UserRepositoryImpl(
-            unAuthenticatedUserService,
-            authenticatedUserService
-        )
-    }
-
-    @Provides
-    @ViewModelScoped
     fun provideCommonScheduleRepositoryRepository(
         commonScheduleService: CommonScheduleService,
     ): CommonScheduleRepository {
