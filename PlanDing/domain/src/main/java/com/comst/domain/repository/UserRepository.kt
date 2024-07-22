@@ -7,5 +7,6 @@ import com.comst.domain.util.ApiResult
 
 interface UserRepository {
     suspend fun getUserProfile(): ApiResult<UserProfile>
+    suspend fun postFCMToken(fcmToken: String): ApiResult<Unit>
     suspend fun postSocialLogin(socialLoginInformation: SocialLoginInformation): ApiResult<LoginResponseModel>
 }

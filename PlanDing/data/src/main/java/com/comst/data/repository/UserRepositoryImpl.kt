@@ -1,5 +1,6 @@
 package com.comst.data.repository
 
+import com.comst.data.model.user.FCMTokenParam
 import com.comst.data.model.user.SocialLoginParam
 import com.comst.data.model.user.toDomainModel
 import com.comst.data.retrofit.ApiHandler
@@ -24,8 +25,17 @@ class UserRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun postSocialLogin(socialLoginInformation: SocialLoginInformation): ApiResult<LoginResponseModel> {
+    override suspend fun postFCMToken(fcmToken: String): ApiResult<Unit> {
+        val requestBody = FCMTokenParam(
+            fcmToken = fcmToken
+        )
+        return ApiHandler.handle(
+            execute = { authenticatedUserService.postFCMTokenApi(requestBody) },
+            mapper = { }
+        )
+    }
 
+    override suspend fun postSocialLogin(socialLoginInformation: SocialLoginInformation): ApiResult<LoginResponseModel> {
         val requestBody = SocialLoginParam(
             profileNickname = socialLoginInformation.profileNickname,
             accountEmail = socialLoginInformation.accountEmail,

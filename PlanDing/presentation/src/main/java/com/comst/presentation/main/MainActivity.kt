@@ -9,15 +9,23 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import com.comst.domain.usecase.user.PostFCMTokenUseCase
+import com.comst.domain.util.onFailure
+import com.comst.domain.util.onSuccess
 import com.comst.presentation.ui.theme.PlanDingTheme
 import com.comst.presentation.util.PDFirebaseMessagingService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var postFCMTokenUseCase : PostFCMTokenUseCase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initFCM()
@@ -29,7 +37,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initFCM() = CoroutineScope(Dispatchers.IO).launch {
-        val s = PDFirebaseMessagingService().getFirebaseToken()
+        postFCMTokenUseCase(PDFirebaseMessagingService().getFirebaseToken()).onSuccess{
+
+        }.onFailure {
+
+        }
     }
 
     companion object {
