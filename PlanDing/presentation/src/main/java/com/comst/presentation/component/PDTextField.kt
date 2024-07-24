@@ -2,7 +2,6 @@ package com.comst.presentation.component
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -15,7 +14,7 @@ import com.comst.presentation.ui.theme.BackgroundColor3
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PDTextFiled(
+fun PDTextField(
     modifier: Modifier,
     hint: String = "",
     value: String,

@@ -24,7 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.comst.domain.model.base.Schedule
 import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
-import com.comst.presentation.component.PDTextFiledOutLine
+import com.comst.presentation.component.PDTextFieldOutLine
 import com.comst.presentation.component.PDTimeDropdownMenu
 import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleIntent
 import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleSideEffect
@@ -69,7 +69,7 @@ fun AddPersonalScheduleDialog(
                         modifier = Modifier
                             .padding(bottom = 8.dp)
                     )
-                    PDTextFiledOutLine(
+                    PDTextFieldOutLine(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
@@ -79,7 +79,7 @@ fun AddPersonalScheduleDialog(
                             viewModel.setIntent(AddPersonalScheduleIntent.TitleChange(it))
                         }
                     )
-                    PDTextFiledOutLine(
+                    PDTextFieldOutLine(
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 200.dp)

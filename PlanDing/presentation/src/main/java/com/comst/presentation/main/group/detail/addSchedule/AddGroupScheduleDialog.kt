@@ -29,7 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
-import com.comst.presentation.component.PDTextFiledOutLine
+import com.comst.presentation.component.PDTextFieldOutLine
 import com.comst.presentation.component.PDTimeDropdownMenu
 import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract.AddGroupScheduleIntent
 import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract.AddGroupScheduleSideEffect
@@ -103,7 +103,7 @@ fun AddGroupScheduleDialog(
                         modifier = Modifier
                             .padding(bottom = 8.dp)
                     )
-                    PDTextFiledOutLine(
+                    PDTextFieldOutLine(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
@@ -113,7 +113,7 @@ fun AddGroupScheduleDialog(
                             viewModel.setIntent(AddGroupScheduleIntent.TitleChange(it))
                         }
                     )
-                    PDTextFiledOutLine(
+                    PDTextFieldOutLine(
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 200.dp)

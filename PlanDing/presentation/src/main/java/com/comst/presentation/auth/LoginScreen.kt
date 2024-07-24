@@ -33,7 +33,7 @@ import com.comst.presentation.R
 import com.comst.presentation.auth.LoginContract.*
 import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
-import com.comst.presentation.component.PDTextFiledOutLine
+import com.comst.presentation.component.PDTextFieldOutLine
 import com.comst.presentation.main.MainActivity
 import com.comst.presentation.ui.theme.PlanDingTheme
 import com.kakao.sdk.auth.model.OAuthToken
@@ -92,7 +92,7 @@ fun LoginScreen(
 
                 Spacer(Modifier.height(60.dp))
 
-                PDTextFiledOutLine(
+                PDTextFieldOutLine(
                     modifier = Modifier.fillMaxWidth(),
                     value = uiState.id,
                     label = "아이디",
@@ -100,7 +100,7 @@ fun LoginScreen(
                 )
                 Spacer(Modifier.height(4.dp))
 
-                PDTextFiledOutLine(
+                PDTextFieldOutLine(
                     modifier = Modifier.fillMaxWidth(),
                     value = uiState.password,
                     label = "비밀번호",

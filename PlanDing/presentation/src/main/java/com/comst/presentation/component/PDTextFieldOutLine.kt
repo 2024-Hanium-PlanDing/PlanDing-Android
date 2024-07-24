@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PDTextFiledOutLine(
+fun PDTextFieldOutLine(
     modifier: Modifier,
     label: String,
     value: String,
