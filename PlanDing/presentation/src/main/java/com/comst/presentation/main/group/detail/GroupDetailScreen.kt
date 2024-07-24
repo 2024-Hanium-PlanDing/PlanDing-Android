@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
@@ -35,6 +37,8 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -49,10 +53,12 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -70,6 +76,7 @@ import com.comst.presentation.component.PDGroupScheduleCard
 import com.comst.presentation.component.PDScheduleBarChart
 import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailIntent
 import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleDialog
+import com.comst.presentation.main.schedule.PersonalScheduleCard
 import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleDialog
 import com.comst.presentation.model.group.GroupProfileUIModel
 import com.comst.presentation.ui.theme.BackgroundColor3
@@ -104,6 +111,7 @@ fun GroupDetailScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
+                    modifier = Modifier.clickable { viewModel.postChat() },
                     title = { Text(text = uiState.groupProfile.name) },
                     navigationIcon = {
                         IconButton(onClick = { }) {
@@ -111,6 +119,15 @@ fun GroupDetailScreen(
                         }
                     }
                 )
+            },
+            bottomBar = {
+                if (uiState.currentPage == 1) {
+                    MessageInputBar(
+                        message = "",
+                        onMessageChange = {},
+                        onSendClick = {}
+                    )
+                }
             }
         ) { paddingValues ->
             LazyColumn(
@@ -127,6 +144,7 @@ fun GroupDetailScreen(
                         selectedWeekdays = uiState.selectedWeekdays,
                         isChartView = uiState.isBarChartView,
                         selectedDayIndex = uiState.selectedDayIndex,
+                        currentPage = uiState.currentPage,
                         onUIAction = viewModel::setIntent
                     )
                 }
@@ -155,6 +173,50 @@ fun GroupDetailScreen(
                     viewModel.postSchedule(schedule)
                     viewModel.setIntent(GroupDetailIntent.HideAddScheduleDialog)
                 }
+            )
+        }
+    }
+}
+
+@Composable
+fun MessageInputBar(
+    message: String,
+    onMessageChange: (String) -> Unit,
+    onSendClick: () -> Unit,
+) {
+    val componentHeight = 56.dp
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(componentHeight)
+            .background(BackgroundColor3),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        TextField(
+            value = message,
+            onValueChange = onMessageChange,
+            modifier = Modifier
+                .weight(1f)
+                .height(componentHeight),
+            placeholder = { Text("Type a message") },
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = BackgroundColor3,
+                unfocusedContainerColor = BackgroundColor3,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+            ),
+        )
+        Box(
+            modifier = Modifier
+                .size(componentHeight)
+                .clickable { onSendClick() },
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_send_24),
+                contentDescription = "Send",
+                tint = MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -241,16 +303,16 @@ private fun GroupTabs(
     selectDay: String,
     isChartView: Boolean,
     selectedDayIndex: Int,
+    currentPage: Int,
     onUIAction: (GroupDetailIntent) -> Unit
 ) {
-    val pages = listOf("그룹 일정", "그룹원")
-    val pagerState = rememberPagerState()
+    val pages = listOf("그룹 일정", "그룹 채팅")
+    val pagerState = rememberPagerState(initialPage = currentPage)
     val coroutineScope = rememberCoroutineScope()
-    var periodIndex by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
-            periodIndex = page
+            onUIAction(GroupDetailIntent.ChangePage(page))
         }
     }
 
@@ -262,12 +324,12 @@ private fun GroupTabs(
             val tabWidth = maxWidth / pages.size
 
             TabRow(
-                selectedTabIndex = periodIndex,
+                selectedTabIndex = currentPage,
                 modifier = Modifier.fillMaxWidth(),
                 indicator = { tabPositions ->
                     Box(
                         modifier = Modifier
-                            .tabIndicatorOffset(tabPositions[periodIndex])
+                            .tabIndicatorOffset(tabPositions[currentPage])
                             .width(tabWidth)
                             .height(4.dp)
                             .background(MaterialTheme.colorScheme.primary)
@@ -276,10 +338,10 @@ private fun GroupTabs(
             ) {
                 pages.forEachIndexed { index, title ->
                     Tab(
-                        selected = periodIndex == index,
+                        selected = currentPage == index,
                         onClick = {
                             coroutineScope.launch {
-                                periodIndex = index
+                                onUIAction(GroupDetailIntent.ChangePage(index))
                                 pagerState.animateScrollToPage(index)
                             }
                         }
@@ -356,7 +418,10 @@ private fun GroupTabsContent(
             }
 
             1 -> {
-                // 그룹원 관련 내용 추가
+                ChatList(
+                    "dd",
+                    listOf()
+                )
             }
         }
     }
@@ -390,7 +455,7 @@ fun ScheduleHeaderRow(
             modifier = Modifier
                 .size(40.dp)
                 .border(1.dp, MainPurple400, shape = RoundedCornerShape(8.dp))
-                .clickable {onUIAction(GroupDetailIntent.ToggleView)  },
+                .clickable { onUIAction(GroupDetailIntent.ToggleView) },
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -406,7 +471,7 @@ fun ScheduleHeaderRow(
             modifier = Modifier
                 .size(40.dp)
                 .border(1.dp, MainPurple400, shape = RoundedCornerShape(8.dp))
-                .clickable { onUIAction(GroupDetailIntent.ShowAddScheduleDialog)  },
+                .clickable { onUIAction(GroupDetailIntent.ShowAddScheduleDialog) },
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -503,11 +568,42 @@ private fun DateSelectTab(
     }
 }
 
+@Composable
+private fun ChatList(
+    userCode: String,
+    messageList: List<Schedule>
+) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(800.dp)
+    ) {
+        items(
+            count = messageList.size,
+            key = { index -> messageList[index].scheduleId }
+        ) { index ->
+            messageList[index].let { message ->
+                if (message.groupName == userCode) {
+                    MyChatCard(
+                        message = "dddddddddddd",
+                        time = "dddd"
+                    )
+                } else {
+                    OtherChatCard(
+                        message = "dddddddddddd",
+                        time = "dddd"
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun GroupDetailPreview() {
     PlanDingTheme {
-        GroupDetailScreen(groupCode = "6318", viewModel = hiltViewModel())
+        GroupDetailScreen(groupCode = "6318")
     }
 }
