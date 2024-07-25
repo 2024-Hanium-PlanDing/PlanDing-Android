@@ -21,14 +21,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.comst.presentation.component.PDProfileImage
+import com.comst.presentation.model.group.socket.ReceiveChatDTO
 import com.comst.presentation.ui.theme.BackgroundColor3
 import com.comst.presentation.ui.theme.MainPurple600
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
 fun OtherChatCard(
-    message: String,
-    time: String
+    chat: ReceiveChatDTO
 ) {
     BoxWithConstraints(
         modifier = Modifier
@@ -44,7 +44,7 @@ fun OtherChatCard(
         ) {
             PDProfileImage(
                 modifier = Modifier.size(48.dp),
-                profileImageUrl = null,
+                profileImageUrl = chat.profileImage,
             )
 
             Column(
@@ -52,7 +52,7 @@ fun OtherChatCard(
                 verticalArrangement = Arrangement.Top
             ) {
                 Text(
-                    text = "nickname",
+                    text = chat.name,
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
@@ -61,7 +61,7 @@ fun OtherChatCard(
                     verticalAlignment = Alignment.Bottom
                 ) {
                     Text(
-                        text = message,
+                        text = chat.message,
                         modifier = Modifier
                             .padding(end = 8.dp)
                             .widthIn(max = maxWidth * 0.6f)
@@ -73,7 +73,7 @@ fun OtherChatCard(
                     )
 
                     Text(
-                        text = time,
+                        text = chat.createdAt,
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Gray
                     )
@@ -90,8 +90,13 @@ fun OtherChatCard(
 private fun OtherChatCardPreview() {
     PlanDingTheme {
         OtherChatCard(
-            message = "auctor",
-            time = "cum"
+            chat = ReceiveChatDTO(
+                message = "congue",
+                profileImage = "ridiculus",
+                name = "Paul Oliver",
+                createdAt = "tempor"
+            )
+
         )
     }
 }

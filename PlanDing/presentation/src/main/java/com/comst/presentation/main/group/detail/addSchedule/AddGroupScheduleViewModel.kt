@@ -93,7 +93,6 @@ class AddGroupScheduleViewModel @Inject constructor(
                 setEffect(
                     AddGroupScheduleSideEffect.SuccessCreateGroupSchedule(
                         SendCreateScheduleDTO(
-                            groupCode = currentState.groupProfile.groupCode,
                             userCode = it,
                             title = currentState.title,
                             content = currentState.content,

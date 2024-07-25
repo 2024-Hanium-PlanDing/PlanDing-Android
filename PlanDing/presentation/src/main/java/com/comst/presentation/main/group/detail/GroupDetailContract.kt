@@ -9,12 +9,14 @@ import com.comst.presentation.common.base.BaseSideEffect
 import com.comst.presentation.common.base.UIState
 import com.comst.presentation.common.util.UniqueList
 import com.comst.presentation.model.group.GroupProfileUIModel
+import com.comst.presentation.model.group.socket.ReceiveChatDTO
 import java.time.LocalDate
 import java.util.Date
 
 class GroupDetailContract {
     @Immutable
     data class GroupDetailUIState(
+        val userCode: String = "",
         val groupProfile: GroupProfileUIModel = GroupProfileUIModel(
             id = 6678,
             name = "Marcia Finley",
@@ -29,7 +31,9 @@ class GroupDetailContract {
         val selectDay: String = DateUtils.getDayOfWeek(selectLocalDate),
         val selectedWeekdays: List<String> = DateUtils.getWeekDays(selectLocalDate),
         val selectWeekGroupScheduleOriginalList: UniqueList<Schedule, Long> = UniqueList({ it.scheduleId }),
+        val chatOriginalList: UniqueList<ReceiveChatDTO, String> = UniqueList({ it.name+it.createdAt }),
         val newScheduleList: UniqueList<Schedule, Long> = UniqueList({ it.scheduleId }),
+        val newChatList: UniqueList<ReceiveChatDTO, String> = UniqueList({ it.name+it.createdAt }),
         val isBottomSheetVisible: Boolean = false,
         val isBarChartView: Boolean = true,
         val isLoading: Boolean = false,
@@ -37,6 +41,8 @@ class GroupDetailContract {
             it.firstOrNull() == selectDay.firstOrNull()
         },
         val isAddScheduleDialogVisible: Boolean = false,
+        val currentPage: Int = 0,
+        val chat: String = ""
     ) : UIState
 
     sealed class GroupDetailSideEffect : BaseSideEffect {
@@ -52,6 +58,9 @@ class GroupDetailContract {
         data class SelectDay(val index: Int): GroupDetailIntent()
         object ShowAddScheduleDialog : GroupDetailIntent()
         object HideAddScheduleDialog : GroupDetailIntent()
+        data class ChangePage(val pageIndex: Int) : GroupDetailIntent()
+        data class ChatChange(val chat: String) : GroupDetailIntent()
+        object SendChat: GroupDetailIntent()
     }
 
 

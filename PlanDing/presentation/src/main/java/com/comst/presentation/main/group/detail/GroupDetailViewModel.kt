@@ -14,7 +14,9 @@ import com.comst.presentation.BuildConfig.STOMP_ENDPOINT
 import com.comst.presentation.common.base.BaseViewModel
 import com.comst.presentation.common.util.UniqueList
 import com.comst.presentation.main.group.detail.GroupDetailContract.*
+import com.comst.presentation.model.group.socket.ReceiveChatDTO
 import com.comst.presentation.model.group.socket.ReceiveScheduleDTO
+import com.comst.presentation.model.group.socket.SendChatDTO
 import com.comst.presentation.model.group.socket.SendCreateScheduleDTO
 import com.comst.presentation.model.group.socket.WebSocketAction
 import com.comst.presentation.model.group.socket.WebSocketResponse
@@ -52,7 +54,6 @@ class GroupDetailViewModel @Inject constructor(
 ) : BaseViewModel<GroupDetailUIState, GroupDetailSideEffect, GroupDetailIntent, GroupDetailEvent>(GroupDetailUIState()) {
 
     private lateinit var token: String
-    private lateinit var userCode: String
 
     private lateinit var stompSession: StompSession
     private val moshi: Moshi = Moshi.Builder()
@@ -60,6 +61,7 @@ class GroupDetailViewModel @Inject constructor(
         .build()
 
     private lateinit var newSchedule: Flow<StompFrame.Message>
+    private lateinit var newChat: Flow<StompFrame.Message>
 
     override fun handleIntent(intent: GroupDetailIntent) {
         when(intent){
@@ -70,6 +72,9 @@ class GroupDetailViewModel @Inject constructor(
             is GroupDetailIntent.SelectDay -> onSelectDay(intent.index)
             is GroupDetailIntent.ShowAddScheduleDialog -> onShowAddScheduleDialog()
             is GroupDetailIntent.HideAddScheduleDialog -> onHideAddScheduleDialog()
+            is GroupDetailIntent.ChangePage -> onChangePage(intent.pageIndex)
+            is GroupDetailIntent.SendChat -> onSendChat()
+            is GroupDetailIntent.ChatChange -> onChatChange(intent.chat)
         }
     }
 
@@ -107,7 +112,13 @@ class GroupDetailViewModel @Inject constructor(
         }
 
         userCodeResult.onSuccess {
-            it?.let { userCode = it }
+            it?.let {  userCode ->
+                setState {
+                    copy(
+                        userCode = userCode
+                    )
+                }
+            }
         }.onFailure {
             isSuccess = false
         }
@@ -153,60 +164,103 @@ class GroupDetailViewModel @Inject constructor(
         )
 
         try {
+            Log.d(TAG, "Connecting to STOMP...")
             stompSession = client.connect(
                 STOMP_ENDPOINT,
-                customStompConnectHeaders = mapOf(
-                    HEADER_AUTHORIZATION to token,
-                    HEADER_GROUP_CODE to currentState.groupProfile.groupCode
-                )
+                customStompConnectHeaders = createStompHeaders()
             ).withMoshi(moshi)
 
-            newSchedule = stompSession.subscribe(
-                StompSubscribeHeaders(
-                    destination = "$SUBSCRIBE_URL${currentState.groupProfile.groupCode}",
-                    customHeaders = mapOf(
-                        HEADER_AUTHORIZATION to token,
-                        HEADER_GROUP_CODE to currentState.groupProfile.groupCode
-                    )
-                )
-            )
+            Log.d(TAG, "Connected to STOMP, subscribing to channels...")
 
-            newSchedule.collect {
-                try {
-                    val scheduleJson = it.bodyAsText
-                    Log.d(TAG, "Received message: $scheduleJson")
+            subscribeToChannels()
 
-                    val moshi = Moshi.Builder()
-                        .add(KotlinJsonAdapterFactory())
-                        .build()
+            Log.d(TAG, "Subscribed to channels, starting to collect messages...")
 
-                    val type = Types.newParameterizedType(WebSocketResponse::class.java, ReceiveScheduleDTO::class.java)
-                    val adapter = moshi.adapter<WebSocketResponse<ReceiveScheduleDTO>>(type)
-                    val response = adapter.fromJson(scheduleJson)
-
-                    if (response != null) {
-                        handleWebSocketMessage(response)
-                    } else {
-                        Log.e(TAG, "Failed to parse response")
-                    }
-                } catch (e: JsonDataException) {
-                    Log.e(TAG, "JSON parsing error", e)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error processing message", e)
-                }
-            }
+            launch { collectScheduleMessages() }
+            launch { collectChatMessages() }
         } catch (e: Exception) {
             Log.e(TAG, "Error connecting to STOMP", e)
         }
     }
+
+    private fun createStompHeaders(): Map<String, String> {
+        return mapOf(
+            HEADER_AUTHORIZATION to token,
+            HEADER_GROUP_CODE to currentState.groupProfile.groupCode
+        )
+    }
+
+    private suspend fun subscribeToChannels() {
+        newSchedule = stompSession.subscribe(
+            StompSubscribeHeaders(
+                destination = "$SUBSCRIBE_SCHEDULE_URL${currentState.groupProfile.groupCode}",
+                customHeaders = createStompHeaders()
+            )
+        )
+
+        newChat = stompSession.subscribe(
+            StompSubscribeHeaders(
+                destination = "$SUBSCRIBE_CHAT_URL${currentState.groupProfile.groupCode}",
+                customHeaders = createStompHeaders()
+            )
+        )
+    }
+
+    private suspend fun collectScheduleMessages() {
+        newSchedule.collect { message ->
+            try {
+                val scheduleJson = message.bodyAsText
+                Log.d(TAG, "Received schedule: $scheduleJson")
+
+                val type = Types.newParameterizedType(WebSocketResponse::class.java, ReceiveScheduleDTO::class.java)
+                val adapter = moshi.adapter<WebSocketResponse<ReceiveScheduleDTO>>(type)
+                val response = adapter.fromJson(scheduleJson)
+
+                if (response != null) {
+                    handleReceiveSchedule(response)
+                } else {
+                    Log.e(TAG, "Failed to parse response")
+                }
+            } catch (e: JsonDataException) {
+                Log.e(TAG, "JSON parsing error", e)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error processing message", e)
+            }
+        }
+    }
+
+    private suspend fun collectChatMessages() {
+        newChat.collect { message ->
+            try {
+                val chatJson = message.bodyAsText
+                Log.d(TAG, "Received chat: $chatJson")
+
+                val type = Types.newParameterizedType(WebSocketResponse::class.java, ReceiveChatDTO::class.java)
+                val adapter = moshi.adapter<WebSocketResponse<ReceiveChatDTO>>(type)
+                val response = adapter.fromJson(chatJson)
+
+                if (response != null) {
+                    handleReceiveChat(response)
+                } else {
+                    Log.e(TAG, "Failed to parse response")
+                }
+            } catch (e: JsonDataException) {
+                Log.e(TAG, "JSON parsing error", e)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error processing message", e)
+            }
+        }
+    }
+
+
     fun updateSchedule(message: String) {
 
     }
 
-    fun postSchedule(sendCreateScheduleDTO: SendCreateScheduleDTO) {
+    fun onCreateSchedule(sendCreateScheduleDTO: SendCreateScheduleDTO) {
         viewModelScope.launch {
             try {
-                val fullUrl = "$SEND_CREATE_URL${currentState.groupProfile.groupCode}"
+                val fullUrl = "$SEND_SCHEDULE_CREATE_URL${currentState.groupProfile.groupCode}"
                 Log.d(TAG, fullUrl)
 
                 val headers = StompSendHeaders(
@@ -226,6 +280,40 @@ class GroupDetailViewModel @Inject constructor(
             }
         }
     }
+
+    private fun onSendChat() {
+        viewModelScope.launch {
+            try {
+                val fullUrl = "$SEND_CHAT_URL${currentState.groupProfile.groupCode}"
+                Log.d(TAG, fullUrl)
+
+                val headers = StompSendHeaders(
+                    destination = fullUrl,
+                    customHeaders = mapOf(
+                        HEADER_AUTHORIZATION to token,
+                        HEADER_GROUP_CODE to currentState.groupProfile.groupCode
+                    )
+                )
+                stompSession.withMoshi(moshi).convertAndSend(
+                    headers = headers,
+                    body = SendChatDTO(
+                        content = currentState.chat,
+                        sender = currentState.userCode,
+                        type = "CHAT"
+                    )
+                )
+
+                setState {
+                    copy(
+                        chat = ""
+                    )
+                }
+                Log.d(TAG, "Message sent successfully")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error sending message", e)
+            }
+        }
+    }
     fun cancelStomp() {
         try {
             viewModelScope.launch {
@@ -236,8 +324,8 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
-    private fun handleWebSocketMessage(response: WebSocketResponse<ReceiveScheduleDTO>) {
-        if (response.success && response.data != null) {
+    private fun handleReceiveSchedule(response: WebSocketResponse<ReceiveScheduleDTO>) {
+        if (response.data != null) {
             val newSchedule = response.data.toDomainModel()
             Log.d(TAG, "Parsed schedule: $newSchedule")
 
@@ -282,6 +370,17 @@ class GroupDetailViewModel @Inject constructor(
             }
         } else {
             Log.e(TAG, "Received error response: ${response.errorResponse}")
+        }
+    }
+
+    private fun handleReceiveChat(response: WebSocketResponse<ReceiveChatDTO>){
+        if (response.data != null){
+            val newChat = response.data
+            setState {
+                copy(
+                    newChatList = newChatList.addOrUpdate(newChat)
+                )
+            }
         }
     }
 
@@ -396,13 +495,30 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
+    private fun onChangePage(pageIndex: Int) {
+        setState {
+            copy(
+                currentPage = pageIndex
+            )
+        }
+    }
+
+    private fun onChatChange(chat: String){
+        setState {
+            copy(chat = chat)
+        }
+    }
+
     companion object{
         const val HEADER_AUTHORIZATION = "Authorization"
         const val HEADER_GROUP_CODE = "groupCode"
 
-        const val SEND_CREATE_URL = "/pub/schedule/create/"
-        const val SEND_UPDATE_URL = "/pub/schedule/update/"
-        const val SEND_DELETE_URL = "/pub/schedule/delete/"
-        const val SUBSCRIBE_URL = "/sub/schedule/"
+        const val SEND_SCHEDULE_CREATE_URL = "/pub/schedule/create/"
+        const val SEND_SCHEDULE_UPDATE_URL = "/pub/schedule/update/"
+        const val SEND_SCHEDULE_DELETE_URL = "/pub/schedule/delete/"
+        const val SEND_CHAT_URL = "/pub/chat/"
+
+        const val SUBSCRIBE_SCHEDULE_URL = "/sub/schedule/"
+        const val SUBSCRIBE_CHAT_URL = "/sub/chat/"
     }
 }

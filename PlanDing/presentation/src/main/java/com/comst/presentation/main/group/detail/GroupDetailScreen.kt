@@ -20,8 +20,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
@@ -44,7 +42,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -53,12 +50,10 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -76,9 +71,8 @@ import com.comst.presentation.component.PDGroupScheduleCard
 import com.comst.presentation.component.PDScheduleBarChart
 import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailIntent
 import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleDialog
-import com.comst.presentation.main.schedule.PersonalScheduleCard
-import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleDialog
 import com.comst.presentation.model.group.GroupProfileUIModel
+import com.comst.presentation.model.group.socket.ReceiveChatDTO
 import com.comst.presentation.ui.theme.BackgroundColor3
 import com.comst.presentation.ui.theme.MainPurple400
 import com.comst.presentation.ui.theme.PlanDingTheme
@@ -111,7 +105,6 @@ fun GroupDetailScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    modifier = Modifier.clickable { viewModel.postChat() },
                     title = { Text(text = uiState.groupProfile.name) },
                     navigationIcon = {
                         IconButton(onClick = { }) {
@@ -123,9 +116,8 @@ fun GroupDetailScreen(
             bottomBar = {
                 if (uiState.currentPage == 1) {
                     MessageInputBar(
-                        message = "",
-                        onMessageChange = {},
-                        onSendClick = {}
+                        message = uiState.chat,
+                        onUIAction = viewModel::setIntent
                     )
                 }
             }
@@ -145,7 +137,9 @@ fun GroupDetailScreen(
                         isChartView = uiState.isBarChartView,
                         selectedDayIndex = uiState.selectedDayIndex,
                         currentPage = uiState.currentPage,
-                        onUIAction = viewModel::setIntent
+                        userCode = uiState.userCode,
+                        chatList = uiState.chatOriginalList.toList() + uiState.newChatList.toList(),
+                        onUIAction = viewModel::setIntent,
                     )
                 }
             }
@@ -170,7 +164,7 @@ fun GroupDetailScreen(
                     viewModel.setIntent(GroupDetailIntent.HideAddScheduleDialog)
                 },
                 onConfirm = { schedule ->
-                    viewModel.postSchedule(schedule)
+                    viewModel.onCreateSchedule(schedule)
                     viewModel.setIntent(GroupDetailIntent.HideAddScheduleDialog)
                 }
             )
@@ -181,8 +175,7 @@ fun GroupDetailScreen(
 @Composable
 fun MessageInputBar(
     message: String,
-    onMessageChange: (String) -> Unit,
-    onSendClick: () -> Unit,
+    onUIAction: (GroupDetailIntent) -> Unit
 ) {
     val componentHeight = 56.dp
     Row(
@@ -194,7 +187,11 @@ fun MessageInputBar(
     ) {
         TextField(
             value = message,
-            onValueChange = onMessageChange,
+            onValueChange = { newChat ->
+                onUIAction(
+                    GroupDetailIntent.ChatChange(newChat)
+                )
+            },
             modifier = Modifier
                 .weight(1f)
                 .height(componentHeight),
@@ -210,7 +207,11 @@ fun MessageInputBar(
         Box(
             modifier = Modifier
                 .size(componentHeight)
-                .clickable { onSendClick() },
+                .clickable {
+                    onUIAction(
+                        GroupDetailIntent.SendChat
+                    )
+                },
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -304,6 +305,8 @@ private fun GroupTabs(
     isChartView: Boolean,
     selectedDayIndex: Int,
     currentPage: Int,
+    userCode: String,
+    chatList: List<ReceiveChatDTO>,
     onUIAction: (GroupDetailIntent) -> Unit
 ) {
     val pages = listOf("그룹 일정", "그룹 채팅")
@@ -369,7 +372,9 @@ private fun GroupTabs(
                 selectedWeekdays = selectedWeekdays,
                 isChartView = isChartView,
                 selectedDayIndex = selectedDayIndex,
-                onUIAction = onUIAction
+                userCode =  userCode,
+                chatList =  chatList,
+                onUIAction = onUIAction,
             )
         }
     }
@@ -384,6 +389,8 @@ private fun GroupTabsContent(
     selectedWeekdays: List<String>,
     isChartView: Boolean,
     selectedDayIndex: Int,
+    userCode: String,
+    chatList: List<ReceiveChatDTO>,
     onUIAction: (GroupDetailIntent) -> Unit
 ) {
     Box(
@@ -419,8 +426,8 @@ private fun GroupTabsContent(
 
             1 -> {
                 ChatList(
-                    "dd",
-                    listOf()
+                    userCode = userCode,
+                    chatList = chatList
                 )
             }
         }
@@ -571,7 +578,7 @@ private fun DateSelectTab(
 @Composable
 private fun ChatList(
     userCode: String,
-    messageList: List<Schedule>
+    chatList: List<ReceiveChatDTO>
 ) {
     LazyColumn(
         modifier = Modifier
@@ -579,19 +586,17 @@ private fun ChatList(
             .height(800.dp)
     ) {
         items(
-            count = messageList.size,
-            key = { index -> messageList[index].scheduleId }
+            count = chatList.size,
+            key = { index -> chatList[index].name+chatList[index].createdAt }
         ) { index ->
-            messageList[index].let { message ->
-                if (message.groupName == userCode) {
+            chatList[index].let { chat ->
+                if (chat.name == userCode) {
                     MyChatCard(
-                        message = "dddddddddddd",
-                        time = "dddd"
+                        chat = chat
                     )
                 } else {
                     OtherChatCard(
-                        message = "dddddddddddd",
-                        time = "dddd"
+                        chat = chat
                     )
                 }
             }

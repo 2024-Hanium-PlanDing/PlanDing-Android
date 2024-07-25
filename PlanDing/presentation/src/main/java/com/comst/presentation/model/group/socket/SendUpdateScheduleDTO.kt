@@ -1,7 +1,6 @@
 package com.comst.presentation.model.group.socket
 
 data class SendUpdateScheduleDTO (
-    val groupCode: String,
     val scheduleId: Long,
     val userCode: String,
     val title: String,

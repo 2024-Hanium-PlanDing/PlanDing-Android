@@ -15,13 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.comst.presentation.model.group.socket.ReceiveChatDTO
 import com.comst.presentation.ui.theme.MainPurple600
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
 fun MyChatCard(
-    message: String,
-    time: String
+    chat: ReceiveChatDTO,
 ) {
     BoxWithConstraints(
         modifier = Modifier
@@ -36,13 +36,13 @@ fun MyChatCard(
             verticalAlignment = Alignment.Bottom
         ) {
             Text(
-                text = time,
+                text = chat.createdAt,
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray,
                 modifier = Modifier.padding(end = 8.dp)
             )
             Text(
-                text = message,
+                text = chat.message,
                 modifier = Modifier
                     .widthIn(max = maxWidth * 0.6f)
                     .background(
@@ -60,8 +60,13 @@ fun MyChatCard(
 private fun MyChatCardPreview(){
     PlanDingTheme {
         MyChatCard(
-            message = "auctor",
-            time = "cum"
+            chat = ReceiveChatDTO(
+                message = "similique",
+                profileImage = "interesset",
+                name = "Darwin Bartlett",
+                createdAt = "usu"
+            )
+
         )
     }
 }
