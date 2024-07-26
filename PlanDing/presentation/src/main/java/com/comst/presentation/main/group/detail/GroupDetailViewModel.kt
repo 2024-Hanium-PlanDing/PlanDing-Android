@@ -265,10 +265,7 @@ class GroupDetailViewModel @Inject constructor(
 
                 val headers = StompSendHeaders(
                     destination = fullUrl,
-                    customHeaders = mapOf(
-                        HEADER_AUTHORIZATION to token,
-                        HEADER_GROUP_CODE to currentState.groupProfile.groupCode
-                    )
+                    customHeaders = createStompHeaders()
                 )
                 stompSession.withMoshi(moshi).convertAndSend(
                     headers = headers,
@@ -289,10 +286,7 @@ class GroupDetailViewModel @Inject constructor(
 
                 val headers = StompSendHeaders(
                     destination = fullUrl,
-                    customHeaders = mapOf(
-                        HEADER_AUTHORIZATION to token,
-                        HEADER_GROUP_CODE to currentState.groupProfile.groupCode
-                    )
+                    customHeaders = createStompHeaders()
                 )
                 stompSession.withMoshi(moshi).convertAndSend(
                     headers = headers,
