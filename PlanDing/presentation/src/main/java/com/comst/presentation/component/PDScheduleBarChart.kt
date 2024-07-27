@@ -28,6 +28,7 @@ import com.comst.domain.model.base.Schedule
 import com.comst.presentation.ui.theme.PlanDingTheme
 import com.comst.presentation.ui.util.bottomBorder
 import com.comst.presentation.ui.util.endBorder
+import kotlin.math.absoluteValue
 
 @Composable
 fun PDScheduleBarChart(scheduleList: List<Schedule>, days: List<String>) {
@@ -129,7 +130,7 @@ fun PDScheduleBarChart(scheduleList: List<Schedule>, days: List<String>) {
                             }
 
                             scheduleList.filter { it.day == day }.forEach { event ->
-                                val topPadding = (event.startTime - 6) * 48.dp
+                                val topPadding = (event.startTime - 6).absoluteValue * 48.dp
                                 val height = (event.endTime - event.startTime) * 48.dp
                                 Box(
                                     modifier = Modifier
