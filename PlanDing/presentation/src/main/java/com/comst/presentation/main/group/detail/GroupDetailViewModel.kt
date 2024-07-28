@@ -3,6 +3,8 @@ package com.comst.presentation.main.group.detail
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.comst.domain.model.base.Schedule
+import com.comst.domain.usecase.chat.GetChatMessageListUseCase
+import com.comst.domain.usecase.chat.PostChatMessageUseCase
 import com.comst.domain.usecase.group.GetGroupInformationUseCase
 import com.comst.domain.usecase.groupSchedule.GetGroupScheduleUseCase
 import com.comst.domain.usecase.local.GetTokenUseCase
@@ -50,7 +52,9 @@ class GroupDetailViewModel @Inject constructor(
     private val getTokenUseCase: GetTokenUseCase,
     private val getUserCodeUseCase: GetUserCodeUseCase,
     private val getGroupInformationUseCase: GetGroupInformationUseCase,
-    private val getGroupScheduleUseCase: GetGroupScheduleUseCase
+    private val getGroupScheduleUseCase: GetGroupScheduleUseCase,
+    private val getChatMessageListUseCase: GetChatMessageListUseCase,
+    private val postChatMessageUseCase: PostChatMessageUseCase
 ) : BaseViewModel<GroupDetailUIState, GroupDetailSideEffect, GroupDetailIntent, GroupDetailEvent>(GroupDetailUIState()) {
 
     private lateinit var token: String
@@ -97,11 +101,13 @@ class GroupDetailViewModel @Inject constructor(
                 schedulePeriodModel = DateUtils.getWeekStartAndEnd(currentState.selectLocalDate)
             )
         }
+        val groupChatMessageDeferred = async { getChatMessageListUseCase(groupCode) }
 
         val tokenResult = tokenDeferred.await()
         val userCodeResult = userCodeDeferred.await()
         val groupInfoResult = groupInfoDeferred.await()
         val groupScheduleResult = groupScheduleDeferred.await()
+        val groupChatMessageResult = groupScheduleDeferred.await()
 
         var isSuccess = true
 
@@ -140,11 +146,18 @@ class GroupDetailViewModel @Inject constructor(
             isSuccess = false
         }
 
+        groupChatMessageResult.onSuccess {
+            Log.d("챗", "$it")
+        }.onFailure {
+            isSuccess = false
+        }
+
 
         if (isSuccess) {
             connectStomp()
         }else{
             // 처리
+            Log.d("챗","실패")
         }
 
         setState { copy(isLoading = false) }
