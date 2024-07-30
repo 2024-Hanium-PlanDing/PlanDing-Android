@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -62,6 +63,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.comst.domain.model.base.Schedule
+import com.comst.domain.model.chat.ChatMessageModel
 import com.comst.domain.util.DateUtils
 import com.comst.presentation.R
 import com.comst.presentation.common.base.BaseScreen
@@ -72,7 +74,6 @@ import com.comst.presentation.component.PDScheduleBarChart
 import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailIntent
 import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleDialog
 import com.comst.presentation.model.group.GroupProfileUIModel
-import com.comst.presentation.model.group.socket.ReceiveChatDTO
 import com.comst.presentation.ui.theme.BackgroundColor3
 import com.comst.presentation.ui.theme.MainPurple400
 import com.comst.presentation.ui.theme.PlanDingTheme
@@ -306,7 +307,7 @@ private fun GroupTabs(
     selectedDayIndex: Int,
     currentPage: Int,
     userCode: String,
-    chatList: List<ReceiveChatDTO>,
+    chatList: List<ChatMessageModel>,
     onUIAction: (GroupDetailIntent) -> Unit
 ) {
     val pages = listOf("그룹 일정", "그룹 채팅")
@@ -390,7 +391,7 @@ private fun GroupTabsContent(
     isChartView: Boolean,
     selectedDayIndex: Int,
     userCode: String,
-    chatList: List<ReceiveChatDTO>,
+    chatList: List<ChatMessageModel>,
     onUIAction: (GroupDetailIntent) -> Unit
 ) {
     Box(
@@ -578,27 +579,39 @@ private fun DateSelectTab(
 @Composable
 private fun ChatList(
     userCode: String,
-    chatList: List<ReceiveChatDTO>
+    chatList: List<ChatMessageModel>
 ) {
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+    var shouldScroll by remember { mutableStateOf(true) }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .height(800.dp)
+            .height(800.dp),
+        state = listState,
+        reverseLayout = true
     ) {
         items(
             count = chatList.size,
-            key = { index -> chatList[index].name+chatList[index].createdAt }
+            key = { index -> chatList[index].id }
         ) { index ->
-            chatList[index].let { chat ->
-                if (chat.name == userCode) {
-                    MyChatCard(
-                        chat = chat
-                    )
-                } else {
-                    OtherChatCard(
-                        chat = chat
-                    )
-                }
+            val chat = chatList[chatList.size - 1 - index]
+            if (chat.userCode == userCode) {
+                MyChatCard(chat = chat)
+            } else {
+                OtherChatCard(chat = chat)
+            }
+        }
+    }
+
+    LaunchedEffect(chatList.size) {
+        val lastVisibleItemIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+        shouldScroll = lastVisibleItemIndex == 0
+
+        if (shouldScroll) {
+            coroutineScope.launch {
+                listState.animateScrollToItem(0)
             }
         }
     }
