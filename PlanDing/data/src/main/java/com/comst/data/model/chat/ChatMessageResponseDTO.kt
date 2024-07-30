@@ -1,8 +1,8 @@
-package com.comst.presentation.model.group.socket
+package com.comst.data.model.chat
 
 import com.comst.domain.model.chat.ChatMessageModel
 
-data class ReceiveChatDTO(
+data class ChatMessageResponseDTO(
     val id: Long,
     val userCode: String,
     val name: String,
@@ -10,7 +10,7 @@ data class ReceiveChatDTO(
     val message: String,
     val createdAt: String,
 )
-fun ReceiveChatDTO.toDomainModel(): ChatMessageModel {
+fun ChatMessageResponseDTO.toDomainModel(): ChatMessageModel {
     return ChatMessageModel(
         id = id,
         userCode = userCode,

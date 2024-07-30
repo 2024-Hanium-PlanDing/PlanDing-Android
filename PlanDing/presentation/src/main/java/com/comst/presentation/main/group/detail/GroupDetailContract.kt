@@ -2,6 +2,7 @@ package com.comst.presentation.main.group.detail
 
 import androidx.compose.runtime.Immutable
 import com.comst.domain.model.base.Schedule
+import com.comst.domain.model.chat.ChatMessageModel
 import com.comst.domain.util.DateUtils
 import com.comst.presentation.common.base.BaseEvent
 import com.comst.presentation.common.base.BaseIntent
@@ -31,9 +32,9 @@ class GroupDetailContract {
         val selectDay: String = DateUtils.getDayOfWeek(selectLocalDate),
         val selectedWeekdays: List<String> = DateUtils.getWeekDays(selectLocalDate),
         val selectWeekGroupScheduleOriginalList: UniqueList<Schedule, Long> = UniqueList({ it.scheduleId }),
-        val chatOriginalList: UniqueList<ReceiveChatDTO, String> = UniqueList({ it.name+it.createdAt }),
+        val chatOriginalList: UniqueList<ChatMessageModel, Long> = UniqueList({ it.id }),
         val newScheduleList: UniqueList<Schedule, Long> = UniqueList({ it.scheduleId }),
-        val newChatList: UniqueList<ReceiveChatDTO, String> = UniqueList({ it.name+it.createdAt }),
+        val newChatList: UniqueList<ChatMessageModel, Long> = UniqueList({ it.id }),
         val isBottomSheetVisible: Boolean = false,
         val isBarChartView: Boolean = true,
         val isLoading: Boolean = false,

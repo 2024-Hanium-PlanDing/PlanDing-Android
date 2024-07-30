@@ -3,6 +3,8 @@ package com.comst.presentation.main.group.detail
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.comst.domain.model.base.Schedule
+import com.comst.domain.usecase.chat.GetChatMessageListUseCase
+import com.comst.domain.usecase.chat.PostChatMessageUseCase
 import com.comst.domain.usecase.group.GetGroupInformationUseCase
 import com.comst.domain.usecase.groupSchedule.GetGroupScheduleUseCase
 import com.comst.domain.usecase.local.GetTokenUseCase
@@ -16,7 +18,6 @@ import com.comst.presentation.common.util.UniqueList
 import com.comst.presentation.main.group.detail.GroupDetailContract.*
 import com.comst.presentation.model.group.socket.ReceiveChatDTO
 import com.comst.presentation.model.group.socket.ReceiveScheduleDTO
-import com.comst.presentation.model.group.socket.SendChatDTO
 import com.comst.presentation.model.group.socket.SendCreateScheduleDTO
 import com.comst.presentation.model.group.socket.WebSocketAction
 import com.comst.presentation.model.group.socket.WebSocketResponse
@@ -50,7 +51,9 @@ class GroupDetailViewModel @Inject constructor(
     private val getTokenUseCase: GetTokenUseCase,
     private val getUserCodeUseCase: GetUserCodeUseCase,
     private val getGroupInformationUseCase: GetGroupInformationUseCase,
-    private val getGroupScheduleUseCase: GetGroupScheduleUseCase
+    private val getGroupScheduleUseCase: GetGroupScheduleUseCase,
+    private val getChatMessageListUseCase: GetChatMessageListUseCase,
+    private val postChatMessageUseCase: PostChatMessageUseCase
 ) : BaseViewModel<GroupDetailUIState, GroupDetailSideEffect, GroupDetailIntent, GroupDetailEvent>(GroupDetailUIState()) {
 
     private lateinit var token: String
@@ -97,11 +100,13 @@ class GroupDetailViewModel @Inject constructor(
                 schedulePeriodModel = DateUtils.getWeekStartAndEnd(currentState.selectLocalDate)
             )
         }
+        val groupChatMessageDeferred = async { getChatMessageListUseCase(groupCode) }
 
         val tokenResult = tokenDeferred.await()
         val userCodeResult = userCodeDeferred.await()
         val groupInfoResult = groupInfoDeferred.await()
         val groupScheduleResult = groupScheduleDeferred.await()
+        val groupChatMessageResult = groupChatMessageDeferred.await()
 
         var isSuccess = true
 
@@ -140,11 +145,20 @@ class GroupDetailViewModel @Inject constructor(
             isSuccess = false
         }
 
+        groupChatMessageResult.onSuccess { chatList ->
+            setState {
+                copy(chatOriginalList = UniqueList({it.id}, chatList))
+            }
+        }.onFailure {
+            isSuccess = false
+        }
+
 
         if (isSuccess) {
             connectStomp()
         }else{
             // 처리
+            Log.d("챗","실패")
         }
 
         setState { copy(isLoading = false) }
@@ -280,31 +294,17 @@ class GroupDetailViewModel @Inject constructor(
 
     private fun onSendChat() {
         viewModelScope.launch {
-            try {
-                val fullUrl = "$SEND_CHAT_URL${currentState.groupProfile.groupCode}"
-                Log.d(TAG, fullUrl)
-
-                val headers = StompSendHeaders(
-                    destination = fullUrl,
-                    customHeaders = createStompHeaders()
-                )
-                stompSession.withMoshi(moshi).convertAndSend(
-                    headers = headers,
-                    body = SendChatDTO(
-                        content = currentState.chat,
-                        sender = currentState.userCode,
-                        type = "CHAT"
-                    )
-                )
-
+            postChatMessageUseCase(
+                groupCode = currentState.groupProfile.groupCode,
+                content = currentState.chat
+            ).onSuccess {
                 setState {
                     copy(
                         chat = ""
                     )
                 }
-                Log.d(TAG, "Message sent successfully")
-            } catch (e: Exception) {
-                Log.e(TAG, "Error sending message", e)
+            }.onFailure {
+
             }
         }
     }
@@ -369,7 +369,7 @@ class GroupDetailViewModel @Inject constructor(
 
     private fun handleReceiveChat(response: WebSocketResponse<ReceiveChatDTO>){
         if (response.data != null){
-            val newChat = response.data
+            val newChat = response.data.toDomainModel()
             setState {
                 copy(
                     newChatList = newChatList.addOrUpdate(newChat)

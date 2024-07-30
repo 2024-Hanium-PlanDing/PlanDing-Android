@@ -5,12 +5,14 @@ import com.comst.data.retrofit.GroupScheduleService
 import com.comst.data.retrofit.GroupService
 import com.comst.data.retrofit.PersonalScheduleService
 import com.comst.data.retrofit.AuthenticatedUserService
+import com.comst.data.retrofit.ChatService
 import com.comst.data.retrofit.UnAuthenticatedUserService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
+import retrofit2.create
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -43,5 +45,10 @@ object ServiceModule {
     @Provides
     fun provideGroupScheduleService(@RetrofitModule.AuthenticatedRetrofit retrofit: Retrofit): GroupScheduleService {
         return retrofit.create(GroupScheduleService::class.java)
+    }
+
+    @Provides
+    fun provideChatService(@RetrofitModule.AuthenticatedRetrofit retrofit: Retrofit): ChatService {
+        return retrofit.create(ChatService::class.java)
     }
 }

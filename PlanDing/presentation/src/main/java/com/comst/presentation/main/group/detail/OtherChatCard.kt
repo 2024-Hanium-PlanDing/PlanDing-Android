@@ -20,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.comst.domain.model.chat.ChatMessageModel
+import com.comst.domain.util.DateUtils
 import com.comst.presentation.component.PDProfileImage
 import com.comst.presentation.model.group.socket.ReceiveChatDTO
 import com.comst.presentation.ui.theme.BackgroundColor3
@@ -28,7 +30,7 @@ import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
 fun OtherChatCard(
-    chat: ReceiveChatDTO
+    chat: ChatMessageModel
 ) {
     BoxWithConstraints(
         modifier = Modifier
@@ -73,7 +75,7 @@ fun OtherChatCard(
                     )
 
                     Text(
-                        text = chat.createdAt,
+                        text = DateUtils.getTimeFromDateTimeString(chat.createdAt),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Gray
                     )
@@ -89,14 +91,6 @@ fun OtherChatCard(
 @Composable
 private fun OtherChatCardPreview() {
     PlanDingTheme {
-        OtherChatCard(
-            chat = ReceiveChatDTO(
-                message = "congue",
-                profileImage = "ridiculus",
-                name = "Paul Oliver",
-                createdAt = "tempor"
-            )
 
-        )
     }
 }
