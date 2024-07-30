@@ -150,4 +150,11 @@ object DateUtils {
     fun getDateFromWeekdayIndex(date: Date, index: Int): LocalDate {
         return getDateFromWeekdayIndex(dateToLocalDate(date), index)
     }
+
+    fun getTimeFromDateTimeString(dateTimeString: String): String {
+        val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+        val dateTime = LocalDateTime.parse(dateTimeString, formatter)
+        val outputFormatter = DateTimeFormatter.ofPattern("HH:mm")
+        return dateTime.format(outputFormatter)
+    }
 }
