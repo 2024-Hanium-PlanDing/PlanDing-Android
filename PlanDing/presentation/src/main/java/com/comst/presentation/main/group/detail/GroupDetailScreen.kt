@@ -26,11 +26,16 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -39,13 +44,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -53,11 +62,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -103,48 +114,84 @@ fun GroupDetailScreen(
             else -> {}
         }
     }) { uiState ->
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(text = uiState.groupProfile.name) },
-                    navigationIcon = {
-                        IconButton(onClick = { }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+        val scope = rememberCoroutineScope()
+
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            ModalNavigationDrawer(
+                drawerContent = {
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr){
+                        ModalDrawerSheet {
+                            Column {
+
+                                Text(
+                                    text = "Menu",
+                                    modifier = Modifier.padding(16.dp)
+                                )
+
+                            }
+
                         }
                     }
-                )
-            },
-            bottomBar = {
-                if (uiState.currentPage == 1) {
-                    MessageInputBar(
-                        message = uiState.chat,
-                        onUIAction = viewModel::setIntent
-                    )
-                }
-            }
-        ) { paddingValues ->
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
+
+                },
+                drawerState = drawerState,
+                gesturesEnabled = true,
+                modifier = Modifier.fillMaxSize()
             ) {
-                item { GroupProfile(uiState.groupProfile) }
-                item {
-                    GroupTabs(
-                        selectWeekGroupScheduleList = uiState.selectWeekGroupScheduleOriginalList.toList() + uiState.newScheduleList.toList(),
-                        selectUIDate = uiState.selectUIDate,
-                        selectDay = uiState.selectDay,
-                        selectedWeekdays = uiState.selectedWeekdays,
-                        isChartView = uiState.isBarChartView,
-                        selectedDayIndex = uiState.selectedDayIndex,
-                        currentPage = uiState.currentPage,
-                        userCode = uiState.userCode,
-                        chatList = uiState.chatOriginalList.toList() + uiState.newChatList.toList(),
-                        onUIAction = viewModel::setIntent,
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                    Scaffold(
+                        topBar = {
+                            TopAppBar(
+                                title = { Text(text = uiState.groupProfile.name) },
+                                navigationIcon = {
+                                    IconButton(onClick = {  }) {
+                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                                    }
+                                },
+                                actions = {
+                                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                                        Icon(Icons.Default.Menu, contentDescription = "Menu")
+                                    }
+                                }
+                            )
+                        },
+                        bottomBar = {
+                            if (uiState.currentPage == 1) {
+                                MessageInputBar(
+                                    message = uiState.chat,
+                                    onUIAction = viewModel::setIntent
+                                )
+                            }
+                        },
+                        content = { paddingValues ->
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(paddingValues)
+                            ) {
+                                item { GroupProfile(uiState.groupProfile) }
+                                item {
+                                    GroupTabs(
+                                        selectWeekGroupScheduleList = uiState.selectWeekGroupScheduleOriginalList.toList() + uiState.newScheduleList.toList(),
+                                        selectUIDate = uiState.selectUIDate,
+                                        selectDay = uiState.selectDay,
+                                        selectedWeekdays = uiState.selectedWeekdays,
+                                        isChartView = uiState.isBarChartView,
+                                        selectedDayIndex = uiState.selectedDayIndex,
+                                        currentPage = uiState.currentPage,
+                                        userCode = uiState.userCode,
+                                        chatList = uiState.chatOriginalList.toList() + uiState.newChatList.toList(),
+                                        onUIAction = viewModel::setIntent,
+                                    )
+                                }
+                            }
+                        }
                     )
                 }
             }
         }
+
         if (uiState.isBottomSheetVisible) {
             PDCalendarBottomSheet(
                 date = DateUtils.uiDateToDate(uiState.selectUIDate),
@@ -172,7 +219,6 @@ fun GroupDetailScreen(
         }
     }
 }
-
 @Composable
 fun MessageInputBar(
     message: String,
