@@ -21,7 +21,9 @@ class AddGroupScheduleContract {
             description = "iusto",
             thumbnailUrl = "https://search.yahoo.com/search?p=doming",
             createdBy = "mnesarchum",
-            true
+            isFavorite = false,
+            isAlarm = false,
+            isGroupAdmin = false
         ),
         val date: LocalDate = LocalDate.now(),
         val uiDate: String = "",

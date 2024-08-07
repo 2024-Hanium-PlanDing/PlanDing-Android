@@ -25,7 +25,9 @@ class GroupDetailContract {
             description = "iusto",
             thumbnailUrl = "https://search.yahoo.com/search?p=doming",
             createdBy = "mnesarchum",
-            true
+            isFavorite = false,
+            isAlarm = false,
+            isGroupAdmin = false
         ),
         val selectLocalDate: LocalDate = LocalDate.now(),
         val selectUIDate: String = DateUtils.localDateToUIDate(selectLocalDate),

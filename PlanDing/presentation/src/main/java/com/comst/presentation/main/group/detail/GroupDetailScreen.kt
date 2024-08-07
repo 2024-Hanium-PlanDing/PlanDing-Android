@@ -146,13 +146,34 @@ fun GroupDetailScreen(
                                 title = { Text(text = uiState.groupProfile.name) },
                                 navigationIcon = {
                                     IconButton(onClick = {  }) {
-                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "favorite")
                                     }
                                 },
                                 actions = {
-                                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                                        Icon(Icons.Default.Menu, contentDescription = "Menu")
+                                    Row {
+                                        IconButton(onClick = {  }) {
+                                            Icon(
+                                                painterResource(
+                                                    id = if (uiState.groupProfile.isAlarm) R.drawable.ic_notifications_on_24 else R.drawable.ic_notifications_off_24
+                                                ),
+                                                tint = MaterialTheme.colorScheme.primary,
+                                                contentDescription = "notification"
+                                            )
+                                        }
+                                        IconButton(onClick = {  }) {
+                                            Icon(
+                                                painterResource(
+                                                    id = if (uiState.groupProfile.isFavorite) R.drawable.ic_favorite_on_24 else R.drawable.ic_favorite_off_24
+                                                ),
+                                                tint = MaterialTheme.colorScheme.primary,
+                                                contentDescription = "favorite"
+                                            )
+                                        }
+                                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                                            Icon(Icons.Default.Menu, contentDescription = "Menu")
+                                        }
                                     }
+
                                 }
                             )
                         },

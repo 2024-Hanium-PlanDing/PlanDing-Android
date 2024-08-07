@@ -200,7 +200,9 @@ private fun AddScheduleDialogPreview() {
                 description = "tacimates",
                 thumbnailUrl = "https://search.yahoo.com/search?p=tation",
                 createdBy = "ultrices",
-                isGroupAdmin = false
+                isGroupAdmin = false,
+                isFavorite = false,
+                isAlarm = false
             ),
             date = LocalDate.now(),
             onDismiss = {},

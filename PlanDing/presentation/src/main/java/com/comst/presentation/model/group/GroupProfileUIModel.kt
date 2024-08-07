@@ -9,6 +9,8 @@ data class GroupProfileUIModel(
     val description: String,
     val thumbnailUrl: String,
     val createdBy: String,
+    val isFavorite: Boolean,
+    val isAlarm: Boolean,
     val isGroupAdmin: Boolean
 )
 
@@ -20,6 +22,8 @@ fun GroupInformationModel.toUIModel(): GroupProfileUIModel {
         description = description,
         thumbnailUrl = thumbnailUrl,
         createdBy = createdBy,
-        isGroupAdmin = isGroupAdmin
+        isGroupAdmin = isGroupAdmin,
+        isFavorite = isFavorite,
+        isAlarm = isAlarm
     )
 }
