@@ -46,6 +46,7 @@ class GroupDetailContract {
             it.firstOrNull() == selectDay.firstOrNull()
         },
         val isAddScheduleDialogVisible: Boolean = false,
+        val isAddGroupMemberDialogVisible: Boolean = false,
         val currentPage: Int = 0,
         val chat: String = ""
     ) : UIState
@@ -63,6 +64,8 @@ class GroupDetailContract {
         data class SelectDay(val index: Int): GroupDetailIntent()
         object ShowAddScheduleDialog : GroupDetailIntent()
         object HideAddScheduleDialog : GroupDetailIntent()
+        object ShowAddGroupMemberDialog : GroupDetailIntent()
+        object HideAddGroupMemberDialog : GroupDetailIntent()
         data class ChangePage(val pageIndex: Int) : GroupDetailIntent()
         data class ChatChange(val chat: String) : GroupDetailIntent()
         object SendChat: GroupDetailIntent()

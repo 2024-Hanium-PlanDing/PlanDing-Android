@@ -75,6 +75,8 @@ class GroupDetailViewModel @Inject constructor(
             is GroupDetailIntent.SelectDay -> onSelectDay(intent.index)
             is GroupDetailIntent.ShowAddScheduleDialog -> onShowAddScheduleDialog()
             is GroupDetailIntent.HideAddScheduleDialog -> onHideAddScheduleDialog()
+            is GroupDetailIntent.ShowAddGroupMemberDialog -> onShowAddGroupMemberDialog()
+            is GroupDetailIntent.HideAddGroupMemberDialog -> onHideAddGroupMemberDialog()
             is GroupDetailIntent.ChangePage -> onChangePage(intent.pageIndex)
             is GroupDetailIntent.SendChat -> onSendChat()
             is GroupDetailIntent.ChatChange -> onChatChange(intent.chat)
@@ -478,6 +480,17 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
+    private fun onShowAddGroupMemberDialog() {
+        setState {
+            copy(isAddGroupMemberDialogVisible = true)
+        }
+    }
+
+    private fun onHideAddGroupMemberDialog() {
+        setState {
+            copy(isAddGroupMemberDialogVisible = false)
+        }
+    }
 
     override fun handleError(exception: Exception) {
         super.handleError(exception)
