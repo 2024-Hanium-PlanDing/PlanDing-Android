@@ -1,6 +1,7 @@
 package com.comst.presentation.main.group.detail
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -27,7 +29,6 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -50,17 +51,17 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
@@ -75,6 +76,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.comst.domain.model.base.Schedule
 import com.comst.domain.model.chat.ChatMessageModel
+import com.comst.domain.model.group.GroupUserInformationModel
 import com.comst.domain.util.DateUtils
 import com.comst.presentation.R
 import com.comst.presentation.common.base.BaseScreen
@@ -86,6 +88,7 @@ import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailI
 import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleDialog
 import com.comst.presentation.model.group.GroupProfileUIModel
 import com.comst.presentation.ui.theme.BackgroundColor3
+import com.comst.presentation.ui.theme.Blue400
 import com.comst.presentation.ui.theme.MainPurple400
 import com.comst.presentation.ui.theme.PlanDingTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -103,6 +106,7 @@ fun GroupDetailScreen(
         viewModel.initialize(groupCode)
     }
 
+
     DisposableEffect(Unit) {
         onDispose {
             viewModel.cancelStomp()
@@ -117,20 +121,24 @@ fun GroupDetailScreen(
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
 
+        BackHandler(enabled = drawerState.isOpen) {
+            scope.launch {
+                drawerState.close()
+            }
+        }
+
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             ModalNavigationDrawer(
                 drawerContent = {
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr){
-                        ModalDrawerSheet {
-                            Column {
-
-                                Text(
-                                    text = "Menu",
-                                    modifier = Modifier.padding(16.dp)
-                                )
-
-                            }
-
+                        ModalDrawerSheet(
+                            modifier = Modifier.fillMaxWidth(0.7f),
+                            drawerShape = RectangleShape
+                        ) {
+                            GroupDrawerContent(
+                                userCode = uiState.userCode,
+                                groupMemberList = uiState.groupMember
+                            )
                         }
                     }
 
@@ -683,6 +691,90 @@ private fun ChatList(
         }
     }
 }
+
+@Composable
+private fun GroupDrawerContent(
+    userCode: String,
+    groupMemberList: List<GroupUserInformationModel>
+){
+    val sortedGroupMemberList = groupMemberList
+        .sortedWith(
+            compareByDescending<GroupUserInformationModel> { it.userCode == userCode }
+                .thenByDescending { it.hasPermission }
+                .thenBy { it.userName }
+        )
+
+    Column(
+        modifier = Modifier.padding(horizontal = 16.dp)
+    ) {
+        Text(
+            text = "그룹 서랍",
+            modifier = Modifier.padding(vertical = 16.dp),
+            fontWeight = FontWeight.Bold
+        )
+
+        HorizontalDivider()
+
+        Text(
+            text = "그룹원",
+            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
+            fontWeight = FontWeight.Bold
+        )
+
+        AddGroupMember()
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            items(
+                count = sortedGroupMemberList.size,
+                key = { index -> sortedGroupMemberList[index].userCode }
+            ) { index ->
+                val member =  sortedGroupMemberList[index]
+                if (member.userCode == userCode){
+                    MyGroupMemberCard(user = member)
+                } else {
+                    OtherGroupMemberCard(user = member)
+                }
+            }
+        }
+
+    }
+}
+
+@Composable
+fun AddGroupMember(
+
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box {
+
+            Image(
+                modifier = Modifier
+                    .size(48.dp)
+                    .padding(4.dp)
+                    .clip(CircleShape),
+                painter = painterResource(id = R.drawable.ic_add_24),
+                colorFilter = ColorFilter.tint(Blue400),
+                contentDescription = "그룹원 추가",
+                contentScale = ContentScale.Crop,
+
+                )
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Text(
+            text = "그룹원 초대",
+            color = Blue400
+        )
+    }
+}
+
 
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)

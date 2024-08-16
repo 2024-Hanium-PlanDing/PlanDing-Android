@@ -14,7 +14,7 @@ data class GroupProfileUIModel(
     val isGroupAdmin: Boolean
 )
 
-fun GroupInformationModel.toUIModel(): GroupProfileUIModel {
+fun GroupInformationModel.toGroupProfileUIModel(): GroupProfileUIModel {
     return  GroupProfileUIModel(
         id = id,
         name = name,

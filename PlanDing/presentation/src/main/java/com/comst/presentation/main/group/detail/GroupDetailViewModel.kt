@@ -22,7 +22,7 @@ import com.comst.presentation.model.group.socket.SendCreateScheduleDTO
 import com.comst.presentation.model.group.socket.WebSocketAction
 import com.comst.presentation.model.group.socket.WebSocketResponse
 import com.comst.presentation.model.group.socket.toDomainModel
-import com.comst.presentation.model.group.toUIModel
+import com.comst.presentation.model.group.toGroupProfileUIModel
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -131,7 +131,10 @@ class GroupDetailViewModel @Inject constructor(
 
         groupInfoResult.onSuccess { groupInformation ->
             setState {
-                copy(groupProfile = groupInformation.toUIModel())
+                copy(
+                    groupProfile = groupInformation.toGroupProfileUIModel(),
+                    groupMember = groupInformation.users
+                )
             }
         }.onFailure {
             isSuccess = false
