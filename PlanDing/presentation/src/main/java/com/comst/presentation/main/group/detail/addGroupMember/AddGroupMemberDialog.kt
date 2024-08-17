@@ -111,7 +111,7 @@ fun AddGroupMemberDialog(
                     onClick = {
                         viewModel.setIntent(AddGroupMemberIntent.InviteGroupMember)
                     },
-                    text = "생성",
+                    text = "초대",
                     modifier = Modifier.fillMaxWidth()
                 )
             },
