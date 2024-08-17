@@ -57,7 +57,7 @@ fun AddGroupMemberDialog(
     val handleEffect: (AddGroupMemberSideEffect) -> Unit = { effect ->
         when (effect) {
             is AddGroupMemberSideEffect.SuccessInviteGroupMember -> {
-
+                onDismiss()
             }
         }
     }
