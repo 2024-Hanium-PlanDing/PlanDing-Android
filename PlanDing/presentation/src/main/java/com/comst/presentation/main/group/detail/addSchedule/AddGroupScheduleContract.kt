@@ -39,6 +39,7 @@ class AddGroupScheduleContract {
     }
 
     sealed class AddGroupScheduleIntent : BaseIntent {
+        data class Initialize(val groupProfile: GroupProfileUIModel, val date: LocalDate): AddGroupScheduleIntent()
         data class TitleChange(val title: String) : AddGroupScheduleIntent()
         data class DescriptionChange(val description: String) : AddGroupScheduleIntent()
         data class SelectedStartTime(val startTime: Int) : AddGroupScheduleIntent()
