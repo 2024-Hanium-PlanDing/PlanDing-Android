@@ -12,6 +12,7 @@ import com.comst.presentation.common.base.UIState
 import com.comst.presentation.common.util.UniqueList
 import com.comst.presentation.model.group.GroupProfileUIModel
 import com.comst.presentation.model.group.socket.ReceiveChatDTO
+import com.comst.presentation.model.group.socket.SendCreateScheduleDTO
 import java.time.LocalDate
 import java.util.Date
 
@@ -69,6 +70,7 @@ class GroupDetailContract {
         data class ChangePage(val pageIndex: Int) : GroupDetailIntent()
         data class ChatChange(val chat: String) : GroupDetailIntent()
         object SendChat: GroupDetailIntent()
+        data class CreateSchedule(val newSchedule: SendCreateScheduleDTO): GroupDetailIntent()
     }
 
 

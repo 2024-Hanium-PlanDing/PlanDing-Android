@@ -80,6 +80,7 @@ class GroupDetailViewModel @Inject constructor(
             is GroupDetailIntent.ChangePage -> onChangePage(intent.pageIndex)
             is GroupDetailIntent.SendChat -> onSendChat()
             is GroupDetailIntent.ChatChange -> onChatChange(intent.chat)
+            is GroupDetailIntent.CreateSchedule -> onCreateSchedule(intent.newSchedule)
         }
     }
 
