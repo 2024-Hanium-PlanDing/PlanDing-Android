@@ -18,6 +18,7 @@ class AddGroupMemberViewModel @Inject constructor(
 
     override fun handleIntent(intent: AddGroupMemberIntent) {
         when(intent){
+            is AddGroupMemberIntent.Initialize -> initialize(intent.groupCode)
             is AddGroupMemberIntent.UserCodeChange -> onUserCodeChange(intent.userCode)
             is AddGroupMemberIntent.InviteGroupMember -> onInviteGroupMember()
         }

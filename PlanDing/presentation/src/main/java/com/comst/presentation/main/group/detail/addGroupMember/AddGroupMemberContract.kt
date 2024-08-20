@@ -19,6 +19,7 @@ class AddGroupMemberContract {
     }
 
     sealed class AddGroupMemberIntent: BaseIntent {
+        data class Initialize(val groupCode: String): AddGroupMemberIntent()
         object InviteGroupMember: AddGroupMemberIntent()
         data class UserCodeChange(val userCode: String): AddGroupMemberIntent()
     }

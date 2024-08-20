@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -34,8 +35,7 @@ import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDTextFieldOutLine
 import com.comst.presentation.component.PDTimeDropdownMenu
-import com.comst.presentation.main.group.detail.addGroupMember.AddGroupMemberContract.AddGroupMemberIntent
-import com.comst.presentation.main.group.detail.addGroupMember.AddGroupMemberContract.AddGroupMemberSideEffect
+import com.comst.presentation.main.group.detail.addGroupMember.AddGroupMemberContract.*
 import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract
 import com.comst.presentation.ui.theme.BackgroundColor3
 import com.comst.presentation.ui.theme.MainPurple600
@@ -63,83 +63,96 @@ fun AddGroupMemberDialog(
     }
 
     BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
-        androidx.compose.material3.AlertDialog(
-            onDismissRequest = {
-                viewModel.initialize(
-                    groupCode = groupCode
-                )
-                onDismiss()
-            },
-            title = {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(text = "그룹원 추가")
-                }
-            },
-            text = {
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "코드를 전달 받았다면 코드를 입력하세요",
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .padding(bottom = 4.dp)
-                    )
-                    PDTextFieldOutLine(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        label = "유저 코드를 입력해주세요",
-                        value = uiState.userCode,
-                        onValueChange = {
-                            viewModel.setIntent(
-                                AddGroupMemberIntent.UserCodeChange(
-                                    it
-                                )
-                            )
-                        }
-                    )
-
-                }
-            },
-            confirmButton = {
-                PDButton(
-                    onClick = {
-                        viewModel.setIntent(AddGroupMemberIntent.InviteGroupMember)
-                    },
-                    text = "초대",
-                    modifier = Modifier.fillMaxWidth()
-                )
-            },
-            dismissButton = {
-                Button(
-                    onClick = {
-                        viewModel.initialize(
-                            groupCode = groupCode
-                        )
-                        onDismiss()
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = BackgroundColor3,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
-                ) {
-                    Text(
-                        text = "닫기",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            },
-            shape = RoundedCornerShape(8.dp)
+        AddGroupMemberDialog(
+            uiState = uiState,
+            setIntent = viewModel::setIntent,
+            onDismiss
         )
     }
+}
+
+@Composable
+private fun AddGroupMemberDialog(
+    uiState: AddGroupMemberUIState,
+    setIntent: (AddGroupMemberIntent) -> Unit = {},
+    onDismiss: () -> Unit = {}
+){
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = {
+            setIntent(
+                AddGroupMemberIntent.Initialize(uiState.groupCode)
+            )
+            onDismiss()
+        },
+        title = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(text = "그룹원 추가")
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "코드를 전달 받았다면 코드를 입력하세요",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .padding(bottom = 4.dp)
+                )
+                PDTextFieldOutLine(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    label = "유저 코드를 입력해주세요",
+                    value = uiState.userCode,
+                    onValueChange = {
+                        setIntent(
+                            AddGroupMemberIntent.UserCodeChange(
+                                it
+                            )
+                        )
+                    }
+                )
+
+            }
+        },
+        confirmButton = {
+            PDButton(
+                onClick = {
+                    setIntent(AddGroupMemberIntent.InviteGroupMember)
+                },
+                text = "초대",
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        dismissButton = {
+            Button(
+                onClick = {
+                    setIntent(
+                        AddGroupMemberIntent.Initialize(uiState.groupCode)
+                    )
+                    onDismiss()
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = BackgroundColor3,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Text(
+                    text = "닫기",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        },
+        shape = RoundedCornerShape(8.dp)
+    )
 }
 
 @Preview
@@ -148,8 +161,7 @@ fun AddGroupMemberDialog(
 private fun AddGroupMemberDialogPreview() {
     PlanDingTheme {
         AddGroupMemberDialog(
-            groupCode = "fabellas",
-            onDismiss = {}
+            uiState = AddGroupMemberUIState()
         )
     }
 }
