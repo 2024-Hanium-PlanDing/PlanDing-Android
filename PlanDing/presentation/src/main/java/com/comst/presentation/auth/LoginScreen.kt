@@ -84,8 +84,8 @@ fun LoginScreen(
 @Composable
 private fun LoginScreen(
     uiState: LoginUIState,
-    onUIAction: (LoginIntent) -> Unit,
-    onKaKaoLoginClick: () -> Unit,
+    onUIAction: (LoginIntent) -> Unit = {},
+    onKaKaoLoginClick: () -> Unit = {},
 ) {
     Surface {
         Column(
@@ -188,13 +188,7 @@ private fun LoginScreen(
 private fun LoginScreenPreview() {
     PlanDingTheme {
         LoginScreen(
-            uiState = LoginUIState(
-                id = "electram",
-                password = "fames",
-                isLoading = false
-            ),
-            onUIAction = {},
-            onKaKaoLoginClick = {}
+            uiState = LoginUIState()
         )
     }
 }

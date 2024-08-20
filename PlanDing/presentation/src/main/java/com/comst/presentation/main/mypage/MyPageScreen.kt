@@ -36,7 +36,6 @@ import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
 fun MyPageScreen(viewModel: MyPageViewModel = hiltViewModel()) {
-    val uiState = viewModel.uiState.collectAsState()
     val handleEffect: (MyPageSideEffect) -> Unit =  { effect ->
         when (effect) {
             else -> {
@@ -45,8 +44,10 @@ fun MyPageScreen(viewModel: MyPageViewModel = hiltViewModel()) {
         }
     }
 
-    BaseScreen(viewModel = viewModel, handleEffect = handleEffect) {
-        MyPageScreen(uiState = uiState.value)
+    BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
+        MyPageScreen(
+            uiState = uiState
+        )
     }
 }
 

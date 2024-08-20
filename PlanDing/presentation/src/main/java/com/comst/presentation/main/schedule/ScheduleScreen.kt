@@ -90,8 +90,8 @@ fun ScheduleScreen(
 @Composable
 private fun ScheduleScreen(
     uiState: ScheduleUIState,
-    onUIAction: (ScheduleIntent) -> Unit,
-    setEvent : (ScheduleEvent) -> Unit
+    onUIAction: (ScheduleIntent) -> Unit = {},
+    setEvent : (ScheduleEvent) -> Unit = {}
 ){
     Surface {
         Column(
@@ -383,9 +383,7 @@ private fun ScheduleList(
 private fun ScheduleScreenPreview() {
     PlanDingTheme {
         ScheduleScreen(
-            uiState = ScheduleUIState(),
-            onUIAction = {},
-            setEvent = {}
+            uiState = ScheduleUIState()
         )
     }
 }
