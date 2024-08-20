@@ -54,7 +54,6 @@ fun MyPageScreen(viewModel: MyPageViewModel = hiltViewModel()) {
 @Composable
 private fun MyPageScreen(
     uiState: MyPageContract.MyPageUIState,
-    handleEffect: (MyPageSideEffect) -> Unit = {}
 ) {
     Surface {
         Column(

@@ -75,7 +75,7 @@ fun LoginScreen(
     BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
         LoginScreen(
             uiState = uiState,
-            onUIAction = viewModel::setIntent,
+            setIntent = viewModel::setIntent,
             onKaKaoLoginClick
         )
     }
@@ -84,7 +84,7 @@ fun LoginScreen(
 @Composable
 private fun LoginScreen(
     uiState: LoginUIState,
-    onUIAction: (LoginIntent) -> Unit = {},
+    setIntent: (LoginIntent) -> Unit = {},
     onKaKaoLoginClick: () -> Unit = {},
 ) {
     Surface {
@@ -110,7 +110,7 @@ private fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 value = uiState.id,
                 label = "아이디",
-                onValueChange = { newId -> onUIAction(LoginIntent.IdChange(newId)) }
+                onValueChange = { newId -> setIntent(LoginIntent.IdChange(newId)) }
             )
             Spacer(Modifier.height(4.dp))
 
@@ -119,14 +119,14 @@ private fun LoginScreen(
                 value = uiState.password,
                 label = "비밀번호",
                 visualTransformation = PasswordVisualTransformation(),
-                onValueChange = { newPassword -> onUIAction(LoginIntent.PasswordChange(newPassword)) }
+                onValueChange = { newPassword -> setIntent(LoginIntent.PasswordChange(newPassword)) }
             )
             Spacer(Modifier.height(20.dp))
 
             PDButton(
                 modifier = Modifier.fillMaxWidth(),
                 text = "로그인하기",
-                onClick = { onUIAction(LoginIntent.Login) }
+                onClick = { setIntent(LoginIntent.Login) }
             )
 
             Spacer(Modifier.height(20.dp))
