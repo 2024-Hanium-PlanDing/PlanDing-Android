@@ -72,7 +72,6 @@ import kotlinx.coroutines.launch
 fun ScheduleScreen(
     viewModel: ScheduleViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
     val handleEffect: (ScheduleSideEffect) -> Unit = { effect ->
         when (effect) {
             else -> {}
@@ -80,78 +79,91 @@ fun ScheduleScreen(
     }
 
     BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
-        Surface {
-            Column(
+        ScheduleScreen(
+            uiState = uiState,
+            onUIAction = viewModel::setIntent,
+            setEvent = viewModel::setEvent
+        )
+    }
+}
+
+@Composable
+private fun ScheduleScreen(
+    uiState: ScheduleUIState,
+    onUIAction: (ScheduleIntent) -> Unit,
+    setEvent : (ScheduleEvent) -> Unit
+){
+    Surface {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            PDScreenHeader(text = "스케줄")
+
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp, horizontal = 16.dp)
+                    .background(
+                        shape = RoundedCornerShape(8.dp),
+                        color = Color.White
+                    ),
             ) {
-                PDScreenHeader(text = "스케줄")
-
-                Box(
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp, horizontal = 16.dp)
-                        .background(
-                            shape = RoundedCornerShape(8.dp),
-                            color = Color.White
-                        ),
+                        .padding(horizontal = 16.dp)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                    ) {
 
-                        DateSelectTab(
-                            selectUIDate = uiState.selectUIDate,
-                            selectDay = uiState.selectDay,
-                            isTodayScheduleVisible = uiState.isTodayScheduleVisible,
-                            onUIAction = viewModel::setIntent
+                    DateSelectTab(
+                        selectUIDate = uiState.selectUIDate,
+                        selectDay = uiState.selectDay,
+                        isTodayScheduleVisible = uiState.isTodayScheduleVisible,
+                        onUIAction = onUIAction
+                    )
+
+                    if (uiState.isTodayScheduleVisible) {
+                        ScheduleTabs(
+                            todayPersonalSchedules = uiState.todayPersonalScheduleList,
+                            todayGroupSchedules = uiState.todayGroupScheduleList,
+                            onUIAction = onUIAction
                         )
-
-                        if (uiState.isTodayScheduleVisible) {
-                            ScheduleTabs(
-                                todayPersonalSchedules = uiState.todayPersonalScheduleList,
-                                todayGroupSchedules = uiState.todayGroupScheduleList,
-                                onUIAction = viewModel::setIntent
-                            )
-                        }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                PDScheduleBarChart(
-                    scheduleList = uiState.selectWeekScheduleList,
-                    days = uiState.selectedWeekdays
-                )
             }
-        }
 
-        if (uiState.isBottomSheetVisible) {
-            PDCalendarBottomSheet(
-                date = DateUtils.uiDateToDate(uiState.selectUIDate),
-                onCloseBottomSheet = {
-                    viewModel.setIntent(ScheduleIntent.CloseBottomSheetClick)
-                },
-                onDateSelected = { date ->
-                    viewModel.setIntent(ScheduleIntent.SelectDate(date))
-                }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            PDScheduleBarChart(
+                scheduleList = uiState.selectWeekScheduleList,
+                days = uiState.selectedWeekdays
             )
         }
+    }
 
-        if (uiState.isAddScheduleDialogVisible) {
-            AddPersonalScheduleDialog(
-                date = uiState.selectLocalDate,
-                onDismiss = {
-                    viewModel.setIntent(ScheduleIntent.HideAddScheduleDialog)
-                },
-                onConfirm = { schedule ->
-                    viewModel.setEvent(ScheduleEvent.AddTodaySchedule(schedule))
-                    viewModel.setIntent(ScheduleIntent.HideAddScheduleDialog)
-                }
-            )
-        }
+    if (uiState.isBottomSheetVisible) {
+        PDCalendarBottomSheet(
+            date = DateUtils.uiDateToDate(uiState.selectUIDate),
+            onCloseBottomSheet = {
+                onUIAction(ScheduleIntent.CloseBottomSheetClick)
+            },
+            onDateSelected = { date ->
+                onUIAction(ScheduleIntent.SelectDate(date))
+            }
+        )
+    }
+
+    if (uiState.isAddScheduleDialogVisible) {
+        AddPersonalScheduleDialog(
+            date = uiState.selectLocalDate,
+            onDismiss = {
+                onUIAction(ScheduleIntent.HideAddScheduleDialog)
+            },
+            onConfirm = { schedule ->
+                setEvent(ScheduleEvent.AddTodaySchedule(schedule))
+                onUIAction(ScheduleIntent.HideAddScheduleDialog)
+            }
+        )
     }
 }
 
@@ -370,6 +382,10 @@ private fun ScheduleList(
 @Composable
 private fun ScheduleScreenPreview() {
     PlanDingTheme {
-        ScheduleScreen()
+        ScheduleScreen(
+            uiState = ScheduleUIState(),
+            onUIAction = {},
+            setEvent = {}
+        )
     }
 }
