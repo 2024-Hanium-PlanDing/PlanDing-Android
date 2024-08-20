@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,12 +34,9 @@ import com.comst.presentation.component.PDScreenHeader
 import com.comst.presentation.main.mypage.MyPageContract.MyPageSideEffect
 import com.comst.presentation.ui.theme.PlanDingTheme
 
-
 @Composable
-fun MyPageScreen(
-    viewModel: MyPageViewModel = hiltViewModel()
-) {
-
+fun MyPageScreen(viewModel: MyPageViewModel = hiltViewModel()) {
+    val uiState = viewModel.uiState.collectAsState()
     val handleEffect: (MyPageSideEffect) -> Unit =  { effect ->
         when (effect) {
             else -> {
@@ -47,109 +45,120 @@ fun MyPageScreen(
         }
     }
 
-    BaseScreen(viewModel = viewModel, handleEffect =  handleEffect) { uiState ->
-        Surface {
-            Column(
-                modifier = Modifier.fillMaxSize(),
+    BaseScreen(viewModel = viewModel, handleEffect = handleEffect) {
+        MyPageScreen(uiState = uiState.value)
+    }
+}
+
+@Composable
+private fun MyPageScreen(
+    uiState: MyPageContract.MyPageUIState,
+    handleEffect: (MyPageSideEffect) -> Unit = {}
+) {
+    Surface {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    PDScreenHeader(text = "마이페이지")
-                    Spacer(modifier = Modifier.weight(1f))
-                    IconButton(onClick = { }) {
-                        Icon(
-                            modifier = Modifier.size(30.dp),
-                            imageVector = Icons.Outlined.Notifications,
-                            contentDescription = "알림",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .padding(top = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    PDProfileImage(
-                        modifier = Modifier.size(100.dp),
-                        profileImageUrl = uiState.profileImageUrl
+                PDScreenHeader(text = "마이페이지")
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = { }) {
+                    Icon(
+                        modifier = Modifier.size(30.dp),
+                        imageVector = Icons.Outlined.Notifications,
+                        contentDescription = "알림",
+                        tint = MaterialTheme.colorScheme.primary
                     )
-
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = uiState.favoriteGroupsCount,
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        Text(
-                            text = "즐겨찾는 그룹",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = Color.Gray
-                        )
-                    }
-
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = uiState.receivedGroupRequestsCount,
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        Text(
-                            text = "그룹요청 목록",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = Color.Gray
-                        )
-                    }
                 }
+            }
 
-                Text(
-                    modifier = Modifier
-                        .padding(top = 8.dp, start = 16.dp),
-                    text = uiState.username,
-                    style = MaterialTheme.typography.titleLarge
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                PDProfileImage(
+                    modifier = Modifier.size(100.dp),
+                    profileImageUrl = uiState.profileImageUrl
                 )
 
-                Text(
-                    modifier = Modifier.padding(start = 16.dp),
-                    text = uiState.userCode,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.Gray
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                MyPageMenu.values().forEachIndexed { index, myPageMenu ->
-                    Spacer(modifier = Modifier.padding(top = 8.dp))
-                    MyPageMenuCard(
-                        menu = myPageMenu.menu,
-                        menuDescription = myPageMenu.menuDescription,
-                        onClickMenu = {
-                            Log.d("페이지", myPageMenu.menuDescription)
-                        }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = uiState.favoriteGroupsCount,
+                        style = MaterialTheme.typography.titleLarge
                     )
-                    if (index != MyPageMenu.values().lastIndex) {
-                        Divider(modifier = Modifier.padding(top = 8.dp))
+                    Text(
+                        text = "즐겨찾는 그룹",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.Gray
+                    )
+                }
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = uiState.receivedGroupRequestsCount,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Text(
+                        text = "그룹요청 목록",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.Gray
+                    )
+                }
+            }
+
+            Text(
+                modifier = Modifier
+                    .padding(top = 8.dp, start = 16.dp),
+                text = uiState.username,
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Text(
+                modifier = Modifier.padding(start = 16.dp),
+                text = uiState.userCode,
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.Gray
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            MyPageMenu.values().forEachIndexed { index, myPageMenu ->
+                Spacer(modifier = Modifier.padding(top = 8.dp))
+                MyPageMenuCard(
+                    menu = myPageMenu.menu,
+                    menuDescription = myPageMenu.menuDescription,
+                    onClickMenu = {
+                        Log.d("페이지", myPageMenu.menuDescription)
                     }
+                )
+                if (index != MyPageMenu.values().lastIndex) {
+                    Divider(modifier = Modifier.padding(top = 8.dp))
                 }
             }
         }
     }
 }
 
+
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun MyPageScreenPreview() {
     PlanDingTheme {
-        MyPageScreen()
+        MyPageScreen(
+            uiState = MyPageContract.MyPageUIState()
+        )
     }
 }
