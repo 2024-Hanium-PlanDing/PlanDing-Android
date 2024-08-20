@@ -16,18 +16,18 @@ class LoginContract {
         val isLoading: Boolean = false,
     ): UIState
 
-    sealed class LoginBaseSideEffect : BaseSideEffect {
-        object NavigateToMainActivity : LoginBaseSideEffect()
+    sealed class LoginSideEffect : BaseSideEffect {
+        object NavigateToMainActivity : LoginSideEffect()
     }
 
-    sealed class LoginBaseIntent : BaseIntent {
-        data class IdChange(val id: String) : LoginBaseIntent()
-        data class PasswordChange(val password: String) : LoginBaseIntent()
-        object Login : LoginBaseIntent()
-        data class SocialLogin(val accountInformation: SocialLoginInformation) : LoginBaseIntent()
+    sealed class LoginIntent : BaseIntent {
+        data class IdChange(val id: String) : LoginIntent()
+        data class PasswordChange(val password: String) : LoginIntent()
+        object Login : LoginIntent()
+        data class SocialLogin(val accountInformation: SocialLoginInformation) : LoginIntent()
     }
 
-    sealed class LoginBaseEvent : BaseEvent {
-        data class LoginFailure(val message: String) : LoginBaseEvent()
+    sealed class LoginEvent : BaseEvent {
+        data class LoginFailure(val message: String) : LoginEvent()
     }
 }
