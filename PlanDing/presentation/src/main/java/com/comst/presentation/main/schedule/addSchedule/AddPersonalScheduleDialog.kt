@@ -26,8 +26,7 @@ import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDTextFieldOutLine
 import com.comst.presentation.component.PDTimeDropdownMenu
-import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleIntent
-import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleSideEffect
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.*
 import com.comst.presentation.ui.theme.BackgroundColor3
 import com.comst.presentation.ui.theme.PlanDingTheme
 import java.time.LocalDate
@@ -54,100 +53,113 @@ fun AddPersonalScheduleDialog(
     }
 
     BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
-        AlertDialog(
-            onDismissRequest = {
-                viewModel.initialize(date)
-                onDismiss()
-            },
-            title = { Text(text = "일정 추가") },
-            text = {
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = uiState.uiDate,
-                        modifier = Modifier
-                            .padding(bottom = 8.dp)
-                    )
-                    PDTextFieldOutLine(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        label = "제목을 입력해주세요",
-                        value = uiState.title,
-                        onValueChange = {
-                            viewModel.setIntent(AddPersonalScheduleIntent.TitleChange(it))
-                        }
-                    )
-                    PDTextFieldOutLine(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 200.dp)
-                            .padding(vertical = 8.dp),
-                        label = "일정 내용을 입력해주세요",
-                        value = uiState.content,
-                        onValueChange = {
-                            viewModel.setIntent(AddPersonalScheduleIntent.DescriptionChange(it))
-                        }
-                    )
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        PDTimeDropdownMenu(
-                            selectedTime = uiState.startTime,
-                            onConfirm = {
-                                viewModel.setIntent(AddPersonalScheduleIntent.SelectedStartTime(it))
-                            }
-                        )
-                        Spacer(modifier = Modifier.weight(0.5f))
-                        Text(text = "부터")
-                        Spacer(modifier = Modifier.weight(1f))
-                        PDTimeDropdownMenu(
-                            selectedTime = uiState.endTime,
-                            onConfirm = {
-                                viewModel.setIntent(AddPersonalScheduleIntent.SelectedEndTime(it))
-                            }
-                        )
-                        Spacer(modifier = Modifier.weight(0.5f))
-                        Text(text = "까지")
-                    }
-                }
-            },
-            confirmButton = {
-                PDButton(
-                    onClick = {
-                        viewModel.setIntent(AddPersonalScheduleIntent.CreatePersonalSchedule)
-                    },
-                    text = "생성",
-                    modifier = Modifier.fillMaxWidth()
-                )
-            },
-            dismissButton = {
-                Button(
-                    onClick = {
-                        viewModel.initialize(date)
-                        onDismiss()
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = BackgroundColor3,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
-                ) {
-                    Text(
-                        text = "닫기",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            },
-            shape = RoundedCornerShape(8.dp)
+        AddPersonalScheduleDialog(
+            uiState = uiState,
+            setIntent = viewModel::setIntent,
+            onDismiss = onDismiss
         )
     }
+}
+
+@Composable
+private fun AddPersonalScheduleDialog(
+    uiState: AddPersonalScheduleUIState,
+    setIntent: (AddPersonalScheduleIntent) -> Unit = {},
+    onDismiss: () -> Unit = {}
+){
+    AlertDialog(
+        onDismissRequest = {
+            setIntent(AddPersonalScheduleIntent.Initialize(uiState.date))
+            onDismiss()
+        },
+        title = { Text(text = "일정 추가") },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = uiState.uiDate,
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                )
+                PDTextFieldOutLine(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    label = "제목을 입력해주세요",
+                    value = uiState.title,
+                    onValueChange = {
+                        setIntent(AddPersonalScheduleIntent.TitleChange(it))
+                    }
+                )
+                PDTextFieldOutLine(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 200.dp)
+                        .padding(vertical = 8.dp),
+                    label = "일정 내용을 입력해주세요",
+                    value = uiState.content,
+                    onValueChange = {
+                        setIntent(AddPersonalScheduleIntent.DescriptionChange(it))
+                    }
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    PDTimeDropdownMenu(
+                        selectedTime = uiState.startTime,
+                        onConfirm = {
+                            setIntent(AddPersonalScheduleIntent.SelectedStartTime(it))
+                        }
+                    )
+                    Spacer(modifier = Modifier.weight(0.5f))
+                    Text(text = "부터")
+                    Spacer(modifier = Modifier.weight(1f))
+                    PDTimeDropdownMenu(
+                        selectedTime = uiState.endTime,
+                        onConfirm = {
+                            setIntent(AddPersonalScheduleIntent.SelectedEndTime(it))
+                        }
+                    )
+                    Spacer(modifier = Modifier.weight(0.5f))
+                    Text(text = "까지")
+                }
+            }
+        },
+        confirmButton = {
+            PDButton(
+                onClick = {
+                    setIntent(AddPersonalScheduleIntent.CreatePersonalSchedule)
+                },
+                text = "생성",
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        dismissButton = {
+            Button(
+                onClick = {
+                    setIntent(AddPersonalScheduleIntent.Initialize(uiState.date))
+                    onDismiss()
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = BackgroundColor3,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Text(
+                    text = "닫기",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        },
+        shape = RoundedCornerShape(8.dp)
+    )
 }
 
 @Preview
@@ -156,9 +168,7 @@ fun AddPersonalScheduleDialog(
 private fun AddScheduleDialogPreview() {
     PlanDingTheme {
         AddPersonalScheduleDialog(
-            date = LocalDate.now(),
-            onDismiss = {},
-            onConfirm = {}
+            AddPersonalScheduleUIState()
         )
     }
 }
