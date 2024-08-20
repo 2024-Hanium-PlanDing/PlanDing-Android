@@ -79,49 +79,60 @@ fun GroupScreen(
     }
 
     BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
-        Surface {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Column(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    PDScreenHeader(text = "나의 그룹")
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                    ) {
-                        items(
-                            count = uiState.groupCardModels.size,
-                            key = { index -> uiState.groupCardModels[index].groupId }
-                        ) { index ->
-                            uiState.groupCardModels[index].let { groupRoomCardModel ->
-                                GroupCard(
-                                    groupName = groupRoomCardModel.groupName,
-                                    groupDescription = groupRoomCardModel.groupDescription,
-                                    groupImageUrl = groupRoomCardModel.groupImageUrl,
-                                    goGroupDetail = { viewModel.setIntent(GroupIntent.GroupCardClick(groupRoomCardModel.groupCode)) }
-                                )
+        GroupScreen(
+            uiState = uiState,
+            setIntent = viewModel::setIntent
+        )
+    }
+}
 
-                                Spacer(modifier = Modifier.height(12.dp))
-                            }
+@Composable
+private fun GroupScreen(
+    uiState: GroupUIState,
+    setIntent: (GroupIntent) -> Unit = {}
+){
+    Surface {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                PDScreenHeader(text = "나의 그룹")
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    items(
+                        count = uiState.groupCardModels.size,
+                        key = { index -> uiState.groupCardModels[index].groupId }
+                    ) { index ->
+                        uiState.groupCardModels[index].let { groupRoomCardModel ->
+                            GroupCard(
+                                groupName = groupRoomCardModel.groupName,
+                                groupDescription = groupRoomCardModel.groupDescription,
+                                groupImageUrl = groupRoomCardModel.groupImageUrl,
+                                goGroupDetail = { setIntent(GroupIntent.GroupCardClick(groupRoomCardModel.groupCode)) }
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
                         }
                     }
                 }
+            }
 
-                FloatingActionButton(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .align(Alignment.BottomEnd)
-                        .padding(16.dp),
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(60.dp),
-                    onClick = { viewModel.setIntent(GroupIntent.GroupCreateClick) },
-                ) {
-                    Icon(
-                        modifier = Modifier.size(40.dp),
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = "Add"
-                    )
-                }
+            FloatingActionButton(
+                modifier = Modifier
+                    .size(100.dp)
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp),
+                containerColor = MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(60.dp),
+                onClick = { setIntent(GroupIntent.GroupCreateClick) },
+            ) {
+                Icon(
+                    modifier = Modifier.size(40.dp),
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Add"
+                )
             }
         }
     }
@@ -132,6 +143,8 @@ fun GroupScreen(
 @Composable
 private fun GroupScreenPreview() {
     PlanDingTheme {
-        GroupScreen()
+        GroupScreen(
+            uiState = GroupUIState()
+        )
     }
 }
