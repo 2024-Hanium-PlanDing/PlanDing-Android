@@ -5,12 +5,13 @@ import com.comst.presentation.common.base.BaseEvent
 import com.comst.presentation.common.base.BaseIntent
 import com.comst.presentation.common.base.BaseSideEffect
 import com.comst.presentation.common.base.UIState
+import com.comst.presentation.model.mypage.groupRequestsReceived.GroupRequestReceivedCardModel
 
 class GroupRequestsReceivedContract {
 
     @Immutable
     data class GroupRequestsReceivedUIState(
-        val groupRequestsReceived: List<String> = listOf()
+        val groupRequestReceivedList: List<GroupRequestReceivedCardModel> = listOf()
     ): UIState
 
     sealed class GroupRequestsReceivedSideEffect: BaseSideEffect {

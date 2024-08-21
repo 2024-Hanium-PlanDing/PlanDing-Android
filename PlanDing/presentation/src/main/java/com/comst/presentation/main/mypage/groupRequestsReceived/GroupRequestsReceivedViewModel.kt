@@ -1,12 +1,12 @@
 package com.comst.presentation.main.mypage.groupRequestsReceived
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.comst.domain.usecase.groupInvite.GetGroupRequestReceivedListUseCase
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
 import com.comst.presentation.main.mypage.groupRequestsReceived.GroupRequestsReceivedContract.*
+import com.comst.presentation.model.mypage.groupRequestsReceived.toGroupRequestReceivedCardModelUIModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,8 +22,12 @@ class GroupRequestsReceivedViewModel @Inject constructor(
     }
 
     private fun load() = viewModelScope.launch {
-        getGroupRequestReceivedListUseCase().onSuccess {
-            
+        getGroupRequestReceivedListUseCase().onSuccess { groupRequestReceivedResponseModel ->
+            setState {
+                copy(
+                    groupRequestReceivedList = groupRequestReceivedResponseModel.map { it.toGroupRequestReceivedCardModelUIModel() }
+                )
+            }
         }.onFailure {
 
         }
