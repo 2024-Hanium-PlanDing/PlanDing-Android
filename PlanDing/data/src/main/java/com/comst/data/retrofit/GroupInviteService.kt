@@ -1,8 +1,8 @@
 package com.comst.data.retrofit
 
 import com.comst.data.model.BaseResponse
-import com.comst.data.model.group.GroupInviteParam
-import com.comst.data.model.group.GroupInviteResponseDTO
+import com.comst.data.model.groupInvite.GroupInviteParam
+import com.comst.data.model.groupInvite.GroupInviteResponseDTO
 import com.comst.data.model.groupInvite.GroupRequestReceivedResponseDTO
 import retrofit2.Response
 import retrofit2.http.Body

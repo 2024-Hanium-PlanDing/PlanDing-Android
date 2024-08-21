@@ -1,4 +1,4 @@
-package com.comst.data.model.group
+package com.comst.data.model.groupInvite
 
 data class GroupInviteParam(
     val groupCode: String,
