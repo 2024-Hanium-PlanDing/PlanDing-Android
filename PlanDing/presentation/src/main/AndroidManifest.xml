@@ -48,6 +48,8 @@
                     android:scheme="kakao${KAKAO_NATIVE_APP_KEY}" />
             </intent-filter>
         </activity>
+        <activity android:name="com.comst.presentation.main.mypage.groupRequestsReceived.GroupRequestsReceivedActivity" />
+
         <service
             android:name="com.comst.presentation.util.PDFirebaseMessagingService"
             android:enabled="true"

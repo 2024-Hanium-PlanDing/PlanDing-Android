@@ -19,11 +19,11 @@ class MyPageContract {
     ) : UIState
 
     sealed class MyPageSideEffect : BaseSideEffect {
-
+        object NavigateToGroupRequestsReceivedActivity: MyPageSideEffect()
     }
 
     sealed class MyPageIntent : BaseIntent {
-
+        object GroupRequestsReceivedClick: MyPageIntent()
     }
 
     sealed class MyPageEvent : BaseEvent {

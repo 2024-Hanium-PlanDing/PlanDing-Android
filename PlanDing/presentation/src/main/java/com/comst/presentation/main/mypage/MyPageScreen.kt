@@ -3,6 +3,7 @@ package com.comst.presentation.main.mypage
 import android.content.res.Configuration
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,13 +32,24 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDProfileImage
 import com.comst.presentation.component.PDScreenHeader
-import com.comst.presentation.main.mypage.MyPageContract.MyPageSideEffect
+import com.comst.presentation.main.mypage.MyPageContract.*
+import com.comst.presentation.main.mypage.groupRequestsReceived.GroupRequestsReceivedActivity
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
 fun MyPageScreen(viewModel: MyPageViewModel = hiltViewModel()) {
+
+    val context = LocalContext.current
+
     val handleEffect: (MyPageSideEffect) -> Unit =  { effect ->
         when (effect) {
+            is MyPageSideEffect.NavigateToGroupRequestsReceivedActivity -> {
+                context.startActivity(
+                    GroupRequestsReceivedActivity.groupRequestsReceivedIntent(
+                        context,
+                    )
+                )
+            }
             else -> {
 
             }
@@ -46,14 +58,16 @@ fun MyPageScreen(viewModel: MyPageViewModel = hiltViewModel()) {
 
     BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
         MyPageScreen(
-            uiState = uiState
+            uiState = uiState,
+            setIntent = viewModel::setIntent
         )
     }
 }
 
 @Composable
 private fun MyPageScreen(
-    uiState: MyPageContract.MyPageUIState,
+    uiState: MyPageUIState,
+    setIntent: (MyPageIntent) -> Unit = {}
 ) {
     Surface {
         Column(
@@ -103,8 +117,12 @@ private fun MyPageScreen(
                 }
 
                 Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable {
+                            setIntent(MyPageIntent.GroupRequestsReceivedClick)
+                        },
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
                         text = uiState.receivedGroupRequestsCount,
@@ -158,7 +176,7 @@ private fun MyPageScreen(
 private fun MyPageScreenPreview() {
     PlanDingTheme {
         MyPageScreen(
-            uiState = MyPageContract.MyPageUIState()
+            uiState = MyPageUIState()
         )
     }
 }
