@@ -2,7 +2,7 @@ package com.comst.data.repository
 
 import com.comst.data.converter.MediaImageMultipartConverter
 import com.comst.data.model.group.GroupCreateParam
-import com.comst.data.model.groupInvite.toDomainModel
+import com.comst.data.model.group.toDomainModel
 import com.comst.data.retrofit.ApiHandler
 import com.comst.data.retrofit.GroupService
 import com.comst.domain.model.file.MediaImage
