@@ -26,6 +26,7 @@ class AddPersonalScheduleContract {
     }
 
     sealed class AddPersonalScheduleIntent : BaseIntent {
+        data class Initialize(val date: LocalDate): AddPersonalScheduleIntent()
         data class TitleChange(val title: String) : AddPersonalScheduleIntent()
         data class DescriptionChange(val description: String) : AddPersonalScheduleIntent()
         data class SelectedStartTime(val startTime: Int) : AddPersonalScheduleIntent()

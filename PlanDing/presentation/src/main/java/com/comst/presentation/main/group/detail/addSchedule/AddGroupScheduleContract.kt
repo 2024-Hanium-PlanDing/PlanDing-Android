@@ -21,7 +21,9 @@ class AddGroupScheduleContract {
             description = "iusto",
             thumbnailUrl = "https://search.yahoo.com/search?p=doming",
             createdBy = "mnesarchum",
-            true
+            isFavorite = false,
+            isAlarm = false,
+            isGroupAdmin = false
         ),
         val date: LocalDate = LocalDate.now(),
         val uiDate: String = "",
@@ -37,6 +39,7 @@ class AddGroupScheduleContract {
     }
 
     sealed class AddGroupScheduleIntent : BaseIntent {
+        data class Initialize(val groupProfile: GroupProfileUIModel, val date: LocalDate): AddGroupScheduleIntent()
         data class TitleChange(val title: String) : AddGroupScheduleIntent()
         data class DescriptionChange(val description: String) : AddGroupScheduleIntent()
         data class SelectedStartTime(val startTime: Int) : AddGroupScheduleIntent()

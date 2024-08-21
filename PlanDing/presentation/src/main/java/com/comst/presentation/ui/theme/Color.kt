@@ -8,6 +8,12 @@ val MainPurple600   = Color(0xFFBEBEFF)
 val MainPurple400   = Color(0xFFD5D4FF)
 val MainPurple200   = Color(0xFFECEBFF)
 
+val Blue   = Color(0xFF4263F7)
+val Blue800   = Color(0xFF3048D5)
+val Blue600   = Color(0xFF3B55E9)
+val Blue400   = Color(0xFF5A78FA)
+val Blue200   = Color(0xFF9FB3FC)
+
 val Gray900 = Color(0XFF020202)
 val Gray800 = Color(0XFF2D3038)
 val Gray700 = Color(0XFF6A707A)

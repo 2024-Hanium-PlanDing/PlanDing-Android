@@ -31,8 +31,7 @@ import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDTextFieldOutLine
 import com.comst.presentation.component.PDTimeDropdownMenu
-import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract.AddGroupScheduleIntent
-import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract.AddGroupScheduleSideEffect
+import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract.*
 import com.comst.presentation.model.group.GroupProfileUIModel
 import com.comst.presentation.model.group.socket.SendCreateScheduleDTO
 import com.comst.presentation.ui.theme.BackgroundColor3
@@ -68,123 +67,136 @@ fun AddGroupScheduleDialog(
     }
 
     BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
-        AlertDialog(
-            onDismissRequest = {
-                viewModel.initialize(
-                    groupProfile = groupProfile,
-                    date = date
+        AddGroupScheduleDialog(
+            uiState = uiState,
+            setIntent = viewModel::setIntent,
+            onDismiss = onDismiss
+        )
+    }
+}
+
+@Composable
+private fun AddGroupScheduleDialog(
+    uiState: AddGroupScheduleUIState,
+    setIntent: (AddGroupScheduleIntent) -> Unit = {},
+    onDismiss: () -> Unit = {}
+){
+    AlertDialog(
+        onDismissRequest = {
+            setIntent(AddGroupScheduleIntent.Initialize(
+                groupProfile = uiState.groupProfile,
+                date = uiState.date
+            ))
+            onDismiss()
+        },
+        title = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Image(
+                    painter = rememberAsyncImagePainter(uiState.groupProfile.thumbnailUrl),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .height(32.dp)
+                        .width(40.dp),
+                    contentScale = ContentScale.FillBounds
                 )
-                onDismiss()
-            },
-            title = {
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "일정 추가")
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = uiState.uiDate,
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                )
+                PDTextFieldOutLine(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    label = "제목을 입력해주세요",
+                    value = uiState.title,
+                    onValueChange = {
+                        setIntent(AddGroupScheduleIntent.TitleChange(it))
+                    }
+                )
+                PDTextFieldOutLine(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 200.dp)
+                        .padding(vertical = 8.dp),
+                    label = "일정 내용을 입력해주세요",
+                    value = uiState.content,
+                    onValueChange = {
+                        setIntent(AddGroupScheduleIntent.DescriptionChange(it))
+                    }
+                )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(groupProfile.thumbnailUrl),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .height(32.dp)
-                            .width(40.dp),
-                        contentScale = ContentScale.FillBounds
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "일정 추가")
-                }
-            },
-            text = {
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = uiState.uiDate,
-                        modifier = Modifier
-                            .padding(bottom = 8.dp)
-                    )
-                    PDTextFieldOutLine(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        label = "제목을 입력해주세요",
-                        value = uiState.title,
-                        onValueChange = {
-                            viewModel.setIntent(AddGroupScheduleIntent.TitleChange(it))
+                    PDTimeDropdownMenu(
+                        selectedTime = uiState.startTime,
+                        onConfirm = {
+                            setIntent(AddGroupScheduleIntent.SelectedStartTime(it))
                         }
                     )
-                    PDTextFieldOutLine(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 200.dp)
-                            .padding(vertical = 8.dp),
-                        label = "일정 내용을 입력해주세요",
-                        value = uiState.content,
-                        onValueChange = {
-                            viewModel.setIntent(AddGroupScheduleIntent.DescriptionChange(it))
+                    Spacer(modifier = Modifier.weight(0.5f))
+                    Text(text = "부터")
+                    Spacer(modifier = Modifier.weight(1f))
+                    PDTimeDropdownMenu(
+                        selectedTime = uiState.endTime,
+                        onConfirm = {
+                            setIntent(AddGroupScheduleIntent.SelectedEndTime(it))
                         }
                     )
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        PDTimeDropdownMenu(
-                            selectedTime = uiState.startTime,
-                            onConfirm = {
-                                viewModel.setIntent(AddGroupScheduleIntent.SelectedStartTime(it))
-                            }
-                        )
-                        Spacer(modifier = Modifier.weight(0.5f))
-                        Text(text = "부터")
-                        Spacer(modifier = Modifier.weight(1f))
-                        PDTimeDropdownMenu(
-                            selectedTime = uiState.endTime,
-                            onConfirm = {
-                                viewModel.setIntent(AddGroupScheduleIntent.SelectedEndTime(it))
-                            }
-                        )
-                        Spacer(modifier = Modifier.weight(0.5f))
-                        Text(text = "까지")
-                    }
+                    Spacer(modifier = Modifier.weight(0.5f))
+                    Text(text = "까지")
                 }
-            },
-            confirmButton = {
-                PDButton(
-                    onClick = {
-                        viewModel.setIntent(AddGroupScheduleIntent.CreateGroupSchedule)
-                    },
-                    text = "생성",
-                    modifier = Modifier.fillMaxWidth()
+            }
+        },
+        confirmButton = {
+            PDButton(
+                onClick = {
+                    setIntent(AddGroupScheduleIntent.CreateGroupSchedule)
+                },
+                text = "생성",
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        dismissButton = {
+            Button(
+                onClick = {
+                    setIntent(AddGroupScheduleIntent.Initialize(
+                        groupProfile = uiState.groupProfile,
+                        date = uiState.date
+                    ))
+                    onDismiss()
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = BackgroundColor3,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 )
-            },
-            dismissButton = {
-                Button(
-                    onClick = {
-                        viewModel.initialize(
-                            groupProfile = groupProfile,
-                            date = date
-                        )
-                        onDismiss()
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = BackgroundColor3,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
-                ) {
-                    Text(
-                        text = "닫기",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            },
-            shape = RoundedCornerShape(8.dp)
-        )
-    }
+            ) {
+                Text(
+                    text = "닫기",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        },
+        shape = RoundedCornerShape(8.dp)
+    )
 }
 
 @Preview
@@ -193,18 +205,7 @@ fun AddGroupScheduleDialog(
 private fun AddScheduleDialogPreview() {
     PlanDingTheme {
         AddGroupScheduleDialog(
-            groupProfile = GroupProfileUIModel(
-                id = 2098,
-                name = "Tammi Mosley",
-                groupCode = "necessitatibus",
-                description = "tacimates",
-                thumbnailUrl = "https://search.yahoo.com/search?p=tation",
-                createdBy = "ultrices",
-                isGroupAdmin = false
-            ),
-            date = LocalDate.now(),
-            onDismiss = {},
-            onConfirm = {}
+            uiState = AddGroupScheduleUIState()
         )
     }
 }

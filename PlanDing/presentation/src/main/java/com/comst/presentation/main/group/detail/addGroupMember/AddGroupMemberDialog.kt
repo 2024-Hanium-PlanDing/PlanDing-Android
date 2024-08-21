@@ -1,13 +1,19 @@
-package com.comst.presentation.main.schedule.addSchedule
+package com.comst.presentation.main.group.detail.addGroupMember
 
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -17,131 +23,118 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.comst.domain.model.base.Schedule
+import coil.compose.rememberAsyncImagePainter
 import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDTextFieldOutLine
 import com.comst.presentation.component.PDTimeDropdownMenu
-import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.*
+import com.comst.presentation.main.group.detail.addGroupMember.AddGroupMemberContract.*
+import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract
 import com.comst.presentation.ui.theme.BackgroundColor3
+import com.comst.presentation.ui.theme.MainPurple600
 import com.comst.presentation.ui.theme.PlanDingTheme
-import java.time.LocalDate
 
 @Composable
-fun AddPersonalScheduleDialog(
-    viewModel: AddPersonalScheduleViewModel = hiltViewModel(),
-    date: LocalDate,
-    onDismiss: () -> Unit,
-    onConfirm: (Schedule) -> Unit
+fun AddGroupMemberDialog(
+    viewModel: AddGroupMemberViewModel = hiltViewModel(),
+    groupCode: String,
+    onDismiss: () -> Unit
 ) {
     LaunchedEffect(Unit) {
-        viewModel.initialize(date)
+        viewModel.initialize(
+            groupCode = groupCode
+        )
     }
 
     val context = LocalContext.current
-    val handleEffect: (AddPersonalScheduleSideEffect) -> Unit = { effect ->
+    val handleEffect: (AddGroupMemberSideEffect) -> Unit = { effect ->
         when (effect) {
-            is AddPersonalScheduleSideEffect.SuccessCreatePersonalSchedule -> {
-                onConfirm(effect.schedule)
-                viewModel.initialize(date)
+            is AddGroupMemberSideEffect.SuccessInviteGroupMember -> {
+                onDismiss()
             }
         }
     }
 
     BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
-        AddPersonalScheduleDialog(
+        AddGroupMemberDialog(
             uiState = uiState,
             setIntent = viewModel::setIntent,
-            onDismiss = onDismiss
+            onDismiss
         )
     }
 }
 
 @Composable
-private fun AddPersonalScheduleDialog(
-    uiState: AddPersonalScheduleUIState,
-    setIntent: (AddPersonalScheduleIntent) -> Unit = {},
+private fun AddGroupMemberDialog(
+    uiState: AddGroupMemberUIState,
+    setIntent: (AddGroupMemberIntent) -> Unit = {},
     onDismiss: () -> Unit = {}
 ){
-    AlertDialog(
+    androidx.compose.material3.AlertDialog(
         onDismissRequest = {
-            setIntent(AddPersonalScheduleIntent.Initialize(uiState.date))
+            setIntent(
+                AddGroupMemberIntent.Initialize(uiState.groupCode)
+            )
             onDismiss()
         },
-        title = { Text(text = "일정 추가") },
+        title = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(text = "그룹원 추가")
+            }
+        },
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = uiState.uiDate,
+                    text = "코드를 전달 받았다면 코드를 입력하세요",
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier
-                        .padding(bottom = 8.dp)
+                        .padding(bottom = 4.dp)
                 )
                 PDTextFieldOutLine(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
-                    label = "제목을 입력해주세요",
-                    value = uiState.title,
+                    label = "유저 코드를 입력해주세요",
+                    value = uiState.userCode,
                     onValueChange = {
-                        setIntent(AddPersonalScheduleIntent.TitleChange(it))
+                        setIntent(
+                            AddGroupMemberIntent.UserCodeChange(
+                                it
+                            )
+                        )
                     }
                 )
-                PDTextFieldOutLine(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 200.dp)
-                        .padding(vertical = 8.dp),
-                    label = "일정 내용을 입력해주세요",
-                    value = uiState.content,
-                    onValueChange = {
-                        setIntent(AddPersonalScheduleIntent.DescriptionChange(it))
-                    }
-                )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    PDTimeDropdownMenu(
-                        selectedTime = uiState.startTime,
-                        onConfirm = {
-                            setIntent(AddPersonalScheduleIntent.SelectedStartTime(it))
-                        }
-                    )
-                    Spacer(modifier = Modifier.weight(0.5f))
-                    Text(text = "부터")
-                    Spacer(modifier = Modifier.weight(1f))
-                    PDTimeDropdownMenu(
-                        selectedTime = uiState.endTime,
-                        onConfirm = {
-                            setIntent(AddPersonalScheduleIntent.SelectedEndTime(it))
-                        }
-                    )
-                    Spacer(modifier = Modifier.weight(0.5f))
-                    Text(text = "까지")
-                }
+
             }
         },
         confirmButton = {
             PDButton(
                 onClick = {
-                    setIntent(AddPersonalScheduleIntent.CreatePersonalSchedule)
+                    setIntent(AddGroupMemberIntent.InviteGroupMember)
                 },
-                text = "생성",
+                text = "초대",
                 modifier = Modifier.fillMaxWidth()
             )
         },
         dismissButton = {
             Button(
                 onClick = {
-                    setIntent(AddPersonalScheduleIntent.Initialize(uiState.date))
+                    setIntent(
+                        AddGroupMemberIntent.Initialize(uiState.groupCode)
+                    )
                     onDismiss()
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -165,10 +158,10 @@ private fun AddPersonalScheduleDialog(
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun AddScheduleDialogPreview() {
+private fun AddGroupMemberDialogPreview() {
     PlanDingTheme {
-        AddPersonalScheduleDialog(
-            AddPersonalScheduleUIState()
+        AddGroupMemberDialog(
+            uiState = AddGroupMemberUIState()
         )
     }
 }

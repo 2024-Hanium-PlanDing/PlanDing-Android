@@ -26,6 +26,7 @@ class AddGroupScheduleViewModel @Inject constructor(
             is AddGroupScheduleIntent.SelectedStartTime -> onSelectedStartTime(intent.startTime)
             is AddGroupScheduleIntent.TitleChange -> onTitleChange(intent.title)
             is AddGroupScheduleIntent.CreateGroupSchedule -> onCreateScheduleClick()
+            is AddGroupScheduleIntent.Initialize -> initialize(groupProfile = intent.groupProfile, date = intent.date)
         }
     }
 

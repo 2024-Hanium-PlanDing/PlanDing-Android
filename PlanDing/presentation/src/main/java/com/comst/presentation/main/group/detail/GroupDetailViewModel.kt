@@ -22,7 +22,7 @@ import com.comst.presentation.model.group.socket.SendCreateScheduleDTO
 import com.comst.presentation.model.group.socket.WebSocketAction
 import com.comst.presentation.model.group.socket.WebSocketResponse
 import com.comst.presentation.model.group.socket.toDomainModel
-import com.comst.presentation.model.group.toUIModel
+import com.comst.presentation.model.group.toGroupProfileUIModel
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -75,9 +75,12 @@ class GroupDetailViewModel @Inject constructor(
             is GroupDetailIntent.SelectDay -> onSelectDay(intent.index)
             is GroupDetailIntent.ShowAddScheduleDialog -> onShowAddScheduleDialog()
             is GroupDetailIntent.HideAddScheduleDialog -> onHideAddScheduleDialog()
+            is GroupDetailIntent.ShowAddGroupMemberDialog -> onShowAddGroupMemberDialog()
+            is GroupDetailIntent.HideAddGroupMemberDialog -> onHideAddGroupMemberDialog()
             is GroupDetailIntent.ChangePage -> onChangePage(intent.pageIndex)
             is GroupDetailIntent.SendChat -> onSendChat()
             is GroupDetailIntent.ChatChange -> onChatChange(intent.chat)
+            is GroupDetailIntent.CreateSchedule -> onCreateSchedule(intent.newSchedule)
         }
     }
 
@@ -131,7 +134,10 @@ class GroupDetailViewModel @Inject constructor(
 
         groupInfoResult.onSuccess { groupInformation ->
             setState {
-                copy(groupProfile = groupInformation.toUIModel())
+                copy(
+                    groupProfile = groupInformation.toGroupProfileUIModel(),
+                    groupMember = groupInformation.users
+                )
             }
         }.onFailure {
             isSuccess = false
@@ -475,6 +481,17 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
+    private fun onShowAddGroupMemberDialog() {
+        setState {
+            copy(isAddGroupMemberDialogVisible = true)
+        }
+    }
+
+    private fun onHideAddGroupMemberDialog() {
+        setState {
+            copy(isAddGroupMemberDialogVisible = false)
+        }
+    }
 
     override fun handleError(exception: Exception) {
         super.handleError(exception)

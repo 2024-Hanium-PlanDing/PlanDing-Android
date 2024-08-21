@@ -20,6 +20,7 @@ class AddPersonalScheduleViewModel @Inject constructor(
 
     override fun handleIntent(intent: AddPersonalScheduleIntent) {
         when (intent) {
+            is AddPersonalScheduleIntent.Initialize -> initialize(intent.date)
             is AddPersonalScheduleIntent.DescriptionChange -> onDescriptionChange(intent.description)
             is AddPersonalScheduleIntent.SelectedEndTime -> onSelectedEndTime(intent.endTime)
             is AddPersonalScheduleIntent.SelectedStartTime -> onSelectedStartTime(intent.startTime)

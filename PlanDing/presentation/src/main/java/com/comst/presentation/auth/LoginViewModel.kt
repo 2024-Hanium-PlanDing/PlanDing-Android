@@ -16,20 +16,20 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val setUserDataUseCase: SetUserDataUseCase,
     private val postSocialLoginUseCase: PostSocialLoginUseCase,
-) : BaseViewModel<LoginUIState, LoginBaseSideEffect, LoginBaseIntent, LoginBaseEvent>(LoginUIState()) {
+) : BaseViewModel<LoginUIState, LoginSideEffect, LoginIntent, LoginEvent>(LoginUIState()) {
 
-    override fun handleIntent(intent: LoginBaseIntent) {
+    override fun handleIntent(intent: LoginIntent) {
         when (intent) {
-            is LoginBaseIntent.IdChange -> onIdChange(intent.id)
-            is LoginBaseIntent.PasswordChange -> onPasswordChange(intent.password)
-            is LoginBaseIntent.Login -> onLoginClick()
-            is LoginBaseIntent.SocialLogin -> onSocialLogin(intent.accountInformation)
+            is LoginIntent.IdChange -> onIdChange(intent.id)
+            is LoginIntent.PasswordChange -> onPasswordChange(intent.password)
+            is LoginIntent.Login -> onLoginClick()
+            is LoginIntent.SocialLogin -> onSocialLogin(intent.accountInformation)
         }
     }
 
-    override fun handleEvent(event: LoginBaseEvent) {
+    override fun handleEvent(event: LoginEvent) {
         when (event) {
-            is LoginBaseEvent.LoginFailure -> {
+            is LoginEvent.LoginFailure -> {
                 setToastEffect(event.message)
             }
         }
@@ -58,7 +58,7 @@ class LoginViewModel @Inject constructor(
         postSocialLoginUseCase(accountInformation)
             .onSuccess {
                 setUserDataUseCase(it.accessToken, it.refreshToken, it.userCode)
-                setEffect(LoginBaseSideEffect.NavigateToMainActivity)
+                setEffect(LoginSideEffect.NavigateToMainActivity)
             }
             .onFailure {
 

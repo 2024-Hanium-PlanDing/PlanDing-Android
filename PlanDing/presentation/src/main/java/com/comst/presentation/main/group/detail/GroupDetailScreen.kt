@@ -1,6 +1,7 @@
 package com.comst.presentation.main.group.detail
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,17 +21,22 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -39,7 +45,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -52,18 +60,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.comst.domain.model.base.Schedule
 import com.comst.domain.model.chat.ChatMessageModel
+import com.comst.domain.model.group.GroupUserInformationModel
 import com.comst.domain.util.DateUtils
 import com.comst.presentation.R
 import com.comst.presentation.common.base.BaseScreen
@@ -71,18 +84,18 @@ import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDCalendarBottomSheet
 import com.comst.presentation.component.PDGroupScheduleCard
 import com.comst.presentation.component.PDScheduleBarChart
-import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailIntent
+import com.comst.presentation.main.group.detail.GroupDetailContract.*
+import com.comst.presentation.main.group.detail.addGroupMember.AddGroupMemberDialog
 import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleDialog
 import com.comst.presentation.model.group.GroupProfileUIModel
 import com.comst.presentation.ui.theme.BackgroundColor3
+import com.comst.presentation.ui.theme.Blue400
 import com.comst.presentation.ui.theme.MainPurple400
 import com.comst.presentation.ui.theme.PlanDingTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GroupDetailScreen(
     groupCode: String,
@@ -92,91 +105,175 @@ fun GroupDetailScreen(
         viewModel.initialize(groupCode)
     }
 
+
     DisposableEffect(Unit) {
         onDispose {
             viewModel.cancelStomp()
         }
     }
 
-    BaseScreen(viewModel = viewModel, handleEffect = { effect ->
-        when (effect) {
-            else -> {}
+    val handleEffect: (GroupDetailSideEffect) -> Unit = { effect ->
+
+    }
+
+    BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
+        GroupDetailScreen(
+            uiState = uiState,
+            setIntent = viewModel::setIntent
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun GroupDetailScreen(
+    uiState: GroupDetailUIState,
+    setIntent: (GroupDetailIntent) -> Unit = {}
+){
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    BackHandler(enabled = drawerState.isOpen) {
+        scope.launch {
+            drawerState.close()
         }
-    }) { uiState ->
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(text = uiState.groupProfile.name) },
-                    navigationIcon = {
-                        IconButton(onClick = { }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+    }
+
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        ModalNavigationDrawer(
+            drawerContent = {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr){
+                    ModalDrawerSheet(
+                        modifier = Modifier.fillMaxWidth(0.7f),
+                        drawerShape = RectangleShape
+                    ) {
+                        GroupDrawerContent(
+                            userCode = uiState.userCode,
+                            groupMemberList = uiState.groupMember,
+                            setIntent
+                        )
+                    }
+                }
+
+            },
+            drawerState = drawerState,
+            gesturesEnabled = true,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                Scaffold(
+                    topBar = {
+                        TopAppBar(
+                            title = { Text(text = uiState.groupProfile.name) },
+                            navigationIcon = {
+                                IconButton(onClick = {  }) {
+                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "favorite")
+                                }
+                            },
+                            actions = {
+                                Row {
+                                    IconButton(onClick = {  }) {
+                                        Icon(
+                                            painterResource(
+                                                id = if (uiState.groupProfile.isAlarm) R.drawable.ic_notifications_on_24 else R.drawable.ic_notifications_off_24
+                                            ),
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            contentDescription = "notification"
+                                        )
+                                    }
+                                    IconButton(onClick = {  }) {
+                                        Icon(
+                                            painterResource(
+                                                id = if (uiState.groupProfile.isFavorite) R.drawable.ic_favorite_on_24 else R.drawable.ic_favorite_off_24
+                                            ),
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            contentDescription = "favorite"
+                                        )
+                                    }
+                                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                                        Icon(Icons.Default.Menu, contentDescription = "Menu")
+                                    }
+                                }
+
+                            }
+                        )
+                    },
+                    bottomBar = {
+                        if (uiState.currentPage == 1) {
+                            MessageInputBar(
+                                message = uiState.chat,
+                                setIntent = setIntent
+                            )
+                        }
+                    },
+                    content = { paddingValues ->
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(paddingValues)
+                        ) {
+                            item { GroupProfile(uiState.groupProfile) }
+                            item {
+                                GroupTabs(
+                                    selectWeekGroupScheduleList = uiState.selectWeekGroupScheduleOriginalList.toList() + uiState.newScheduleList.toList(),
+                                    selectUIDate = uiState.selectUIDate,
+                                    selectDay = uiState.selectDay,
+                                    selectedWeekdays = uiState.selectedWeekdays,
+                                    isChartView = uiState.isBarChartView,
+                                    selectedDayIndex = uiState.selectedDayIndex,
+                                    currentPage = uiState.currentPage,
+                                    userCode = uiState.userCode,
+                                    chatList = uiState.chatOriginalList.toList() + uiState.newChatList.toList(),
+                                    setIntent = setIntent,
+                                )
+                            }
                         }
                     }
                 )
-            },
-            bottomBar = {
-                if (uiState.currentPage == 1) {
-                    MessageInputBar(
-                        message = uiState.chat,
-                        onUIAction = viewModel::setIntent
-                    )
-                }
-            }
-        ) { paddingValues ->
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
-                item { GroupProfile(uiState.groupProfile) }
-                item {
-                    GroupTabs(
-                        selectWeekGroupScheduleList = uiState.selectWeekGroupScheduleOriginalList.toList() + uiState.newScheduleList.toList(),
-                        selectUIDate = uiState.selectUIDate,
-                        selectDay = uiState.selectDay,
-                        selectedWeekdays = uiState.selectedWeekdays,
-                        isChartView = uiState.isBarChartView,
-                        selectedDayIndex = uiState.selectedDayIndex,
-                        currentPage = uiState.currentPage,
-                        userCode = uiState.userCode,
-                        chatList = uiState.chatOriginalList.toList() + uiState.newChatList.toList(),
-                        onUIAction = viewModel::setIntent,
-                    )
-                }
             }
         }
-        if (uiState.isBottomSheetVisible) {
-            PDCalendarBottomSheet(
-                date = DateUtils.uiDateToDate(uiState.selectUIDate),
-                onCloseBottomSheet = {
-                    viewModel.setIntent(GroupDetailIntent.CloseBottomSheetClick)
-                },
-                onDateSelected = { date ->
-                    viewModel.setIntent(GroupDetailIntent.SelectDate(date))
-                }
-            )
-        }
+    }
 
-        if (uiState.isAddScheduleDialogVisible) {
-            AddGroupScheduleDialog(
-                groupProfile = uiState.groupProfile,
-                date = uiState.selectLocalDate,
-                onDismiss = {
-                    viewModel.setIntent(GroupDetailIntent.HideAddScheduleDialog)
-                },
-                onConfirm = { schedule ->
-                    viewModel.onCreateSchedule(schedule)
-                    viewModel.setIntent(GroupDetailIntent.HideAddScheduleDialog)
-                }
-            )
-        }
+    if (uiState.isBottomSheetVisible) {
+        PDCalendarBottomSheet(
+            date = DateUtils.uiDateToDate(uiState.selectUIDate),
+            onCloseBottomSheet = {
+                setIntent(GroupDetailIntent.CloseBottomSheetClick)
+            },
+            onDateSelected = { date ->
+                setIntent(GroupDetailIntent.SelectDate(date))
+            }
+        )
+    }
+
+    if (uiState.isAddScheduleDialogVisible) {
+        AddGroupScheduleDialog(
+            groupProfile = uiState.groupProfile,
+            date = uiState.selectLocalDate,
+            onDismiss = {
+                setIntent(GroupDetailIntent.HideAddScheduleDialog)
+            },
+            onConfirm = { schedule ->
+                setIntent(GroupDetailIntent.CreateSchedule(schedule))
+                setIntent(GroupDetailIntent.HideAddScheduleDialog)
+            }
+        )
+    }
+
+    if (uiState.isAddGroupMemberDialogVisible) {
+        AddGroupMemberDialog(
+            groupCode = uiState.groupProfile.groupCode,
+            onDismiss = {
+                setIntent(GroupDetailIntent.HideAddGroupMemberDialog)
+            }
+        )
     }
 }
 
 @Composable
 fun MessageInputBar(
     message: String,
-    onUIAction: (GroupDetailIntent) -> Unit
+    setIntent: (GroupDetailIntent) -> Unit
 ) {
     val componentHeight = 56.dp
     Row(
@@ -189,7 +286,7 @@ fun MessageInputBar(
         TextField(
             value = message,
             onValueChange = { newChat ->
-                onUIAction(
+                setIntent(
                     GroupDetailIntent.ChatChange(newChat)
                 )
             },
@@ -209,7 +306,7 @@ fun MessageInputBar(
             modifier = Modifier
                 .size(componentHeight)
                 .clickable {
-                    onUIAction(
+                    setIntent(
                         GroupDetailIntent.SendChat
                     )
                 },
@@ -308,7 +405,7 @@ private fun GroupTabs(
     currentPage: Int,
     userCode: String,
     chatList: List<ChatMessageModel>,
-    onUIAction: (GroupDetailIntent) -> Unit
+    setIntent: (GroupDetailIntent) -> Unit
 ) {
     val pages = listOf("그룹 일정", "그룹 채팅")
     val pagerState = rememberPagerState(initialPage = currentPage)
@@ -316,7 +413,7 @@ private fun GroupTabs(
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
-            onUIAction(GroupDetailIntent.ChangePage(page))
+            setIntent(GroupDetailIntent.ChangePage(page))
         }
     }
 
@@ -345,7 +442,7 @@ private fun GroupTabs(
                         selected = currentPage == index,
                         onClick = {
                             coroutineScope.launch {
-                                onUIAction(GroupDetailIntent.ChangePage(index))
+                                setIntent(GroupDetailIntent.ChangePage(index))
                                 pagerState.animateScrollToPage(index)
                             }
                         }
@@ -375,7 +472,7 @@ private fun GroupTabs(
                 selectedDayIndex = selectedDayIndex,
                 userCode =  userCode,
                 chatList =  chatList,
-                onUIAction = onUIAction,
+                setIntent = setIntent,
             )
         }
     }
@@ -392,7 +489,7 @@ private fun GroupTabsContent(
     selectedDayIndex: Int,
     userCode: String,
     chatList: List<ChatMessageModel>,
-    onUIAction: (GroupDetailIntent) -> Unit
+    setIntent: (GroupDetailIntent) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -407,7 +504,7 @@ private fun GroupTabsContent(
                         selectUIDate = selectUIDate,
                         selectDay = selectDay,
                         isChartView = isChartView,
-                        onUIAction = onUIAction
+                        setIntent = setIntent
                     )
                     if (isChartView) {
                         PDScheduleBarChart(
@@ -419,7 +516,7 @@ private fun GroupTabsContent(
                             selectedDayIndex = selectedDayIndex,
                             selectedWeekdays = selectedWeekdays,
                             selectWeekGroupScheduleList = selectWeekGroupScheduleList,
-                            onUIAction = onUIAction
+                            setIntent = setIntent
                         )
                     }
                 }
@@ -440,7 +537,7 @@ fun ScheduleHeaderRow(
     selectUIDate: String,
     selectDay: String,
     isChartView: Boolean,
-    onUIAction: (GroupDetailIntent) -> Unit
+    setIntent: (GroupDetailIntent) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -453,7 +550,7 @@ fun ScheduleHeaderRow(
             modifier = Modifier.weight(1f),
             selectUIDate = selectUIDate,
             selectDay = selectDay,
-            onUIAction = onUIAction
+            setIntent = setIntent
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -463,7 +560,7 @@ fun ScheduleHeaderRow(
             modifier = Modifier
                 .size(40.dp)
                 .border(1.dp, MainPurple400, shape = RoundedCornerShape(8.dp))
-                .clickable { onUIAction(GroupDetailIntent.ToggleView) },
+                .clickable { setIntent(GroupDetailIntent.ToggleView) },
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -479,7 +576,7 @@ fun ScheduleHeaderRow(
             modifier = Modifier
                 .size(40.dp)
                 .border(1.dp, MainPurple400, shape = RoundedCornerShape(8.dp))
-                .clickable { onUIAction(GroupDetailIntent.ShowAddScheduleDialog) },
+                .clickable { setIntent(GroupDetailIntent.ShowAddScheduleDialog) },
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -497,7 +594,7 @@ fun GroupScheduleList(
     selectedDayIndex: Int,
     selectedWeekdays: List<String>,
     selectWeekGroupScheduleList: List<Schedule>,
-    onUIAction: (GroupDetailIntent) -> Unit
+    setIntent: (GroupDetailIntent) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -514,7 +611,7 @@ fun GroupScheduleList(
                     fontSize = 14.sp,
                     modifier = Modifier
                         .padding(horizontal = 4.dp)
-                        .clickable { onUIAction(GroupDetailIntent.SelectDay(index)) },
+                        .clickable { setIntent(GroupDetailIntent.SelectDay(index)) },
                     textAlign = TextAlign.Center,
                     fontWeight = if (index == selectedDayIndex) FontWeight.Bold else FontWeight.Normal,
                     color = if (index == selectedDayIndex) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground.copy(
@@ -549,7 +646,7 @@ private fun DateSelectTab(
     modifier: Modifier,
     selectUIDate: String,
     selectDay: String,
-    onUIAction: (GroupDetailIntent) -> Unit
+    setIntent: (GroupDetailIntent) -> Unit
 ) {
     Row(
         modifier = modifier
@@ -559,7 +656,7 @@ private fun DateSelectTab(
                 color = BackgroundColor3
             )
             .padding(vertical = 8.dp, horizontal = 16.dp)
-            .clickable { onUIAction(GroupDetailIntent.OpenBottomSheetClick) },
+            .clickable { setIntent(GroupDetailIntent.OpenBottomSheetClick) },
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -617,11 +714,98 @@ private fun ChatList(
     }
 }
 
+@Composable
+private fun GroupDrawerContent(
+    userCode: String,
+    groupMemberList: List<GroupUserInformationModel>,
+    setIntent: (GroupDetailIntent) -> Unit
+){
+    val sortedGroupMemberList = groupMemberList
+        .sortedWith(
+            compareByDescending<GroupUserInformationModel> { it.userCode == userCode }
+                .thenByDescending { it.hasPermission }
+                .thenBy { it.userName }
+        )
+
+    Column(
+        modifier = Modifier.padding(horizontal = 16.dp)
+    ) {
+        Text(
+            text = "그룹 서랍",
+            modifier = Modifier.padding(vertical = 16.dp),
+            fontWeight = FontWeight.Bold
+        )
+
+        HorizontalDivider()
+
+        Text(
+            text = "그룹원",
+            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
+            fontWeight = FontWeight.Bold
+        )
+
+        AddGroupMember(setIntent)
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            items(
+                count = sortedGroupMemberList.size,
+                key = { index -> sortedGroupMemberList[index].userCode }
+            ) { index ->
+                val member =  sortedGroupMemberList[index]
+                if (member.userCode == userCode){
+                    MyGroupMemberCard(user = member)
+                } else {
+                    OtherGroupMemberCard(user = member)
+                }
+            }
+        }
+
+    }
+}
+
+@Composable
+fun AddGroupMember(
+    showAddGroupMemberDialog: (GroupDetailIntent) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                showAddGroupMemberDialog(GroupDetailIntent.ShowAddGroupMemberDialog)
+            },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box {
+            Image(
+                modifier = Modifier
+                    .size(48.dp)
+                    .padding(4.dp)
+                    .clip(CircleShape),
+                painter = painterResource(id = R.drawable.ic_add_24),
+                colorFilter = ColorFilter.tint(Blue400),
+                contentDescription = "그룹원 추가",
+                contentScale = ContentScale.Crop,
+                )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = "그룹원 초대",
+            color = Blue400
+        )
+    }
+}
+
+
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun GroupDetailPreview() {
     PlanDingTheme {
-        GroupDetailScreen(groupCode = "6318")
+        GroupDetailScreen(
+            uiState = GroupDetailUIState()
+        )
     }
 }

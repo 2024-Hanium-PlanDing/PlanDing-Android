@@ -46,7 +46,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -72,7 +71,6 @@ import kotlinx.coroutines.launch
 fun ScheduleScreen(
     viewModel: ScheduleViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
     val handleEffect: (ScheduleSideEffect) -> Unit = { effect ->
         when (effect) {
             else -> {}
@@ -80,78 +78,91 @@ fun ScheduleScreen(
     }
 
     BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
-        Surface {
-            Column(
+        ScheduleScreen(
+            uiState = uiState,
+            setIntent = viewModel::setIntent,
+            setEvent = viewModel::setEvent
+        )
+    }
+}
+
+@Composable
+private fun ScheduleScreen(
+    uiState: ScheduleUIState,
+    setIntent: (ScheduleIntent) -> Unit = {},
+    setEvent : (ScheduleEvent) -> Unit = {}
+){
+    Surface {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            PDScreenHeader(text = "스케줄")
+
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp, horizontal = 16.dp)
+                    .background(
+                        shape = RoundedCornerShape(8.dp),
+                        color = Color.White
+                    ),
             ) {
-                PDScreenHeader(text = "스케줄")
-
-                Box(
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp, horizontal = 16.dp)
-                        .background(
-                            shape = RoundedCornerShape(8.dp),
-                            color = Color.White
-                        ),
+                        .padding(horizontal = 16.dp)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                    ) {
 
-                        DateSelectTab(
-                            selectUIDate = uiState.selectUIDate,
-                            selectDay = uiState.selectDay,
-                            isTodayScheduleVisible = uiState.isTodayScheduleVisible,
-                            onUIAction = viewModel::setIntent
+                    DateSelectTab(
+                        selectUIDate = uiState.selectUIDate,
+                        selectDay = uiState.selectDay,
+                        isTodayScheduleVisible = uiState.isTodayScheduleVisible,
+                        setIntent = setIntent
+                    )
+
+                    if (uiState.isTodayScheduleVisible) {
+                        ScheduleTabs(
+                            todayPersonalSchedules = uiState.todayPersonalScheduleList,
+                            todayGroupSchedules = uiState.todayGroupScheduleList,
+                            setIntent = setIntent
                         )
-
-                        if (uiState.isTodayScheduleVisible) {
-                            ScheduleTabs(
-                                todayPersonalSchedules = uiState.todayPersonalScheduleList,
-                                todayGroupSchedules = uiState.todayGroupScheduleList,
-                                onUIAction = viewModel::setIntent
-                            )
-                        }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                PDScheduleBarChart(
-                    scheduleList = uiState.selectWeekScheduleList,
-                    days = uiState.selectedWeekdays
-                )
             }
-        }
 
-        if (uiState.isBottomSheetVisible) {
-            PDCalendarBottomSheet(
-                date = DateUtils.uiDateToDate(uiState.selectUIDate),
-                onCloseBottomSheet = {
-                    viewModel.setIntent(ScheduleIntent.CloseBottomSheetClick)
-                },
-                onDateSelected = { date ->
-                    viewModel.setIntent(ScheduleIntent.SelectDate(date))
-                }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            PDScheduleBarChart(
+                scheduleList = uiState.selectWeekScheduleList,
+                days = uiState.selectedWeekdays
             )
         }
+    }
 
-        if (uiState.isAddScheduleDialogVisible) {
-            AddPersonalScheduleDialog(
-                date = uiState.selectLocalDate,
-                onDismiss = {
-                    viewModel.setIntent(ScheduleIntent.HideAddScheduleDialog)
-                },
-                onConfirm = { schedule ->
-                    viewModel.setEvent(ScheduleEvent.AddTodaySchedule(schedule))
-                    viewModel.setIntent(ScheduleIntent.HideAddScheduleDialog)
-                }
-            )
-        }
+    if (uiState.isBottomSheetVisible) {
+        PDCalendarBottomSheet(
+            date = DateUtils.uiDateToDate(uiState.selectUIDate),
+            onCloseBottomSheet = {
+                setIntent(ScheduleIntent.CloseBottomSheetClick)
+            },
+            onDateSelected = { date ->
+                setIntent(ScheduleIntent.SelectDate(date))
+            }
+        )
+    }
+
+    if (uiState.isAddScheduleDialogVisible) {
+        AddPersonalScheduleDialog(
+            date = uiState.selectLocalDate,
+            onDismiss = {
+                setIntent(ScheduleIntent.HideAddScheduleDialog)
+            },
+            onConfirm = { schedule ->
+                setEvent(ScheduleEvent.AddTodaySchedule(schedule))
+                setIntent(ScheduleIntent.HideAddScheduleDialog)
+            }
+        )
     }
 }
 
@@ -160,12 +171,12 @@ private fun DateSelectTab(
     selectUIDate: String,
     selectDay: String,
     isTodayScheduleVisible: Boolean,
-    onUIAction: (ScheduleIntent) -> Unit
+    setIntent: (ScheduleIntent) -> Unit
 ) {
     Row(
         modifier = Modifier
             .height(40.dp)
-            .clickable { onUIAction(ScheduleIntent.OpenBottomSheetClick) },
+            .clickable { setIntent(ScheduleIntent.OpenBottomSheetClick) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -184,7 +195,7 @@ private fun DateSelectTab(
         Icon(
             imageVector = if (isTodayScheduleVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
             contentDescription = "오늘의 스케줄 토글",
-            modifier = Modifier.clickable { onUIAction(ScheduleIntent.ToggleTodayScheduleVisibility) }
+            modifier = Modifier.clickable { setIntent(ScheduleIntent.ToggleTodayScheduleVisibility) }
         )
     }
 }
@@ -194,7 +205,7 @@ private fun DateSelectTab(
 private fun ScheduleTabs(
     todayPersonalSchedules: List<Schedule>,
     todayGroupSchedules: List<Schedule>,
-    onUIAction: (ScheduleIntent) -> Unit
+    setIntent: (ScheduleIntent) -> Unit
 ) {
     val pages = listOf("개인일정", "그룹일정")
     val pagerState = rememberPagerState()
@@ -260,7 +271,7 @@ private fun ScheduleTabs(
                 page = page,
                 todayPersonalSchedules = todayPersonalSchedules,
                 todayGroupSchedules = todayGroupSchedules,
-                onUIAction = onUIAction
+                setIntent = setIntent
             )
         }
     }
@@ -271,7 +282,7 @@ private fun ScheduleTabsContent(
     page: Int,
     todayPersonalSchedules: List<Schedule>,
     todayGroupSchedules: List<Schedule>,
-    onUIAction: (ScheduleIntent) -> Unit
+    setIntent: (ScheduleIntent) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -293,7 +304,7 @@ private fun ScheduleTabsContent(
                     containerColor = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(60.dp),
                     onClick = {
-                        onUIAction(ScheduleIntent.ShowAddScheduleDialog)
+                        setIntent(ScheduleIntent.ShowAddScheduleDialog)
                     },
                 ) {
                     Icon(
@@ -370,6 +381,8 @@ private fun ScheduleList(
 @Composable
 private fun ScheduleScreenPreview() {
     PlanDingTheme {
-        ScheduleScreen()
+        ScheduleScreen(
+            uiState = ScheduleUIState()
+        )
     }
 }
