@@ -8,4 +8,12 @@ import com.comst.domain.util.ApiResult
 interface GroupInviteRepository {
     suspend fun getGroupRequestsReceived(): ApiResult<List<GroupRequestReceivedResponseModel>>
     suspend fun postInviteGroupMember(groupInviteModel: GroupInviteModel): ApiResult<GroupInviteResponseModel>
+
+    suspend fun getAcceptGroupInvite(
+        groupCode: String,
+        inviteCode: String
+    ): ApiResult<Unit>
+    suspend fun deleteDenyGroupInvite(
+        inviteCode: String
+    ): ApiResult<String>
 }

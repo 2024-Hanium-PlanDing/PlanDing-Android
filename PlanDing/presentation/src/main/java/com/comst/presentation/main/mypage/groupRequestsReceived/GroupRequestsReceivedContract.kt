@@ -19,7 +19,8 @@ class GroupRequestsReceivedContract {
     }
 
     sealed class GroupRequestsReceivedIntent: BaseIntent {
-
+        data class AcceptClick(val groupRequestReceivedCardModel: GroupRequestReceivedCardModel) : GroupRequestsReceivedIntent()
+        data class DenyClick(val groupRequestReceivedCardModel: GroupRequestReceivedCardModel) : GroupRequestsReceivedIntent()
     }
 
     sealed class GroupRequestsReceivedEvent: BaseEvent {

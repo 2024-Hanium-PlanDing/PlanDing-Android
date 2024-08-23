@@ -14,8 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDScreenHeader
-import com.comst.presentation.main.mypage.groupRequestsReceived.GroupRequestsReceivedContract.GroupRequestsReceivedSideEffect
-import com.comst.presentation.main.mypage.groupRequestsReceived.GroupRequestsReceivedContract.GroupRequestsReceivedUIState
+import com.comst.presentation.main.mypage.groupRequestsReceived.GroupRequestsReceivedContract.*
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
@@ -29,14 +28,16 @@ fun GroupRequestsReceivedScreen(
 
     BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
         GroupRequestsReceivedScreen(
-            uiState = uiState
+            uiState = uiState,
+            setIntent = viewModel::setIntent
         )
     }
 }
 
 @Composable
 private fun GroupRequestsReceivedScreen(
-    uiState: GroupRequestsReceivedUIState
+    uiState: GroupRequestsReceivedUIState,
+    setIntent: (GroupRequestsReceivedIntent) -> Unit = {}
 ){
     Surface {
         Column(
@@ -53,7 +54,13 @@ private fun GroupRequestsReceivedScreen(
                 ){ index ->
                     uiState.groupRequestReceivedList[index].let { groupRequestReceived ->
                         GroupRequestReceivedCard(
-                            groupRequestReceivedCardModel = groupRequestReceived
+                            groupRequestReceivedCardModel = groupRequestReceived,
+                            onAcceptClick = { groupRequestReceivedCardModel ->
+                                setIntent(GroupRequestsReceivedIntent.AcceptClick(groupRequestReceivedCardModel))
+                            },
+                            onDenyClick = { groupRequestReceivedCardModel ->
+                                setIntent(GroupRequestsReceivedIntent.DenyClick(groupRequestReceivedCardModel))
+                            }
                         )
 
                         Spacer(modifier = Modifier.height(12.dp))

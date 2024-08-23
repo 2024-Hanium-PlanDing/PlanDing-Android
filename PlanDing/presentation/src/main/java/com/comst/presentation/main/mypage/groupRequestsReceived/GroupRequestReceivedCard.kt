@@ -37,7 +37,9 @@ import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
 fun GroupRequestReceivedCard(
-    groupRequestReceivedCardModel: GroupRequestReceivedCardModel
+    groupRequestReceivedCardModel: GroupRequestReceivedCardModel,
+    onAcceptClick: (GroupRequestReceivedCardModel) -> Unit,
+    onDenyClick: (GroupRequestReceivedCardModel) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -103,6 +105,9 @@ fun GroupRequestReceivedCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
+                    modifier = Modifier.clickable {
+                        onDenyClick(groupRequestReceivedCardModel)
+                    },
                     text = "거절",
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.bodySmall,
@@ -120,6 +125,9 @@ fun GroupRequestReceivedCard(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
+                    modifier = Modifier.clickable {
+                        onAcceptClick(groupRequestReceivedCardModel)
+                    },
                     text = "수락",
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.bodySmall,
@@ -143,7 +151,9 @@ private fun GroupRequestReceivedCardPreview(){
                 invitedUserName = "Caitlin Franklin",
                 groupImageUrl = "https://www.google.com/#q=purus",
                 createdAt = "eget"
-            )
+            ),
+            onAcceptClick = { },
+            onDenyClick = { },
         )
     }
 }

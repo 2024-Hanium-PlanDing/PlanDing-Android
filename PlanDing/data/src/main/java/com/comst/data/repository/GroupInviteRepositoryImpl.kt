@@ -13,11 +13,11 @@ import javax.inject.Inject
 
 class GroupInviteRepositoryImpl @Inject constructor(
     private val groupInviteService: GroupInviteService
-): GroupInviteRepository{
+) : GroupInviteRepository {
     override suspend fun getGroupRequestsReceived(): ApiResult<List<GroupRequestReceivedResponseModel>> {
         return ApiHandler.handle(
             execute = { groupInviteService.getGroupRequestsReceivedApi() },
-            mapper = { response -> response.map { it.toDomainModel() }}
+            mapper = { response -> response.map { it.toDomainModel() } }
         )
     }
 
@@ -29,6 +29,32 @@ class GroupInviteRepositoryImpl @Inject constructor(
         return ApiHandler.handle(
             execute = { groupInviteService.postGroupInviteApi(requestBody) },
             mapper = { response -> response.toDomainModel() }
+        )
+    }
+
+    override suspend fun getAcceptGroupInvite(
+        groupCode: String,
+        inviteCode: String
+    ): ApiResult<Unit> {
+        return ApiHandler.handle(
+            execute = {
+                groupInviteService.getAcceptGroupInviteApi(
+                    groupCode = groupCode,
+                    inviteCode = inviteCode
+                )
+            },
+            mapper = { response -> response.toDomainModel() }
+        )
+    }
+
+    override suspend fun deleteDenyGroupInvite(inviteCode: String): ApiResult<String> {
+        return ApiHandler.handle(
+            execute = {
+                groupInviteService.deleteDenyGroupInviteApi(
+                    inviteCode = inviteCode
+                )
+            },
+            mapper = { response -> response  }
         )
     }
 
