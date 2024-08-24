@@ -81,6 +81,8 @@ class GroupDetailViewModel @Inject constructor(
             is GroupDetailIntent.SendChat -> onSendChat()
             is GroupDetailIntent.ChatChange -> onChatChange(intent.chat)
             is GroupDetailIntent.CreateSchedule -> onCreateSchedule(intent.newSchedule)
+            is GroupDetailIntent.ShowScheduleDetailDialog -> onShowScheduleDetailDialog(intent.scheduleId)
+            is GroupDetailIntent.HideScheduleDetailDialog -> onHideScheduleDetailDialog()
         }
     }
 
@@ -277,7 +279,7 @@ class GroupDetailViewModel @Inject constructor(
 
     }
 
-    fun onCreateSchedule(sendCreateScheduleDTO: SendCreateScheduleDTO) {
+    private fun onCreateSchedule(sendCreateScheduleDTO: SendCreateScheduleDTO) {
         viewModelScope.launch {
             try {
                 val fullUrl = "$SEND_SCHEDULE_CREATE_URL${currentState.groupProfile.groupCode}"
@@ -503,6 +505,21 @@ class GroupDetailViewModel @Inject constructor(
             copy(
 
             )
+        }
+    }
+
+    private fun onShowScheduleDetailDialog(scheduleId: Long) {
+        setState {
+            copy(
+                selectScheduleId = scheduleId,
+                isScheduleDetailDialogVisible = true
+            )
+        }
+    }
+
+    private fun onHideScheduleDetailDialog() {
+        setState {
+            copy(isScheduleDetailDialogVisible = false)
         }
     }
 

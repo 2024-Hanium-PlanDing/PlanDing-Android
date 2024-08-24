@@ -11,7 +11,6 @@ import com.comst.presentation.common.base.BaseSideEffect
 import com.comst.presentation.common.base.UIState
 import com.comst.presentation.common.util.UniqueList
 import com.comst.presentation.model.group.GroupProfileUIModel
-import com.comst.presentation.model.group.socket.ReceiveChatDTO
 import com.comst.presentation.model.group.socket.SendCreateScheduleDTO
 import java.time.LocalDate
 import java.util.Date
@@ -49,7 +48,9 @@ class GroupDetailContract {
         val isAddScheduleDialogVisible: Boolean = false,
         val isAddGroupMemberDialogVisible: Boolean = false,
         val currentPage: Int = 0,
-        val chat: String = ""
+        val chat: String = "",
+        val selectScheduleId: Long = -1,
+        val isScheduleDetailDialogVisible: Boolean = false,
     ) : UIState
 
     sealed class GroupDetailSideEffect : BaseSideEffect {
@@ -71,6 +72,8 @@ class GroupDetailContract {
         data class ChatChange(val chat: String) : GroupDetailIntent()
         object SendChat: GroupDetailIntent()
         data class CreateSchedule(val newSchedule: SendCreateScheduleDTO): GroupDetailIntent()
+        data class ShowScheduleDetailDialog(val scheduleId: Long): GroupDetailIntent()
+        object HideScheduleDetailDialog: GroupDetailIntent()
     }
 
 
