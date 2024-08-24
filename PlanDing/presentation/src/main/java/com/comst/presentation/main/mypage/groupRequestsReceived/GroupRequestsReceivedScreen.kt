@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Surface
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -14,8 +14,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDScreenHeader
-import com.comst.presentation.main.group.GroupCard
-import com.comst.presentation.main.group.GroupContract
 import com.comst.presentation.main.mypage.groupRequestsReceived.GroupRequestsReceivedContract.*
 import com.comst.presentation.ui.theme.PlanDingTheme
 
@@ -30,14 +28,16 @@ fun GroupRequestsReceivedScreen(
 
     BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
         GroupRequestsReceivedScreen(
-            uiState = uiState
+            uiState = uiState,
+            setIntent = viewModel::setIntent
         )
     }
 }
 
 @Composable
 private fun GroupRequestsReceivedScreen(
-    uiState: GroupRequestsReceivedUIState
+    uiState: GroupRequestsReceivedUIState,
+    setIntent: (GroupRequestsReceivedIntent) -> Unit = {}
 ){
     Surface {
         Column(
@@ -48,7 +48,24 @@ private fun GroupRequestsReceivedScreen(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
+                items(
+                    count = uiState.groupRequestReceivedList.size,
+                    key = { index -> uiState.groupRequestReceivedList[index].groupCode }
+                ){ index ->
+                    uiState.groupRequestReceivedList[index].let { groupRequestReceived ->
+                        GroupRequestReceivedCard(
+                            groupRequestReceivedCardModel = groupRequestReceived,
+                            onAcceptClick = { groupRequestReceivedCardModel ->
+                                setIntent(GroupRequestsReceivedIntent.AcceptClick(groupRequestReceivedCardModel))
+                            },
+                            onDenyClick = { groupRequestReceivedCardModel ->
+                                setIntent(GroupRequestsReceivedIntent.DenyClick(groupRequestReceivedCardModel))
+                            }
+                        )
 
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+                }
             }
         }
     }

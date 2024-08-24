@@ -1,12 +1,11 @@
 package com.comst.data.repository
 
-import com.comst.data.model.group.GroupInviteParam
-import com.comst.data.model.group.toDomainModel
+import com.comst.data.model.groupInvite.GroupInviteParam
 import com.comst.data.model.groupInvite.toDomainModel
 import com.comst.data.retrofit.ApiHandler
 import com.comst.data.retrofit.GroupInviteService
-import com.comst.domain.model.group.GroupInviteModel
-import com.comst.domain.model.group.GroupInviteResponseModel
+import com.comst.domain.model.groupInvite.GroupInviteModel
+import com.comst.domain.model.groupInvite.GroupInviteResponseModel
 import com.comst.domain.model.groupInvite.GroupRequestReceivedResponseModel
 import com.comst.domain.repository.GroupInviteRepository
 import com.comst.domain.util.ApiResult
@@ -14,11 +13,11 @@ import javax.inject.Inject
 
 class GroupInviteRepositoryImpl @Inject constructor(
     private val groupInviteService: GroupInviteService
-): GroupInviteRepository{
+) : GroupInviteRepository {
     override suspend fun getGroupRequestsReceived(): ApiResult<List<GroupRequestReceivedResponseModel>> {
         return ApiHandler.handle(
             execute = { groupInviteService.getGroupRequestsReceivedApi() },
-            mapper = { response -> response.map { it.toDomainModel() }}
+            mapper = { response -> response.map { it.toDomainModel() } }
         )
     }
 
@@ -30,6 +29,32 @@ class GroupInviteRepositoryImpl @Inject constructor(
         return ApiHandler.handle(
             execute = { groupInviteService.postGroupInviteApi(requestBody) },
             mapper = { response -> response.toDomainModel() }
+        )
+    }
+
+    override suspend fun getAcceptGroupInvite(
+        groupCode: String,
+        inviteCode: String
+    ): ApiResult<Unit> {
+        return ApiHandler.handle(
+            execute = {
+                groupInviteService.getAcceptGroupInviteApi(
+                    groupCode = groupCode,
+                    inviteCode = inviteCode
+                )
+            },
+            mapper = { response -> response.toDomainModel() }
+        )
+    }
+
+    override suspend fun deleteDenyGroupInvite(inviteCode: String): ApiResult<String> {
+        return ApiHandler.handle(
+            execute = {
+                groupInviteService.deleteDenyGroupInviteApi(
+                    inviteCode = inviteCode
+                )
+            },
+            mapper = { response -> response  }
         )
     }
 

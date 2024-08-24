@@ -1,7 +1,7 @@
 package com.comst.presentation.main.group.detail.addGroupMember
 
 import androidx.lifecycle.viewModelScope
-import com.comst.domain.model.group.GroupInviteModel
+import com.comst.domain.model.groupInvite.GroupInviteModel
 import com.comst.domain.usecase.groupInvite.PostGroupInviteUseCase
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess

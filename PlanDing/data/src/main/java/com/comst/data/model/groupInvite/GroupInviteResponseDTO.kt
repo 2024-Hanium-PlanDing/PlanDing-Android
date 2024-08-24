@@ -1,7 +1,6 @@
-package com.comst.data.model.group
+package com.comst.data.model.groupInvite
 
-import com.comst.domain.model.group.GroupInviteResponseModel
-
+import com.comst.domain.model.groupInvite.GroupInviteResponseModel
 data class GroupInviteResponseDTO(
     val inviteCode : String,
     val groupCode : String,

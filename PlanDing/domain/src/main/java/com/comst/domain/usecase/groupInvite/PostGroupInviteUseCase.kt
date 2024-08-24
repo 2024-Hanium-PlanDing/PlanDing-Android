@@ -1,7 +1,7 @@
 package com.comst.domain.usecase.groupInvite
 
-import com.comst.domain.model.group.GroupInviteModel
-import com.comst.domain.model.group.GroupInviteResponseModel
+import com.comst.domain.model.groupInvite.GroupInviteModel
+import com.comst.domain.model.groupInvite.GroupInviteResponseModel
 import com.comst.domain.repository.GroupInviteRepository
 import com.comst.domain.util.ApiResult
 import javax.inject.Inject

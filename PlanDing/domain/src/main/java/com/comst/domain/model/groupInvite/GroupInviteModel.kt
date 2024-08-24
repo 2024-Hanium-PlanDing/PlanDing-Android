@@ -1,4 +1,4 @@
-package com.comst.domain.model.group
+package com.comst.domain.model.groupInvite
 
 data class GroupInviteModel(
     val groupCode: String,
