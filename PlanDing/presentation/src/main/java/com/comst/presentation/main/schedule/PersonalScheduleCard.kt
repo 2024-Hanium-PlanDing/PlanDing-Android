@@ -94,13 +94,13 @@ fun PersonalScheduleCard(
                     .clickable { isContentVisible = !isContentVisible }
             ) {
                 Text(
-                    text = if (isContentVisible) "Hide Details" else "Show Details",
+                    text = if (isContentVisible) "Hide Content" else "Show Content",
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.padding(end = 8.dp)
                 )
                 Icon(
                     imageVector = if (isContentVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = if (isContentVisible) "Hide Details" else "Show Details"
+                    contentDescription = if (isContentVisible) "Hide Content" else "Show Content"
                 )
             }
 
