@@ -27,12 +27,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.comst.domain.model.base.Schedule
 import com.comst.domain.model.base.ScheduleType
 import com.comst.presentation.ui.theme.BackgroundColor2
+import com.comst.presentation.ui.theme.BackgroundColor4
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
@@ -115,7 +115,7 @@ fun PDGroupScheduleCard(
                             style = MaterialTheme.typography.labelSmall,
                             modifier = Modifier
                                 .padding(bottom = 8.dp)
-                                .background(Color(0xFFEEEEEE), shape = RoundedCornerShape(8.dp))
+                                .background(BackgroundColor4, shape = RoundedCornerShape(8.dp))
                                 .padding(8.dp)
                         )
                     }

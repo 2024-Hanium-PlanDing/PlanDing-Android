@@ -23,7 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import com.comst.presentation.ui.theme.BackgroundColor3
+import com.comst.presentation.ui.theme.BackgroundColor1
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
@@ -38,7 +38,7 @@ fun GroupCard(
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
             .background(
-                color = BackgroundColor3,
+                color = BackgroundColor1,
                 shape = RoundedCornerShape(16.dp)
             ).clickable {
                 goGroupDetail()

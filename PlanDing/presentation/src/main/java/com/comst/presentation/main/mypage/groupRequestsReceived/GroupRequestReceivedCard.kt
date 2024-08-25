@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
@@ -30,9 +28,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import com.comst.domain.model.groupInvite.GroupRequestReceivedResponseModel
 import com.comst.presentation.model.mypage.groupRequestsReceived.GroupRequestReceivedCardModel
-import com.comst.presentation.ui.theme.BackgroundColor3
+import com.comst.presentation.ui.theme.BackgroundColor1
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
@@ -46,7 +43,7 @@ fun GroupRequestReceivedCard(
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
             .background(
-                color = BackgroundColor3,
+                color = BackgroundColor1,
                 shape = RoundedCornerShape(16.dp)
             )
             .clickable {

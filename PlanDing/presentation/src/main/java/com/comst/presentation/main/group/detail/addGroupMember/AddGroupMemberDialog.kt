@@ -1,44 +1,29 @@
 package com.comst.presentation.main.group.detail.addGroupMember
 
 import android.content.res.Configuration
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AlertDialog
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.rememberAsyncImagePainter
 import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDTextFieldOutLine
-import com.comst.presentation.component.PDTimeDropdownMenu
 import com.comst.presentation.main.group.detail.addGroupMember.AddGroupMemberContract.*
-import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract
-import com.comst.presentation.ui.theme.BackgroundColor3
-import com.comst.presentation.ui.theme.MainPurple600
+import com.comst.presentation.ui.theme.BackgroundColor1
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
@@ -140,7 +125,7 @@ private fun AddGroupMemberDialog(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = BackgroundColor3,
+                    containerColor = BackgroundColor1,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {

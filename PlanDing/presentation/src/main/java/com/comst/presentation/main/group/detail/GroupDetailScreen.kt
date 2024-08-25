@@ -89,7 +89,7 @@ import com.comst.presentation.main.group.detail.addGroupMember.AddGroupMemberDia
 import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleDialog
 import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailBottomSheet
 import com.comst.presentation.model.group.GroupProfileUIModel
-import com.comst.presentation.ui.theme.BackgroundColor3
+import com.comst.presentation.ui.theme.BackgroundColor1
 import com.comst.presentation.ui.theme.Blue400
 import com.comst.presentation.ui.theme.MainPurple400
 import com.comst.presentation.ui.theme.PlanDingTheme
@@ -292,7 +292,7 @@ fun MessageInputBar(
         modifier = Modifier
             .fillMaxWidth()
             .height(componentHeight)
-            .background(BackgroundColor3),
+            .background(BackgroundColor1),
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextField(
@@ -307,8 +307,8 @@ fun MessageInputBar(
                 .height(componentHeight),
             placeholder = { Text("Type a message") },
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = BackgroundColor3,
-                unfocusedContainerColor = BackgroundColor3,
+                focusedContainerColor = BackgroundColor1,
+                unfocusedContainerColor = BackgroundColor1,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent
@@ -667,7 +667,7 @@ private fun DateSelectTab(
             .height(40.dp)
             .background(
                 shape = RoundedCornerShape(8.dp),
-                color = BackgroundColor3
+                color = BackgroundColor1
             )
             .padding(vertical = 8.dp, horizontal = 16.dp)
             .clickable { setIntent(GroupDetailIntent.OpenCalendarBottomSheet) },

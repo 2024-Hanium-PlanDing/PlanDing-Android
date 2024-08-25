@@ -34,7 +34,7 @@ import com.comst.presentation.component.PDTimeDropdownMenu
 import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract.*
 import com.comst.presentation.model.group.GroupProfileUIModel
 import com.comst.presentation.model.group.socket.SendCreateScheduleDTO
-import com.comst.presentation.ui.theme.BackgroundColor3
+import com.comst.presentation.ui.theme.BackgroundColor1
 import com.comst.presentation.ui.theme.PlanDingTheme
 import java.time.LocalDate
 
@@ -184,7 +184,7 @@ private fun AddGroupScheduleDialog(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = BackgroundColor3,
+                    containerColor = BackgroundColor1,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
