@@ -633,8 +633,8 @@ fun GroupScheduleList(
                     selectWeekGroupScheduleList.filter { it.day == selectedWeekdays[selectedDayIndex] }[index]
                 PDGroupScheduleCard(
                     schedule = schedule,
-                    onShowScheduleDetail = { scheduleId ->
-                        setIntent(GroupDetailIntent.ShowScheduleDetailDialog(scheduleId))
+                    onShowScheduleDetail = { schedule ->
+                        setIntent(GroupDetailIntent.ShowScheduleDetailBottomSheet(schedule))
                     }
                 )
                 HorizontalDivider()

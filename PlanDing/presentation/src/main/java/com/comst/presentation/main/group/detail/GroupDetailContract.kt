@@ -2,6 +2,7 @@ package com.comst.presentation.main.group.detail
 
 import androidx.compose.runtime.Immutable
 import com.comst.domain.model.base.Schedule
+import com.comst.domain.model.base.ScheduleType
 import com.comst.domain.model.chat.ChatMessageModel
 import com.comst.domain.model.group.GroupUserInformationModel
 import com.comst.domain.util.DateUtils
@@ -49,7 +50,17 @@ class GroupDetailContract {
         val isAddGroupMemberDialogVisible: Boolean = false,
         val currentPage: Int = 0,
         val chat: String = "",
-        val selectScheduleId: Long = -1,
+        val selectSchedule: Schedule = Schedule(
+            scheduleId = 8676,
+            title = "te",
+            content = "elaboraret",
+            startTime = 8509,
+            endTime = 4108,
+            day = "integer",
+            complete = false,
+            groupName = null,
+            type = ScheduleType.GROUP
+        ),
         val isScheduleDetailDialogVisible: Boolean = false,
     ) : UIState
 
@@ -72,8 +83,8 @@ class GroupDetailContract {
         data class ChatChange(val chat: String) : GroupDetailIntent()
         object SendChat: GroupDetailIntent()
         data class CreateSchedule(val newSchedule: SendCreateScheduleDTO): GroupDetailIntent()
-        data class ShowScheduleDetailDialog(val scheduleId: Long): GroupDetailIntent()
-        object HideScheduleDetailDialog: GroupDetailIntent()
+        data class ShowScheduleDetailBottomSheet(val schedule: Schedule): GroupDetailIntent()
+        object HideScheduleDetailBottomSheet: GroupDetailIntent()
     }
 
 

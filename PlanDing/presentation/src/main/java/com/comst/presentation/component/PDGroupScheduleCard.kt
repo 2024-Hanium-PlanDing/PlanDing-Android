@@ -38,7 +38,7 @@ import com.comst.presentation.ui.theme.PlanDingTheme
 @Composable
 fun PDGroupScheduleCard(
     schedule: Schedule,
-    onShowScheduleDetail: (Long) -> Unit
+    onShowScheduleDetail: (Schedule) -> Unit
 ) {
     var isContentVisible by remember { mutableStateOf(false) }
 
@@ -124,9 +124,7 @@ fun PDGroupScheduleCard(
                 IconButton(
                     modifier = Modifier.align(Alignment.CenterEnd),
                     onClick = {
-                        onShowScheduleDetail(
-                            schedule.scheduleId
-                        )
+                        onShowScheduleDetail(schedule)
                     }
                 ) {
                     Icon(

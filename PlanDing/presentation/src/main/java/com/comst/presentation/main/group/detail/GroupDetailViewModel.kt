@@ -81,8 +81,8 @@ class GroupDetailViewModel @Inject constructor(
             is GroupDetailIntent.SendChat -> onSendChat()
             is GroupDetailIntent.ChatChange -> onChatChange(intent.chat)
             is GroupDetailIntent.CreateSchedule -> onCreateSchedule(intent.newSchedule)
-            is GroupDetailIntent.ShowScheduleDetailDialog -> onShowScheduleDetailDialog(intent.scheduleId)
-            is GroupDetailIntent.HideScheduleDetailDialog -> onHideScheduleDetailDialog()
+            is GroupDetailIntent.ShowScheduleDetailBottomSheet -> onShowScheduleDetailDialog(intent.schedule)
+            is GroupDetailIntent.HideScheduleDetailBottomSheet -> onHideScheduleDetailDialog()
         }
     }
 
@@ -508,10 +508,10 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
-    private fun onShowScheduleDetailDialog(scheduleId: Long) {
+    private fun onShowScheduleDetailDialog(schedule: Schedule) {
         setState {
             copy(
-                selectScheduleId = scheduleId,
+                selectSchedule = schedule,
                 isScheduleDetailDialogVisible = true
             )
         }
