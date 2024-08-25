@@ -29,8 +29,8 @@ class ScheduleViewModel @Inject constructor(
 
     override fun handleIntent(intent: ScheduleIntent) {
         when (intent) {
-            is ScheduleIntent.OpenBottomSheetClick -> onOpenBottomSheet()
-            is ScheduleIntent.CloseBottomSheetClick -> onCloseBottomSheet()
+            is ScheduleIntent.OpenCalendarBottomSheet -> onOpenCalendarBottomSheet()
+            is ScheduleIntent.CloseCalendarBottomSheet -> onCloseCalendarBottomSheet()
             is ScheduleIntent.SelectDate -> onSelectDate(intent.date)
             is ScheduleIntent.ToggleTodayScheduleVisibility -> onToggleTextViewVisibility()
             is ScheduleIntent.ShowAddScheduleDialog -> onShowAddScheduleDialog()
@@ -68,15 +68,15 @@ class ScheduleViewModel @Inject constructor(
             }
     }
 
-    private fun onOpenBottomSheet() {
+    private fun onOpenCalendarBottomSheet() {
         setState {
-            copy(isBottomSheetVisible = true)
+            copy(isCalendarBottomSheetVisible = true)
         }
     }
 
-    private fun onCloseBottomSheet() {
+    private fun onCloseCalendarBottomSheet() {
         setState {
-            copy(isBottomSheetVisible = false)
+            copy(isCalendarBottomSheetVisible = false)
         }
     }
 
@@ -91,7 +91,7 @@ class ScheduleViewModel @Inject constructor(
         setState {
             copy(
                 selectLocalDate = selectedLocalDate,
-                isBottomSheetVisible = false
+                isCalendarBottomSheetVisible = false
             )
         }
         setEvent(ScheduleEvent.DateSelected(selectedLocalDate))

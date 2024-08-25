@@ -68,8 +68,8 @@ class GroupDetailViewModel @Inject constructor(
 
     override fun handleIntent(intent: GroupDetailIntent) {
         when(intent){
-            is GroupDetailIntent.OpenBottomSheetClick -> onOpenBottomSheet()
-            is GroupDetailIntent.CloseBottomSheetClick -> onCloseBottomSheet()
+            is GroupDetailIntent.OpenCalendarBottomSheet -> onOpenCalendarBottomSheet()
+            is GroupDetailIntent.CloseCalendarBottomSheet -> onCloseCalendarBottomSheet()
             is GroupDetailIntent.SelectDate -> onSelectDate(intent.date)
             is GroupDetailIntent.ToggleView -> onToggleView()
             is GroupDetailIntent.SelectDay -> onSelectDay(intent.index)
@@ -81,8 +81,8 @@ class GroupDetailViewModel @Inject constructor(
             is GroupDetailIntent.SendChat -> onSendChat()
             is GroupDetailIntent.ChatChange -> onChatChange(intent.chat)
             is GroupDetailIntent.CreateSchedule -> onCreateSchedule(intent.newSchedule)
-            is GroupDetailIntent.ShowScheduleDetailBottomSheet -> onShowScheduleDetailDialog(intent.schedule)
-            is GroupDetailIntent.HideScheduleDetailBottomSheet -> onHideScheduleDetailDialog()
+            is GroupDetailIntent.OpenScheduleDetailBottomSheet -> onOpenScheduleDetailBottomSheet(intent.schedule)
+            is GroupDetailIntent.CloseScheduleDetailBottomSheet -> onCloseScheduleDetailBottomSheet()
         }
     }
 
@@ -386,15 +386,15 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
-    private fun onOpenBottomSheet() {
+    private fun onOpenCalendarBottomSheet() {
         setState {
-            copy(isBottomSheetVisible = true)
+            copy(isCalendarBottomSheetVisible = true)
         }
     }
 
-    private fun onCloseBottomSheet() {
+    private fun onCloseCalendarBottomSheet() {
         setState {
-            copy(isBottomSheetVisible = false)
+            copy(isCalendarBottomSheetVisible = false)
         }
     }
 
@@ -403,7 +403,7 @@ class GroupDetailViewModel @Inject constructor(
         setState {
             copy(
                 selectLocalDate = selectedLocalDate,
-                isBottomSheetVisible = false
+                isCalendarBottomSheetVisible = false
             )
         }
         setEvent(GroupDetailEvent.DateSelected(selectedLocalDate))
@@ -508,7 +508,7 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
-    private fun onShowScheduleDetailDialog(schedule: Schedule) {
+    private fun onOpenScheduleDetailBottomSheet(schedule: Schedule) {
         setState {
             copy(
                 selectSchedule = schedule,
@@ -517,7 +517,7 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
-    private fun onHideScheduleDetailDialog() {
+    private fun onCloseScheduleDetailBottomSheet() {
         setState {
             copy(isScheduleDetailDialogVisible = false)
         }

@@ -19,7 +19,7 @@ class ScheduleContract {
         val todayPersonalScheduleList: List<Schedule> = emptyList(),
         val todayGroupScheduleList: List<Schedule> = emptyList(),
         val selectWeekScheduleList: List<Schedule> = emptyList(),
-        val isBottomSheetVisible: Boolean = false,
+        val isCalendarBottomSheetVisible: Boolean = false,
         val isExpanded: Boolean = false,
         val isTodayScheduleVisible: Boolean = false,
         val isAddScheduleDialogVisible: Boolean = false,
@@ -31,8 +31,8 @@ class ScheduleContract {
     }
 
     sealed class ScheduleIntent : BaseIntent {
-        object OpenBottomSheetClick : ScheduleIntent()
-        object CloseBottomSheetClick : ScheduleIntent()
+        object OpenCalendarBottomSheet : ScheduleIntent()
+        object CloseCalendarBottomSheet : ScheduleIntent()
         data class SelectDate(val date: Date) : ScheduleIntent()
         object ToggleTodayScheduleVisibility : ScheduleIntent()
         object ShowAddScheduleDialog : ScheduleIntent()

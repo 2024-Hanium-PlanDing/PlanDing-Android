@@ -40,7 +40,7 @@ class GroupDetailContract {
         val chatOriginalList: UniqueList<ChatMessageModel, Long> = UniqueList({ it.id }),
         val newScheduleList: UniqueList<Schedule, Long> = UniqueList({ it.scheduleId }),
         val newChatList: UniqueList<ChatMessageModel, Long> = UniqueList({ it.id }),
-        val isBottomSheetVisible: Boolean = false,
+        val isCalendarBottomSheetVisible: Boolean = false,
         val isBarChartView: Boolean = true,
         val isLoading: Boolean = false,
         val selectedDayIndex: Int = selectedWeekdays.indexOfFirst {
@@ -69,9 +69,8 @@ class GroupDetailContract {
     }
 
     sealed class GroupDetailIntent : BaseIntent {
-        object OpenBottomSheetClick : GroupDetailIntent()
-        object CloseBottomSheetClick : GroupDetailIntent()
-
+        object OpenCalendarBottomSheet : GroupDetailIntent()
+        object CloseCalendarBottomSheet : GroupDetailIntent()
         object ToggleView : GroupDetailIntent()
         data class SelectDate(val date: Date) : GroupDetailIntent()
         data class SelectDay(val index: Int): GroupDetailIntent()
@@ -83,8 +82,8 @@ class GroupDetailContract {
         data class ChatChange(val chat: String) : GroupDetailIntent()
         object SendChat: GroupDetailIntent()
         data class CreateSchedule(val newSchedule: SendCreateScheduleDTO): GroupDetailIntent()
-        data class ShowScheduleDetailBottomSheet(val schedule: Schedule): GroupDetailIntent()
-        object HideScheduleDetailBottomSheet: GroupDetailIntent()
+        data class OpenScheduleDetailBottomSheet(val schedule: Schedule): GroupDetailIntent()
+        object CloseScheduleDetailBottomSheet: GroupDetailIntent()
     }
 
 

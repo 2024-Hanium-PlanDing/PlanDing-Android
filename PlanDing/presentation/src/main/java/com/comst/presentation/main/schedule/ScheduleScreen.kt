@@ -140,11 +140,11 @@ private fun ScheduleScreen(
         }
     }
 
-    if (uiState.isBottomSheetVisible) {
+    if (uiState.isCalendarBottomSheetVisible) {
         PDCalendarBottomSheet(
             date = DateUtils.uiDateToDate(uiState.selectUIDate),
             onCloseBottomSheet = {
-                setIntent(ScheduleIntent.CloseBottomSheetClick)
+                setIntent(ScheduleIntent.CloseCalendarBottomSheet)
             },
             onDateSelected = { date ->
                 setIntent(ScheduleIntent.SelectDate(date))
@@ -176,7 +176,7 @@ private fun DateSelectTab(
     Row(
         modifier = Modifier
             .height(40.dp)
-            .clickable { setIntent(ScheduleIntent.OpenBottomSheetClick) },
+            .clickable { setIntent(ScheduleIntent.OpenCalendarBottomSheet) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(

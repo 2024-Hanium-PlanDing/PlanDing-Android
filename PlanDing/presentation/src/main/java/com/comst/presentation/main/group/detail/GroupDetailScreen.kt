@@ -235,11 +235,11 @@ private fun GroupDetailScreen(
         }
     }
 
-    if (uiState.isBottomSheetVisible) {
+    if (uiState.isCalendarBottomSheetVisible) {
         PDCalendarBottomSheet(
             date = DateUtils.uiDateToDate(uiState.selectUIDate),
             onCloseBottomSheet = {
-                setIntent(GroupDetailIntent.CloseBottomSheetClick)
+                setIntent(GroupDetailIntent.CloseCalendarBottomSheet)
             },
             onDateSelected = { date ->
                 setIntent(GroupDetailIntent.SelectDate(date))
@@ -276,7 +276,7 @@ private fun GroupDetailScreen(
             groupCode = uiState.groupProfile.groupCode,
             schedule = uiState.selectSchedule,
             onCloseBottomSheet = {
-                setIntent(GroupDetailIntent.HideScheduleDetailBottomSheet)
+                setIntent(GroupDetailIntent.CloseScheduleDetailBottomSheet)
             }
         )
     }
@@ -646,7 +646,7 @@ fun GroupScheduleList(
                 PDGroupScheduleCard(
                     schedule = schedule,
                     onShowScheduleDetail = { schedule ->
-                        setIntent(GroupDetailIntent.ShowScheduleDetailBottomSheet(schedule))
+                        setIntent(GroupDetailIntent.OpenScheduleDetailBottomSheet(schedule))
                     }
                 )
                 HorizontalDivider()
@@ -670,7 +670,7 @@ private fun DateSelectTab(
                 color = BackgroundColor3
             )
             .padding(vertical = 8.dp, horizontal = 16.dp)
-            .clickable { setIntent(GroupDetailIntent.OpenBottomSheetClick) },
+            .clickable { setIntent(GroupDetailIntent.OpenCalendarBottomSheet) },
         verticalAlignment = Alignment.CenterVertically
     ) {
 
