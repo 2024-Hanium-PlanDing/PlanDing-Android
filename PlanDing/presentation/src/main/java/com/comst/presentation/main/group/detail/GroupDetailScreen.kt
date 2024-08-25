@@ -87,6 +87,7 @@ import com.comst.presentation.component.PDScheduleBarChart
 import com.comst.presentation.main.group.detail.GroupDetailContract.*
 import com.comst.presentation.main.group.detail.addGroupMember.AddGroupMemberDialog
 import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleDialog
+import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailBottomSheet
 import com.comst.presentation.model.group.GroupProfileUIModel
 import com.comst.presentation.ui.theme.BackgroundColor3
 import com.comst.presentation.ui.theme.Blue400
@@ -265,6 +266,17 @@ private fun GroupDetailScreen(
             groupCode = uiState.groupProfile.groupCode,
             onDismiss = {
                 setIntent(GroupDetailIntent.HideAddGroupMemberDialog)
+            }
+        )
+    }
+
+
+    if (uiState.isScheduleDetailDialogVisible){
+        ScheduleDetailBottomSheet(
+            groupCode = uiState.groupProfile.groupCode,
+            schedule = uiState.selectSchedule,
+            onCloseBottomSheet = {
+                setIntent(GroupDetailIntent.HideScheduleDetailBottomSheet)
             }
         )
     }
