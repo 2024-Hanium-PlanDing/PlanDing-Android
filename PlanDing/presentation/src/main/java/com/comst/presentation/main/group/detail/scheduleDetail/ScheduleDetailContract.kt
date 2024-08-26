@@ -16,7 +16,7 @@ class ScheduleDetailContract {
         val schedule: Schedule = Schedule(
             scheduleId = 5852,
             title = "affert",
-            content = "civibus",
+            content = "civibusaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\nadasddddddddddddddwadddddddddd\naaaaaaaaaaaaaaaaaaaaaaaaaaaaxxxxxxxxxxxwwwwwwww\nzzzzzzzzzzzzzzzzzzzzzzzzzzzzzwwwwwwwwwwwwwwwqqqqqqq\nzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
             startTime = 4559,
             endTime = 2723,
             day = "phasellus",
@@ -24,6 +24,7 @@ class ScheduleDetailContract {
             groupName = null,
             type = ScheduleType.GROUP
         ),
+        val selectedOption: TaskStatus = TaskStatus.ALL
     ): UIState
 
     sealed class ScheduleDetailSideEffect : BaseSideEffect {
@@ -31,10 +32,18 @@ class ScheduleDetailContract {
     }
 
     sealed class ScheduleDetailIntent: BaseIntent {
-        data class Initialize(val groupCode: String, val scheduleId: Long): ScheduleDetailIntent()
+        data class Initialize(val groupCode: String, val schedule: Schedule): ScheduleDetailIntent()
+        data class SelectTaskStatusOption(val option: TaskStatus) : ScheduleDetailIntent()
     }
 
     sealed class ScheduleDetailEvent : BaseEvent {
 
+    }
+
+    enum class TaskStatus(val displayName: String) {
+        ALL("전체"),
+        PENDING("대기"),
+        IN_PROGRESS("진행"),
+        COMPLETED("완료")
     }
 }
