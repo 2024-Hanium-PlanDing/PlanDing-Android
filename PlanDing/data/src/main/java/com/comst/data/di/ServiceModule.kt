@@ -7,6 +7,7 @@ import com.comst.data.retrofit.PersonalScheduleService
 import com.comst.data.retrofit.AuthenticatedUserService
 import com.comst.data.retrofit.ChatService
 import com.comst.data.retrofit.GroupInviteService
+import com.comst.data.retrofit.GroupTaskService
 import com.comst.data.retrofit.UnAuthenticatedUserService
 import dagger.Module
 import dagger.Provides
@@ -57,4 +58,10 @@ object ServiceModule {
     fun provideGroupInviteService(@RetrofitModule.AuthenticatedRetrofit retrofit: Retrofit): GroupInviteService {
         return retrofit.create(GroupInviteService::class.java)
     }
+
+    @Provides
+    fun provideGroupTaskService(@RetrofitModule.AuthenticatedRetrofit retrofit: Retrofit): GroupTaskService {
+        return retrofit.create(GroupTaskService::class.java)
+    }
+
 }
