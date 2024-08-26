@@ -4,7 +4,7 @@ import com.comst.domain.model.groupTask.GroupTaskResponseModel
 import com.google.gson.annotations.SerializedName
 
 data class GroupTaskResponseDTO(
-    @SerializedName("planner")
+    @SerializedName("planners")
     val task: List<TaskResponseDTO>,
     val scheduleId: Long,
 )

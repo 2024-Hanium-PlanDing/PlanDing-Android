@@ -7,6 +7,6 @@ data class TaskResponseModel(
     val content: String,
     val status: String,
     val deadline: String,
-    val manager: String,
-    val users: String,
+    val manager: TaskUserResponseModel,
+    val users: List<TaskUserResponseModel>,
 )

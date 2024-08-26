@@ -9,8 +9,8 @@ data class TaskResponseDTO(
     val content: String,
     val status: String,
     val deadline: String,
-    val manager: String,
-    val users: String,
+    val manager: TaskUserResponseDTO,
+    val users: List<TaskUserResponseDTO>,
 )
 
 fun TaskResponseDTO.toDomainModel(): TaskResponseModel {
@@ -21,7 +21,7 @@ fun TaskResponseDTO.toDomainModel(): TaskResponseModel {
         content = content,
         status = status,
         deadline = deadline,
-        manager = manager,
-        users = users
+        manager = manager.toDomainModel(),
+        users = users.map { it.toDomainModel() }
     )
 }
