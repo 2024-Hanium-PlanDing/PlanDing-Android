@@ -157,4 +157,18 @@ object DateUtils {
         val outputFormatter = DateTimeFormatter.ofPattern("HH:mm")
         return dateTime.format(outputFormatter)
     }
+
+    fun formatDateAndTime(date: String?, time: String?): String {
+        val formattedDate = date?.let {
+            LocalDate.parse(it, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                .format(DateTimeFormatter.ofPattern("yyyy년 M월 d일"))
+        } ?: "날짜"
+
+        val formattedTime = time?.let {
+            "${it.padStart(2, '0')}:00"
+        } ?: "시간"
+
+        return "$formattedDate $formattedTime"
+    }
+
 }
