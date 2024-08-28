@@ -5,7 +5,12 @@ import com.comst.domain.usecase.group.GetMyGroupsUseCase
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
-import com.comst.presentation.main.group.GroupContract.*
+import com.comst.presentation.main.group.GroupContract.GroupEvent
+import com.comst.presentation.main.group.GroupContract.GroupIntent
+import com.comst.presentation.main.group.GroupContract.GroupSideEffect
+import com.comst.presentation.main.group.GroupContract.GroupUIState
+import com.comst.presentation.model.group.GroupCardUIModel
+import com.comst.presentation.model.group.toGroupCardUIModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,16 +36,17 @@ class GroupViewModel @Inject constructor(
     override fun handleEvent(event: GroupEvent) {
         when (event) {
             is GroupEvent.LoadFailure -> onLoadFailure(event.message)
+            is GroupEvent.GroupCreated -> onAddGroup(event.groupCardUIModel)
         }
     }
 
     private fun load() = viewModelScope.launch {
         setState { copy(isLoading = true) }
         getMyGroupsUseCase()
-            .onSuccess {
+            .onSuccess { groupCardModels ->
                 setState {
                     copy(
-                        groupCardModels = it,
+                        groupCardModels = groupCardModels.map { it.toGroupCardUIModel() },
                         isRefreshing = false
                     )
                 }
@@ -67,5 +73,14 @@ class GroupViewModel @Inject constructor(
     private fun onRefresh() {
         setState { copy(isRefreshing = true) }
         load()
+    }
+
+    private fun onAddGroup(groupCardUIModel: GroupCardUIModel) {
+        setState {
+            copy(
+                groupCardModels = listOf(groupCardUIModel) + currentState.groupCardModels,
+                isRefreshing = false
+            )
+        }
     }
 }

@@ -47,11 +47,25 @@ fun GroupScreen(
     viewModel: GroupViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+
+    val resultLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        when (result.resultCode) {
+            CreateGroupActivity.CREATE_GROUP -> {
+                val groupResponse = CreateGroupActivity.getGroupResponseFromIntent(result.data ?: return@rememberLauncherForActivityResult)
+                groupResponse?.let {
+                    viewModel.setEvent(GroupEvent.GroupCreated(it))
+                }
+            }
+        }
+    }
+
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         if (permissions.all { it.value }) {
-            context.startActivity(
+            resultLauncher.launch(
                 CreateGroupActivity.createGroupIntent(context)
             )
         } else {
@@ -73,7 +87,7 @@ fun GroupScreen(
             }
 
             is GroupSideEffect.NavigateToGroupDetailActivity -> {
-                context.startActivity(
+                resultLauncher.launch(
                     GroupDetailActivity.groupDetailIntent(
                         context,
                         effect.groupCode
@@ -119,12 +133,10 @@ private fun GroupScreen(
                         count = uiState.groupCardModels.size,
                         key = { index -> uiState.groupCardModels[index].groupId }
                     ) { index ->
-                        uiState.groupCardModels[index].let { groupRoomCardModel ->
+                        uiState.groupCardModels[index].let { groupCardUIModel ->
                             GroupCard(
-                                groupName = groupRoomCardModel.groupName,
-                                groupDescription = groupRoomCardModel.groupDescription,
-                                groupImageUrl = groupRoomCardModel.groupImageUrl,
-                                goGroupDetail = { setIntent(GroupIntent.GroupCardClick(groupRoomCardModel.groupCode)) }
+                                groupCardUIModel = groupCardUIModel,
+                                goGroupDetail = { setIntent(GroupIntent.GroupCardClick(groupCardUIModel.groupCode)) }
                             )
 
                             Spacer(modifier = Modifier.height(12.dp))

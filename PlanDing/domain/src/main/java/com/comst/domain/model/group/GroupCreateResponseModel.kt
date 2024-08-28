@@ -5,5 +5,6 @@ data class GroupCreateResponseModel(
     val name: String,
     val description: String,
     val code: String,
-    val ownerCode: String
+    val ownerCode: String,
+    val thumbnailPath: String
 )

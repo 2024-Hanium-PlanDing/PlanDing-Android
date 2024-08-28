@@ -2,10 +2,12 @@ package com.comst.presentation.main.group.create
 
 import androidx.compose.runtime.Immutable
 import com.comst.domain.model.file.MediaImage
+import com.comst.domain.model.group.GroupCreateResponseModel
 import com.comst.presentation.common.base.BaseEvent
 import com.comst.presentation.common.base.BaseIntent
 import com.comst.presentation.common.base.BaseSideEffect
 import com.comst.presentation.common.base.UIState
+import com.comst.presentation.model.group.GroupCardUIModel
 
 class CreateGroupContract {
 
@@ -19,7 +21,7 @@ class CreateGroupContract {
     ) : UIState
 
     sealed class CreateGroupSideEffect : BaseSideEffect {
-        object SuccessGroupCreation : CreateGroupSideEffect()
+        data class SuccessGroupCreation(val groupCardUIModel: GroupCardUIModel) : CreateGroupSideEffect()
     }
 
     sealed class CreateGroupIntent : BaseIntent {

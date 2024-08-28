@@ -9,6 +9,7 @@ import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
 import com.comst.presentation.main.group.create.CreateGroupContract.*
+import com.comst.presentation.model.group.toGroupCardUIModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -89,7 +90,7 @@ class CreateGroupViewModel @Inject constructor(
             currentState.selectedImage!!
         ).onSuccess {
             setToastEffect("그룹 생성을 성공했습니다.")
-            setEffect(CreateGroupSideEffect.SuccessGroupCreation)
+            setEffect(CreateGroupSideEffect.SuccessGroupCreation(it.toGroupCardUIModel()))
         }.onFailure {
         }
         setState { copy(isLoading = false) }

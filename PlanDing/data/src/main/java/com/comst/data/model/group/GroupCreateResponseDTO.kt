@@ -7,7 +7,8 @@ data class GroupCreateResponseDTO(
     val name: String,
     val description: String,
     val code: String,
-    val ownerCode: String
+    val ownerCode: String,
+    val thumbnailPath: String
 )
 
 fun GroupCreateResponseDTO.toDomainModel(): GroupCreateResponseModel {
@@ -16,6 +17,7 @@ fun GroupCreateResponseDTO.toDomainModel(): GroupCreateResponseModel {
         name = name,
         description = description,
         code = code,
-        ownerCode = ownerCode
+        ownerCode = ownerCode,
+        thumbnailPath = thumbnailPath
     )
 }
