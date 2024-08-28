@@ -12,7 +12,8 @@ class GroupContract {
     @Immutable
     data class GroupUIState(
         val groupCardModels: List<GroupCardModel> = emptyList(),
-        val isLoading: Boolean = false
+        val isLoading: Boolean = false,
+        val isRefreshing: Boolean = false
     ) : UIState
 
     sealed class GroupSideEffect : BaseSideEffect {
@@ -23,6 +24,7 @@ class GroupContract {
     sealed class GroupIntent : BaseIntent {
         data class GroupCardClick(val groupCode: String) : GroupIntent()
         object GroupCreateClick : GroupIntent()
+        object Refresh : GroupIntent()
     }
 
     sealed class GroupEvent : BaseEvent {

@@ -24,6 +24,7 @@ class GroupViewModel @Inject constructor(
         when (intent) {
             is GroupIntent.GroupCardClick -> setEffect(GroupSideEffect.NavigateToGroupDetailActivity(intent.groupCode))
             is GroupIntent.GroupCreateClick -> setEffect(GroupSideEffect.NavigateToCreateGroupActivity)
+            is GroupIntent.Refresh -> onRefresh()
         }
     }
 
@@ -38,12 +39,20 @@ class GroupViewModel @Inject constructor(
         getMyGroupsUseCase()
             .onSuccess {
                 setState {
-                    copy(groupCardModels = it)
+                    copy(
+                        groupCardModels = it,
+                        isRefreshing = false
+                    )
                 }
             }
             .onFailure {
             }
-        setState { copy(isLoading = false) }
+        setState {
+            copy(
+                isLoading = false,
+                isRefreshing = false
+            )
+        }
     }
 
     private fun onLoadFailure(message: String) {
@@ -53,5 +62,10 @@ class GroupViewModel @Inject constructor(
     override fun handleError(exception: Exception) {
         super.handleError(exception)
         setToastEffect(exception.message.orEmpty())
+    }
+
+    private fun onRefresh() {
+        setState { copy(isRefreshing = true) }
+        load()
     }
 }
