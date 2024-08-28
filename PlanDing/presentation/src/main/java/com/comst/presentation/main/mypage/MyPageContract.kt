@@ -15,7 +15,8 @@ class MyPageContract {
         val profileImageUrl: String? = null,
         val favoriteGroupsCount: String = "-1",
         val receivedGroupRequestsCount: String = "-1",
-        val isLoading: Boolean = false
+        val isLoading: Boolean = false,
+        val isRefreshing: Boolean = false
     ) : UIState
 
     sealed class MyPageSideEffect : BaseSideEffect {
@@ -24,6 +25,7 @@ class MyPageContract {
 
     sealed class MyPageIntent : BaseIntent {
         object GroupRequestsReceivedClick: MyPageIntent()
+        object Refresh : MyPageIntent()
     }
 
     sealed class MyPageEvent : BaseEvent {

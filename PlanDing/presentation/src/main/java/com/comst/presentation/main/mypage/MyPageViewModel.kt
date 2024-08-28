@@ -7,6 +7,7 @@ import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
 import com.comst.presentation.main.mypage.MyPageContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,8 +21,9 @@ class MyPageViewModel @Inject constructor(
     }
 
     override fun handleIntent(intent: MyPageIntent) {
-        when(intent){
+        when (intent) {
             is MyPageIntent.GroupRequestsReceivedClick -> setEffect(MyPageSideEffect.NavigateToGroupRequestsReceivedActivity)
+            is MyPageIntent.Refresh -> onRefresh()
         }
     }
 
@@ -42,13 +44,19 @@ class MyPageViewModel @Inject constructor(
                         profileImageUrl = it.profileImage,
                         favoriteGroupsCount = it.groupFavorite,
                         receivedGroupRequestsCount = it.groupRequest,
-                        isLoading = false
+                        isLoading = false,
+                        isRefreshing = false
                     )
                 }
             }
             .onFailure {
             }
-        setState { copy(isLoading = false) }
+        setState {
+            copy(
+                isLoading = false,
+                isRefreshing = false
+            )
+        }
     }
 
     private fun onLoadFailure(message: String) {
@@ -58,5 +66,10 @@ class MyPageViewModel @Inject constructor(
     override fun handleError(exception: Exception) {
         super.handleError(exception)
         setToastEffect(exception.message.orEmpty())
+    }
+
+    private fun onRefresh() {
+        setState { copy(isRefreshing = true) }
+        load()
     }
 }
