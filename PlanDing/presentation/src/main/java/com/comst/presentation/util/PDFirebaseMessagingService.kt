@@ -2,12 +2,15 @@ package com.comst.presentation.util
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.RingtoneManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.comst.domain.util.DateUtils.formatDateAndTime
+import com.comst.presentation.main.MainActivity
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -89,6 +92,12 @@ class PDFirebaseMessagingService : FirebaseMessagingService() {
             else -> "공지사항"
         }
     }
+
+    private fun createMainActivityIntent(): Intent {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        return intent
+    }
     private fun sendNotification(remoteMessage: RemoteMessage, channelId: String, channelName: String) {
         CoroutineScope(Dispatchers.IO).launch {
 
@@ -100,6 +109,14 @@ class PDFirebaseMessagingService : FirebaseMessagingService() {
                 val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
                 val uniId: Int = (System.currentTimeMillis() / 7).toInt()
 
+                val intent = createMainActivityIntent()
+                val pendingIntent = PendingIntent.getActivity(
+                    this@PDFirebaseMessagingService,
+                    uniId,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                )
+
                 val notificationBuilder = NotificationCompat.Builder(
                     this@PDFirebaseMessagingService, channelId
                 ).apply {
@@ -109,7 +126,7 @@ class PDFirebaseMessagingService : FirebaseMessagingService() {
                     setContentText(message)
                     setAutoCancel(true)
                     setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-
+                    setContentIntent(pendingIntent)
                 }
 
                 val channel =
