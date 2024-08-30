@@ -58,10 +58,15 @@ import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDCalendarBottomSheet
 import com.comst.presentation.component.PDScheduleBarChart
 import com.comst.presentation.component.PDScreenHeader
-import com.comst.presentation.main.schedule.ScheduleContract.*
+import com.comst.presentation.main.schedule.ScheduleContract.ScheduleEvent
+import com.comst.presentation.main.schedule.ScheduleContract.ScheduleIntent
+import com.comst.presentation.main.schedule.ScheduleContract.ScheduleSideEffect
+import com.comst.presentation.main.schedule.ScheduleContract.ScheduleUIState
 import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleDialog
-import com.comst.presentation.ui.theme.BackgroundColor2
+import com.comst.presentation.ui.theme.Background0
+import com.comst.presentation.ui.theme.Background20
 import com.comst.presentation.ui.theme.PlanDingTheme
+import com.comst.presentation.ui.theme.Primary100
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -111,7 +116,7 @@ private fun ScheduleScreen(
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = 16.dp,)
                 ) {
 
                     DateSelectTab(
@@ -222,7 +227,7 @@ private fun ScheduleTabs(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                color = BackgroundColor2,
+                color = Background20,
                 shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
             )
     ) {
@@ -245,6 +250,7 @@ private fun ScheduleTabs(
                 pages.forEachIndexed { index, title ->
                     Tab(
                         selected = periodIndex == index,
+                        modifier = Modifier.background(Background20),
                         onClick = {
                             coroutineScope.launch {
                                 periodIndex = index
@@ -301,7 +307,8 @@ private fun ScheduleTabsContent(
                         .size(80.dp)
                         .padding(16.dp)
                         .align(Alignment.BottomEnd),
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = Primary100,
+                    contentColor = Background0,
                     shape = RoundedCornerShape(60.dp),
                     onClick = {
                         setIntent(ScheduleIntent.ShowAddScheduleDialog)
@@ -337,7 +344,7 @@ private fun NoScheduleContent() {
         Box(
             modifier = Modifier
                 .size(120.dp)
-                .background(color = Color(0xFFF4F4F4), shape = CircleShape),
+                .background(color = Background20, shape = CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Image(
@@ -362,7 +369,7 @@ private fun ScheduleList(
 ) {
     val sortedScheduleList = remember(scheduleList) { scheduleList.sortedBy { it.startTime } }
     LazyColumn(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().padding(bottom = 20.dp)
     ) {
         items(
             count = sortedScheduleList.size,

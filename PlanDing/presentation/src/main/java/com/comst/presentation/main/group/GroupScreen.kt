@@ -40,7 +40,9 @@ import com.comst.presentation.main.group.GroupContract.*
 import com.comst.presentation.main.group.create.CreateGroupActivity
 import com.comst.presentation.main.group.detail.GroupDetailActivity
 import com.comst.presentation.main.mypage.MyPageContract
+import com.comst.presentation.ui.theme.Background0
 import com.comst.presentation.ui.theme.PlanDingTheme
+import com.comst.presentation.ui.theme.Primary100
 
 @Composable
 fun GroupScreen(
@@ -157,7 +159,8 @@ private fun GroupScreen(
                     .size(100.dp)
                     .align(Alignment.BottomEnd)
                     .padding(16.dp),
-                containerColor = MaterialTheme.colorScheme.primary,
+                containerColor = Primary100,
+                contentColor = Background0,
                 shape = RoundedCornerShape(60.dp),
                 onClick = { setIntent(GroupIntent.GroupCreateClick) },
             ) {

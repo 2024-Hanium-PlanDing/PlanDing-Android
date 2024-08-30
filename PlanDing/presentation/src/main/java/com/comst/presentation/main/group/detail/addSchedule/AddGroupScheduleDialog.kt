@@ -31,10 +31,13 @@ import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDTextFieldOutLine
 import com.comst.presentation.component.PDTimeDropdownMenu
-import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract.*
+import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract.AddGroupScheduleIntent
+import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract.AddGroupScheduleSideEffect
+import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract.AddGroupScheduleUIState
 import com.comst.presentation.model.group.GroupProfileUIModel
 import com.comst.presentation.model.group.socket.SendCreateScheduleDTO
-import com.comst.presentation.ui.theme.BackgroundColor1
+import com.comst.presentation.ui.theme.Background0
+import com.comst.presentation.ui.theme.Background60
 import com.comst.presentation.ui.theme.PlanDingTheme
 import java.time.LocalDate
 
@@ -184,7 +187,7 @@ private fun AddGroupScheduleDialog(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = BackgroundColor1,
+                    containerColor = Background0,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {

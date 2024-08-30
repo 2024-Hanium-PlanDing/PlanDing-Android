@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.comst.presentation.ui.theme.BackgroundColor1
+import com.comst.presentation.ui.theme.Background0
 
 @Composable
 fun PDTextFieldOutLine(
@@ -23,8 +23,8 @@ fun PDTextFieldOutLine(
         value = value,
         onValueChange = onValueChange,
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = BackgroundColor1,
-            unfocusedContainerColor = BackgroundColor1,
+            focusedContainerColor = Background0,
+            unfocusedContainerColor = Background0,
         ),
         label = { Text(text = label) },
         shape = RoundedCornerShape(8.dp),

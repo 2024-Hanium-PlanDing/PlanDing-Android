@@ -26,8 +26,10 @@ import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDTextFieldOutLine
 import com.comst.presentation.component.PDTimeDropdownMenu
-import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.*
-import com.comst.presentation.ui.theme.BackgroundColor1
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleIntent
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleSideEffect
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleUIState
+import com.comst.presentation.ui.theme.Background0
 import com.comst.presentation.ui.theme.PlanDingTheme
 import java.time.LocalDate
 
@@ -147,7 +149,7 @@ private fun AddPersonalScheduleDialog(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = BackgroundColor1,
+                    containerColor = Background0,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {

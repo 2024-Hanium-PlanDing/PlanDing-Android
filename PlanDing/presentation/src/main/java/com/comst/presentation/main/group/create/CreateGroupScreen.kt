@@ -1,5 +1,6 @@
 package com.comst.presentation.main.group.create
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,7 +30,9 @@ import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDTextField
 import com.comst.presentation.main.group.create.CreateGroupContract.*
 import com.comst.presentation.model.group.GroupCardUIModel
+import com.comst.presentation.ui.theme.Background20
 import com.comst.presentation.ui.theme.PlanDingTheme
+import com.comst.presentation.ui.theme.Primary100
 
 @Composable
 fun CreateGroupScreen(
@@ -86,7 +89,7 @@ private fun CreateGroupScreen(
                             Text(text = "생성", color = Color.Black)
                         }
                     },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Primary100)
                 )
             },
             content = { paddingValues ->

@@ -22,8 +22,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDTextFieldOutLine
-import com.comst.presentation.main.group.detail.addGroupMember.AddGroupMemberContract.*
-import com.comst.presentation.ui.theme.BackgroundColor1
+import com.comst.presentation.main.group.detail.addGroupMember.AddGroupMemberContract.AddGroupMemberIntent
+import com.comst.presentation.main.group.detail.addGroupMember.AddGroupMemberContract.AddGroupMemberSideEffect
+import com.comst.presentation.main.group.detail.addGroupMember.AddGroupMemberContract.AddGroupMemberUIState
+import com.comst.presentation.ui.theme.Background60
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
@@ -125,7 +127,7 @@ private fun AddGroupMemberDialog(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = BackgroundColor1,
+                    containerColor = Background60,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {

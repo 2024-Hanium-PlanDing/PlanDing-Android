@@ -46,6 +46,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.main.group.create.CreateGroupContract.*
 import com.comst.presentation.ui.theme.PlanDingTheme
+import com.comst.presentation.ui.theme.Primary100
 
 @Composable
 fun ImageSelectScreen(
@@ -104,7 +105,7 @@ private fun ImageSelectScreen(
                             Text(text = "다음", color = Color.Black)
                         }
                     },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Primary100)
                 )
             },
             content = { paddingValues ->

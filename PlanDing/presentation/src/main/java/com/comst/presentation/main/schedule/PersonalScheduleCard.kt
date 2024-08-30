@@ -28,8 +28,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.comst.domain.model.base.Schedule
 import com.comst.domain.model.base.ScheduleType
-import com.comst.presentation.ui.theme.BackgroundColor2
-import com.comst.presentation.ui.theme.BackgroundColor4
+import com.comst.presentation.ui.theme.Background0
+import com.comst.presentation.ui.theme.Background20
+import com.comst.presentation.ui.theme.Background30
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
@@ -42,9 +43,9 @@ fun PersonalScheduleCard(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = BackgroundColor2),
+            .background(color = Background20),
         colors = CardDefaults.cardColors(
-            containerColor = BackgroundColor2,
+            containerColor = Background20,
         )
     ) {
         Column(
@@ -110,7 +111,7 @@ fun PersonalScheduleCard(
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier
                         .padding(bottom = 8.dp)
-                        .background(BackgroundColor4, shape = RoundedCornerShape(8.dp))
+                        .background(Background0, shape = RoundedCornerShape(8.dp))
                         .padding(8.dp)
                 )
             }
