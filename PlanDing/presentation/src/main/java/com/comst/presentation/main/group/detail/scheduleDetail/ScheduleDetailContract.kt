@@ -7,11 +7,14 @@ import com.comst.presentation.common.base.BaseEvent
 import com.comst.presentation.common.base.BaseIntent
 import com.comst.presentation.common.base.BaseSideEffect
 import com.comst.presentation.common.base.UIState
+import com.comst.presentation.common.util.UniqueList
+import com.comst.presentation.model.group.TaskUIModel
 
 class ScheduleDetailContract {
 
     @Immutable
     data class ScheduleDetailUIState(
+        val userCode: String = "",
         val groupCode: String = "",
         val schedule: Schedule = Schedule(
             scheduleId = 5852,
@@ -24,7 +27,9 @@ class ScheduleDetailContract {
             groupName = null,
             type = ScheduleType.GROUP
         ),
-        val selectedOption: TaskStatus = TaskStatus.ALL
+        val taskOriginalList: UniqueList<TaskUIModel, Long> = UniqueList({ it.id }),
+        val newTaskList: UniqueList<TaskUIModel, Long> = UniqueList({ it.id }),
+        val selectedOption: TaskStatus = TaskStatus.PENDING
     ): UIState
 
     sealed class ScheduleDetailSideEffect : BaseSideEffect {
@@ -41,7 +46,6 @@ class ScheduleDetailContract {
     }
 
     enum class TaskStatus(val displayName: String) {
-        ALL("전체"),
         PENDING("대기"),
         IN_PROGRESS("진행"),
         COMPLETED("완료")

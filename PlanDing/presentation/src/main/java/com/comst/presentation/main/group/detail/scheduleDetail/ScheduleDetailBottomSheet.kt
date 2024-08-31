@@ -1,7 +1,6 @@
 package com.comst.presentation.main.group.detail.scheduleDetail
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,10 +8,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,12 +35,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.comst.domain.model.base.Schedule
 import com.comst.presentation.common.base.BaseScreen
-import com.comst.presentation.component.PDDropdownSelector
-import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailContract.*
-import com.comst.presentation.ui.theme.BackgroundColor1
-import com.comst.presentation.ui.theme.BackgroundColor4
+import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailContract.ScheduleDetailIntent
+import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailContract.ScheduleDetailSideEffect
+import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailContract.ScheduleDetailUIState
+import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailContract.TaskStatus
+import com.comst.presentation.model.group.TaskUIModel
+import com.comst.presentation.ui.theme.Background0
 import com.comst.presentation.ui.theme.PlanDingTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScheduleDetailBottomSheet(
     viewModel: ScheduleDetailViewModel = hiltViewModel(),
@@ -48,6 +51,9 @@ fun ScheduleDetailBottomSheet(
     schedule: Schedule,
     onCloseBottomSheet:() -> Unit,
 ) {
+
+    val scheduleDetailBottomSheetState = rememberModalBottomSheetState()
+
     LaunchedEffect(Unit) {
         viewModel.initialize(
             groupCode = groupCode,
@@ -60,11 +66,18 @@ fun ScheduleDetailBottomSheet(
     }
 
     BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
-        ScheduleDetailBottomSheet(
-            uiState = uiState,
-            setIntent = viewModel::setIntent,
-            onCloseBottomSheet = onCloseBottomSheet
-        )
+        ModalBottomSheet(
+            onDismissRequest = {
+                onCloseBottomSheet()
+            },
+            sheetState = scheduleDetailBottomSheetState,
+        ){
+            ScheduleDetailBottomSheet(
+                uiState = uiState,
+                setIntent = viewModel::setIntent,
+                onCloseBottomSheet = onCloseBottomSheet
+            )
+        }
     }
 }
 
@@ -99,7 +112,7 @@ private fun ScheduleDetailContent(
 
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 16.dp)
     ) {
         Text(
@@ -121,7 +134,7 @@ private fun ScheduleDetailContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 4.dp, bottom = 8.dp)
-                .background(BackgroundColor1, shape = RoundedCornerShape(8.dp))
+                .background(Background0, shape = RoundedCornerShape(8.dp))
                 .padding(8.dp),
             maxLines = if (isExpanded) Int.MAX_VALUE else 4,
             overflow = TextOverflow.Ellipsis,
@@ -138,7 +151,9 @@ private fun ScheduleDetailContent(
         )
 
         TaskArea(
+            userCode = uiState.userCode,
             selectedOption = uiState.selectedOption,
+            taskList = uiState.newTaskList.toList() + uiState.taskOriginalList.toList(),
             setIntent = setIntent
         )
     }
@@ -146,14 +161,16 @@ private fun ScheduleDetailContent(
 
 @Composable
 private fun TaskArea(
+    userCode: String,
     selectedOption: TaskStatus,
+    taskList: List<TaskUIModel>,
     setIntent: (ScheduleDetailIntent) -> Unit = {}
 ){
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 4.dp, bottom = 8.dp)
-            .background(BackgroundColor1, shape = RoundedCornerShape(8.dp))
+            .background(Background0, shape = RoundedCornerShape(8.dp))
             .padding(8.dp)
     ){
         Column(
@@ -174,6 +191,22 @@ private fun TaskArea(
                             }
                             .padding(8.dp)
                     )
+                }
+            }
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                items(
+                    count = taskList.size,
+                    key = { index -> taskList[index].id }
+                ){ index ->
+                    taskList[index].let { task ->
+                        TaskCard(
+                            userCode = userCode,
+                            task = task
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
                 }
             }
         }
