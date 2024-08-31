@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import com.comst.presentation.ui.theme.PlanDingTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -13,6 +14,8 @@ class GroupDetailActivity  : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         val groupCode = intent.getStringExtra(GROUP_CODE) ?: ""
         setContent {
             PlanDingTheme {

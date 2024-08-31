@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.view.WindowCompat
 import com.comst.domain.usecase.user.PostFCMTokenUseCase
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
@@ -28,6 +29,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         initFCM()
         setContent {
             PlanDingTheme {
