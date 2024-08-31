@@ -33,6 +33,7 @@ import com.comst.domain.model.base.Schedule
 import com.comst.domain.model.base.ScheduleType
 import com.comst.presentation.ui.theme.Background0
 import com.comst.presentation.ui.theme.Background20
+import com.comst.presentation.ui.theme.Background300
 import com.comst.presentation.ui.theme.Background60
 import com.comst.presentation.ui.theme.PlanDingTheme
 
@@ -70,7 +71,7 @@ fun PDGroupScheduleCard(
                 Text(
                     text = "Complete: ",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                    color = Background300
                 )
 
                 Checkbox(
@@ -78,7 +79,7 @@ fun PDGroupScheduleCard(
                     onCheckedChange = null,
                     colors = CheckboxDefaults.colors(
                         checkedColor = MaterialTheme.colorScheme.primary,
-                        uncheckedColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                        uncheckedColor = Background300
                     )
                 )
             }
@@ -88,7 +89,7 @@ fun PDGroupScheduleCard(
                     Text(
                         text = "시간: ${schedule.startTime}:00 ~ ${schedule.endTime}:00",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                        color = Background300,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
