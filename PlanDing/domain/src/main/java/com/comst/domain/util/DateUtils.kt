@@ -171,4 +171,11 @@ object DateUtils {
         return "$formattedDate $formattedTime"
     }
 
+    fun formatDateTime(input: String): String {
+        val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+        val dateTime = LocalDateTime.parse(input, inputFormatter)
+        val outputFormatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일 H시", Locale.getDefault())
+        return dateTime.format(outputFormatter)
+    }
+
 }
