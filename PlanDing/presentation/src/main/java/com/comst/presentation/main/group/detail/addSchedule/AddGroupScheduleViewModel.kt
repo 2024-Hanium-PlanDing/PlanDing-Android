@@ -110,7 +110,6 @@ class AddGroupScheduleViewModel @Inject constructor(
 
         }
 
-
         setState {
             copy(isLoading = false)
         }
@@ -120,8 +119,4 @@ class AddGroupScheduleViewModel @Inject constructor(
         setToastEffect(message)
     }
 
-    override fun handleError(exception: Exception) {
-        super.handleError(exception)
-        setToastEffect(exception.message.orEmpty())
-    }
 }

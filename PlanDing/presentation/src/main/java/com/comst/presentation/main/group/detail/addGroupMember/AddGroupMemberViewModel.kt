@@ -3,6 +3,7 @@ package com.comst.presentation.main.group.detail.addGroupMember
 import androidx.lifecycle.viewModelScope
 import com.comst.domain.model.groupInvite.GroupInviteModel
 import com.comst.domain.usecase.groupInvite.PostGroupInviteUseCase
+import com.comst.domain.util.onException
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
@@ -45,7 +46,7 @@ class AddGroupMemberViewModel @Inject constructor(
         }
     }
 
-    private fun onInviteGroupMember() = viewModelScope.launch {
+    private fun onInviteGroupMember() = viewModelScope.launch(apiExceptionHandler) {
         if (currentState.userCode.isEmpty()){
             setToastEffect("유저 코드를 입력해주세요.")
             return@launch
@@ -60,6 +61,8 @@ class AddGroupMemberViewModel @Inject constructor(
             setEffect(AddGroupMemberSideEffect.SuccessInviteGroupMember)
         }.onFailure {
 
+        }.onException { exception ->
+            throw exception
         }
     }
 

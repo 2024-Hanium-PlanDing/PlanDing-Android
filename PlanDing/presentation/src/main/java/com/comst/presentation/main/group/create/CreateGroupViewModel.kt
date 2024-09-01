@@ -5,6 +5,7 @@ import com.comst.domain.model.file.MediaImage
 import com.comst.domain.model.group.GroupCreate
 import com.comst.domain.usecase.file.GetImageListUseCase
 import com.comst.domain.usecase.group.PostGroupUseCase
+import com.comst.domain.util.onException
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
@@ -35,7 +36,7 @@ class CreateGroupViewModel @Inject constructor(
 
     override fun handleEvent(event: CreateGroupEvent) {
         when (event) {
-            is CreateGroupEvent.LoadFailure -> onLoadFailure(event.message)
+            is CreateGroupEvent.LoadFailure -> setToastEffect(event.message)
         }
     }
 
@@ -49,6 +50,7 @@ class CreateGroupViewModel @Inject constructor(
                 )
             }
         }.onFailure {
+
         }
         setState { copy(isLoading = false) }
 
@@ -76,7 +78,7 @@ class CreateGroupViewModel @Inject constructor(
         }
     }
 
-    private fun onCreateGroupClick() = viewModelScope.launch {
+    private fun onCreateGroupClick() = viewModelScope.launch(apiExceptionHandler) {
         if (currentState.selectedImage == null) {
             setToastEffect("그룹 이미지는 필수입니다.")
             return@launch
@@ -92,16 +94,10 @@ class CreateGroupViewModel @Inject constructor(
             setToastEffect("그룹 생성을 성공했습니다.")
             setEffect(CreateGroupSideEffect.SuccessGroupCreation(it.toGroupCardUIModel()))
         }.onFailure {
+        }.onException { exception ->
+            throw exception
         }
         setState { copy(isLoading = false) }
     }
 
-    private fun onLoadFailure(message: String) {
-        setToastEffect(message)
-    }
-
-    override fun handleError(exception: Exception) {
-        super.handleError(exception)
-        setToastEffect(exception.message.orEmpty())
-    }
 }

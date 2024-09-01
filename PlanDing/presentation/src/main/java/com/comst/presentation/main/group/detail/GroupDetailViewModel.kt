@@ -10,6 +10,7 @@ import com.comst.domain.usecase.groupSchedule.GetGroupScheduleUseCase
 import com.comst.domain.usecase.local.GetTokenUseCase
 import com.comst.domain.usecase.local.GetUserCodeUseCase
 import com.comst.domain.util.DateUtils
+import com.comst.domain.util.onException
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.BuildConfig.STOMP_ENDPOINT
@@ -93,7 +94,7 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
-    fun initialize(groupCode: String) = viewModelScope.launch {
+    fun initialize(groupCode: String) = viewModelScope.launch(apiExceptionHandler) {
         setState { copy(isLoading = true) }
 
         val tokenDeferred = async { getTokenUseCase() }
@@ -143,6 +144,9 @@ class GroupDetailViewModel @Inject constructor(
             }
         }.onFailure {
             isSuccess = false
+        }.onException { exception ->
+            isSuccess = false
+            throw exception
         }
 
         groupScheduleResult.onSuccess { groupSchedules ->
@@ -151,6 +155,9 @@ class GroupDetailViewModel @Inject constructor(
             }
         }.onFailure {
             isSuccess = false
+        }.onException { exception ->
+            isSuccess = false
+            throw exception
         }
 
         groupChatMessageResult.onSuccess { chatList ->
@@ -159,8 +166,10 @@ class GroupDetailViewModel @Inject constructor(
             }
         }.onFailure {
             isSuccess = false
+        }.onException { exception ->
+            isSuccess = false
+            throw exception
         }
-
 
         if (isSuccess) {
             connectStomp()
@@ -408,7 +417,7 @@ class GroupDetailViewModel @Inject constructor(
         }
         setEvent(GroupDetailEvent.DateSelected(selectedLocalDate))
     }
-    private fun onDateSelected(date: LocalDate) = viewModelScope.launch {
+    private fun onDateSelected(date: LocalDate) = viewModelScope.launch(apiExceptionHandler) {
         val newSelectedWeekdays = DateUtils.getWeekDays(date)
         val selectUIDate = DateUtils.localDateToUIDate(date)
         val selectDay = DateUtils.getDayOfWeek(date)
@@ -435,6 +444,8 @@ class GroupDetailViewModel @Inject constructor(
                 }
             }.onFailure {
                 // 실패 처리 로직 추가 가능
+            }.onException { exception ->
+                throw exception
             }
         } else {
             // 동일한 주라면 날짜와 요일만 업데이트
@@ -493,11 +504,6 @@ class GroupDetailViewModel @Inject constructor(
         setState {
             copy(isAddGroupMemberDialogVisible = false)
         }
-    }
-
-    override fun handleError(exception: Exception) {
-        super.handleError(exception)
-        setToastEffect(exception.message.orEmpty())
     }
 
     private fun onAddGroupSchedule(schedule: Schedule) {

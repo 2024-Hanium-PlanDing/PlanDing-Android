@@ -1,11 +1,9 @@
 package com.comst.presentation.main.mypage.groupRequestsReceived
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.comst.domain.usecase.groupInvite.DeleteDenyGroupInviteUseCase
 import com.comst.domain.usecase.groupInvite.GetAcceptGroupInviteUseCase
 import com.comst.domain.usecase.groupInvite.GetGroupRequestReceivedListUseCase
-import com.comst.domain.util.onError
 import com.comst.domain.util.onException
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
@@ -29,7 +27,7 @@ class GroupRequestsReceivedViewModel @Inject constructor(
         load()
     }
 
-    private fun load() = viewModelScope.launch {
+    private fun load() = viewModelScope.launch(apiExceptionHandler) {
         getGroupRequestReceivedListUseCase().onSuccess { groupRequestReceivedResponseModel ->
             setState {
                 copy(
@@ -38,6 +36,8 @@ class GroupRequestsReceivedViewModel @Inject constructor(
             }
         }.onFailure {
 
+        }.onException { exception ->
+            throw exception
         }
     }
 
@@ -53,7 +53,7 @@ class GroupRequestsReceivedViewModel @Inject constructor(
 
     }
 
-    private fun onAcceptClick(groupRequestReceivedCardModel: GroupRequestReceivedCardModel) = viewModelScope.launch {
+    private fun onAcceptClick(groupRequestReceivedCardModel: GroupRequestReceivedCardModel) = viewModelScope.launch(apiExceptionHandler) {
         getAcceptGroupInviteUseCase(
             groupCode = groupRequestReceivedCardModel.groupCode,
             inviteCode = groupRequestReceivedCardModel.inviteCode
@@ -66,10 +66,12 @@ class GroupRequestsReceivedViewModel @Inject constructor(
             setToastEffect("요청을 수락했습니다.")
         }.onFailure {
 
+        }.onException { exception ->
+            throw exception
         }
     }
 
-    private fun onDenyClick(groupRequestReceivedCardModel: GroupRequestReceivedCardModel)  = viewModelScope.launch{
+    private fun onDenyClick(groupRequestReceivedCardModel: GroupRequestReceivedCardModel)  = viewModelScope.launch(apiExceptionHandler){
         deleteDenyGroupInviteUseCase(
             inviteCode = groupRequestReceivedCardModel.inviteCode
         ).onSuccess {
@@ -81,6 +83,8 @@ class GroupRequestsReceivedViewModel @Inject constructor(
             setToastEffect("요청을 거절했습니다.")
         }.onFailure {
             
+        }.onException { exception ->
+            throw exception
         }
     }
 

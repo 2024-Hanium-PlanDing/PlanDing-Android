@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.comst.domain.model.base.ScheduleModel
 import com.comst.domain.usecase.personalSchedule.PostPersonalScheduleUseCase
 import com.comst.domain.util.DateUtils
+import com.comst.domain.util.onException
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
@@ -73,7 +74,7 @@ class AddPersonalScheduleViewModel @Inject constructor(
         }
     }
 
-    private fun onCreateScheduleClick() = viewModelScope.launch {
+    private fun onCreateScheduleClick() = viewModelScope.launch(apiExceptionHandler) {
         if (currentState.title.isEmpty() || currentState.content.isEmpty()) {
             setToastEffect("일정의 제목과 내용은 필수입니다.")
             return@launch
@@ -100,6 +101,8 @@ class AddPersonalScheduleViewModel @Inject constructor(
             setEffect(AddPersonalScheduleSideEffect.SuccessCreatePersonalSchedule(it))
         }.onFailure {
 
+        }.onException { exception ->
+            throw exception
         }
 
         setState {
@@ -111,8 +114,4 @@ class AddPersonalScheduleViewModel @Inject constructor(
         setToastEffect(message)
     }
 
-    override fun handleError(exception: Exception) {
-        super.handleError(exception)
-        setToastEffect(exception.message.orEmpty())
-    }
 }

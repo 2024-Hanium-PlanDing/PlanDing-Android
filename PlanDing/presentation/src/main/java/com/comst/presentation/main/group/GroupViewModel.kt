@@ -2,6 +2,7 @@ package com.comst.presentation.main.group
 
 import androidx.lifecycle.viewModelScope
 import com.comst.domain.usecase.group.GetMyGroupsUseCase
+import com.comst.domain.util.onException
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
@@ -35,12 +36,12 @@ class GroupViewModel @Inject constructor(
 
     override fun handleEvent(event: GroupEvent) {
         when (event) {
-            is GroupEvent.LoadFailure -> onLoadFailure(event.message)
+            is GroupEvent.LoadFailure -> setToastEffect(event.message)
             is GroupEvent.GroupCreated -> onAddGroup(event.groupCardUIModel)
         }
     }
 
-    private fun load() = viewModelScope.launch {
+    private fun load() = viewModelScope.launch(apiExceptionHandler) {
         setState { copy(isLoading = true) }
         getMyGroupsUseCase()
             .onSuccess { groupCardModels ->
@@ -52,6 +53,8 @@ class GroupViewModel @Inject constructor(
                 }
             }
             .onFailure {
+            }.onException { exception ->
+                throw exception
             }
         setState {
             copy(
@@ -59,15 +62,6 @@ class GroupViewModel @Inject constructor(
                 isRefreshing = false
             )
         }
-    }
-
-    private fun onLoadFailure(message: String) {
-        setToastEffect(message)
-    }
-
-    override fun handleError(exception: Exception) {
-        super.handleError(exception)
-        setToastEffect(exception.message.orEmpty())
     }
 
     private fun onRefresh() {

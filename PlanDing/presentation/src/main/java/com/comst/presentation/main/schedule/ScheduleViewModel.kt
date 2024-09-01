@@ -5,7 +5,9 @@ import com.comst.domain.model.base.Schedule
 import com.comst.domain.util.DateUtils
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleTodayListUseCase
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleWeekListUseCase
+import com.comst.domain.usecase.local.ClearUserDataUseCase
 import com.comst.domain.usecase.personalSchedule.GetPersonalScheduleListUseCase
+import com.comst.domain.util.onException
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
@@ -20,7 +22,8 @@ import javax.inject.Inject
 class ScheduleViewModel @Inject constructor(
     private val getCommonScheduleTodayListUseCase: GetCommonScheduleTodayListUseCase,
     private val getCommonScheduleWeekListUseCase: GetCommonScheduleWeekListUseCase,
-    private val getPersonalScheduleListUseCase: GetPersonalScheduleListUseCase
+    private val getPersonalScheduleListUseCase: GetPersonalScheduleListUseCase,
+    private val clearUserDataUseCase: ClearUserDataUseCase
 ) : BaseViewModel<ScheduleUIState, ScheduleSideEffect, ScheduleIntent, ScheduleEvent>(ScheduleUIState()) {
 
     init {
@@ -41,33 +44,45 @@ class ScheduleViewModel @Inject constructor(
     override fun handleEvent(event: ScheduleEvent) {
         when (event) {
             is ScheduleEvent.DateSelected -> onDateSelected(event.date)
-            is ScheduleEvent.LoadFailure -> onLoadFailure(event.message)
+            is ScheduleEvent.LoadFailure -> setToastEffect(event.message)
             is ScheduleEvent.AddTodaySchedule -> onAddTodaySchedule(event.schedule)
         }
     }
 
-    private fun load() = viewModelScope.launch {
+    private fun load() {
+        viewModelScope.launch {
+            loadWeeklySchedule()
+            loadDailySchedule()
+        }
+    }
+
+    private fun loadWeeklySchedule() = viewModelScope.launch(apiExceptionHandler) {
         val weeklySchedulePeriod = DateUtils.getWeekStartAndEnd(currentState.selectLocalDate)
         getCommonScheduleWeekListUseCase(weeklySchedulePeriod)
             .onSuccess {
                 setState {
                     copy(selectWeekScheduleList = it)
                 }
-            }
-            .onFailure {
-            }
+            }.onFailure {
 
+            }.onException { exception ->
+                throw exception
+            }
+    }
+
+    private fun loadDailySchedule() = viewModelScope.launch(apiExceptionHandler) {
         val dailyPeriod = DateUtils.getDayStartAndEnd(currentState.selectLocalDate)
         getPersonalScheduleListUseCase(dailyPeriod)
             .onSuccess {
                 setState {
                     copy(todayPersonalScheduleList = it)
                 }
-            }
-            .onFailure {
+            }.onFailure {
+
+            }.onException { exception ->
+                throw exception
             }
     }
-
     private fun onOpenCalendarBottomSheet() {
         setState {
             copy(isCalendarBottomSheetVisible = true)
@@ -118,43 +133,42 @@ class ScheduleViewModel @Inject constructor(
         }
     }
 
-    private fun onDateSelected(date: LocalDate) = viewModelScope.launch {
+    private fun onDateSelected(date: LocalDate) = viewModelScope.launch(apiExceptionHandler) {
         val weeklySchedulePeriod = DateUtils.getWeekStartAndEnd(date)
         val dailyPeriod = DateUtils.getDayStartAndEnd(date)
 
-        getCommonScheduleWeekListUseCase(weeklySchedulePeriod)
-            .onSuccess {
-                setState {
-                    copy(
-                        selectLocalDate = date,
-                        selectUIDate = DateUtils.localDateToUIDate(date),
-                        selectDay = DateUtils.getDayOfWeek(date),
-                        selectedWeekdays = DateUtils.getWeekDays(date),
-                        selectWeekScheduleList = it
-                    )
+        launch{
+            getCommonScheduleWeekListUseCase(weeklySchedulePeriod)
+                .onSuccess {
+                    setState {
+                        copy(
+                            selectLocalDate = date,
+                            selectUIDate = DateUtils.localDateToUIDate(date),
+                            selectDay = DateUtils.getDayOfWeek(date),
+                            selectedWeekdays = DateUtils.getWeekDays(date),
+                            selectWeekScheduleList = it
+                        )
+                    }
+                }.onFailure {
+
+                }.onException { exception ->
+                    throw exception
                 }
-            }
-            .onFailure {
+        }
 
-            }
-
-        getPersonalScheduleListUseCase(dailyPeriod)
-            .onSuccess {
-                setState {
-                    copy(todayPersonalScheduleList = it)
+        launch {
+            getPersonalScheduleListUseCase(dailyPeriod)
+                .onSuccess {
+                    setState {
+                        copy(todayPersonalScheduleList = it)
+                    }
                 }
-            }
-            .onFailure {
+                .onFailure {
 
-            }
+                }.onException { exception ->
+                    throw exception
+                }
+        }
     }
 
-    private fun onLoadFailure(message: String) {
-        setToastEffect(message)
-    }
-
-    override fun handleError(exception: Exception) {
-        super.handleError(exception)
-        setToastEffect(exception.message.orEmpty())
-    }
 }

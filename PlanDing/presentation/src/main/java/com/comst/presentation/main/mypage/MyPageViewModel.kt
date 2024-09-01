@@ -2,12 +2,12 @@ package com.comst.presentation.main.mypage
 
 import androidx.lifecycle.viewModelScope
 import com.comst.domain.usecase.user.GetUserProfileUseCase
+import com.comst.domain.util.onException
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
 import com.comst.presentation.main.mypage.MyPageContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,7 +33,7 @@ class MyPageViewModel @Inject constructor(
         }
     }
 
-    private fun load() = viewModelScope.launch {
+    private fun load() = viewModelScope.launch(apiExceptionHandler) {
         setState { copy(isLoading = true) }
         getUserProfileUseCase()
             .onSuccess {
@@ -50,6 +50,8 @@ class MyPageViewModel @Inject constructor(
                 }
             }
             .onFailure {
+            }.onException { exception ->
+                throw exception
             }
         setState {
             copy(
@@ -61,11 +63,6 @@ class MyPageViewModel @Inject constructor(
 
     private fun onLoadFailure(message: String) {
         setToastEffect(message)
-    }
-
-    override fun handleError(exception: Exception) {
-        super.handleError(exception)
-        setToastEffect(exception.message.orEmpty())
     }
 
     private fun onRefresh() {

@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.comst.domain.model.user.SocialLoginInformation
 import com.comst.domain.usecase.user.PostSocialLoginUseCase
 import com.comst.domain.usecase.local.SetUserDataUseCase
+import com.comst.domain.util.onException
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.auth.LoginContract.*
@@ -53,21 +54,18 @@ class LoginViewModel @Inject constructor(
         setState { copy(isLoading = false) }
     }
 
-    private fun onSocialLogin(accountInformation: SocialLoginInformation) = viewModelScope.launch {
+    private fun onSocialLogin(accountInformation: SocialLoginInformation) = viewModelScope.launch(apiExceptionHandler) {
         setState { copy(isLoading = true) }
         postSocialLoginUseCase(accountInformation)
             .onSuccess {
                 setUserDataUseCase(it.accessToken, it.refreshToken, it.userCode)
                 setEffect(LoginSideEffect.NavigateToMainActivity)
-            }
-            .onFailure {
+            }.onFailure {
 
+            }.onException { exception ->
+                throw exception
             }
         setState { copy(isLoading = false) }
     }
 
-    override fun handleError(exception: Exception) {
-        super.handleError(exception)
-        setToastEffect(exception.message.orEmpty())
-    }
 }
