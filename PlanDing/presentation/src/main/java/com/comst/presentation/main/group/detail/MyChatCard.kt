@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.comst.domain.model.chat.ChatMessageModel
 import com.comst.domain.util.DateUtils
 import com.comst.presentation.ui.theme.PlanDingTheme
-import com.comst.presentation.ui.theme.Primary300
+import com.comst.presentation.ui.theme.Primary75
 
 @Composable
 fun MyChatCard(
@@ -47,7 +47,7 @@ fun MyChatCard(
                 modifier = Modifier
                     .widthIn(max = maxWidth * 0.6f)
                     .background(
-                        color = Primary300,
+                        color = Primary75,
                         shape = RoundedCornerShape(8.dp)
                     )
                     .padding(8.dp)

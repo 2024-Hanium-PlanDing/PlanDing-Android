@@ -12,9 +12,12 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -293,11 +296,14 @@ fun MessageInputBar(
     setIntent: (GroupDetailIntent) -> Unit
 ) {
     val componentHeight = 56.dp
+    val bottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(bottom = bottomPadding)
             .height(componentHeight)
-            .background(Background60),
+            .background(Background0),
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextField(
@@ -312,8 +318,8 @@ fun MessageInputBar(
                 .height(componentHeight),
             placeholder = { Text("Type a message") },
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = Background60,
-                unfocusedContainerColor = Background60,
+                focusedContainerColor = Background0,
+                unfocusedContainerColor = Background0,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent

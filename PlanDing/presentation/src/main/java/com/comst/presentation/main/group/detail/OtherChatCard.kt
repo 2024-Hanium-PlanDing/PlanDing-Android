@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.comst.domain.model.chat.ChatMessageModel
 import com.comst.domain.util.DateUtils
 import com.comst.presentation.component.PDProfileImage
+import com.comst.presentation.ui.theme.Background0
 import com.comst.presentation.ui.theme.Background60
 import com.comst.presentation.ui.theme.PlanDingTheme
 
@@ -64,7 +65,7 @@ fun OtherChatCard(
                             .padding(end = 8.dp)
                             .widthIn(max = maxWidth * 0.6f)
                             .background(
-                                color = Background60,
+                                color = Background0,
                                 shape = RoundedCornerShape(8.dp)
                             )
                             .padding(8.dp)
