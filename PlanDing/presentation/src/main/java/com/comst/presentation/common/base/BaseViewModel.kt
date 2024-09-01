@@ -33,8 +33,8 @@ abstract class BaseViewModel<S : UIState, A : BaseSideEffect, I : BaseIntent, E 
     private val _event: MutableSharedFlow<E> = MutableSharedFlow()
     private val event = _event.asSharedFlow()
 
-    protected val exceptionHandler = CoroutineExceptionHandler { _, exception ->
-        handleException(exception)
+    protected val apiExceptionHandler = CoroutineExceptionHandler { _, exception ->
+        apiHandleException(exception)
     }
 
     init {
@@ -99,7 +99,7 @@ abstract class BaseViewModel<S : UIState, A : BaseSideEffect, I : BaseIntent, E 
         }
     }
 
-    private fun handleException(exception: Throwable) {
+    private fun apiHandleException(exception: Throwable) {
         when (exception) {
             is BadRequestException -> setToastEffect("잘못된 요청입니다.")
             is AccountNotFoundException -> setToastEffect("계정을 찾을 수 없습니다.")
