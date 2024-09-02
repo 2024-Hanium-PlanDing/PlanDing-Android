@@ -124,13 +124,16 @@ class ScheduleDetailViewModel @Inject constructor(
             }
         }.onFailure {
             isSuccess = false
+        }.onException { exception ->
+            isSuccess = false
+            throw exception
         }
 
         if (isSuccess) {
             connectStomp()
         }else{
             // 처리
-            Log.d("챗","실패")
+            Log.d("테스크","실패")
         }
     }
 
@@ -246,6 +249,6 @@ class ScheduleDetailViewModel @Inject constructor(
         const val SEND_TASK_UPDATE_URL = "/pub/planner/update/"
         const val SEND_TASK_DELETE_URL = "/pub/planner/delete/"
 
-        const val SUBSCRIBE_TASK_URL = "/sub/schedule/"
+        const val SUBSCRIBE_TASK_URL = "/sub/planner/"
     }
 }

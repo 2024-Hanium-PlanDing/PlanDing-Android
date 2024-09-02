@@ -1,7 +1,6 @@
 package com.comst.presentation.main.group
 
 import android.Manifest
-import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.widget.Toast
@@ -24,7 +23,6 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment

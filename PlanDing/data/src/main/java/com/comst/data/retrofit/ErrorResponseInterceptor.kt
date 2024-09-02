@@ -50,6 +50,7 @@ class ErrorResponseInterceptor @Inject constructor() : Interceptor {
             402 -> AccountNotFoundException(Throwable(errorResponse?.message), url)
             404 -> ServerNotFoundException(Throwable(errorResponse?.message), url)
             500 -> InternalServerErrorException(Throwable(errorResponse?.message), url)
+            502 -> BadRequestException(Throwable(errorResponse?.message), url)
             else -> null
         }
 }
