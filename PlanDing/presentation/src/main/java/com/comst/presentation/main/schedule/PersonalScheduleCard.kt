@@ -27,10 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.comst.domain.model.base.Schedule
-import com.comst.domain.model.base.ScheduleType
+import com.comst.domain.model.base.WebSocketType
 import com.comst.presentation.ui.theme.Background0
 import com.comst.presentation.ui.theme.Background20
-import com.comst.presentation.ui.theme.Background30
 import com.comst.presentation.ui.theme.Background300
 import com.comst.presentation.ui.theme.PlanDingTheme
 
@@ -134,7 +133,7 @@ private fun PersonalScheduleCardPreview() {
                 day = "nibh",
                 complete = false,
                 groupName = null,
-                type = ScheduleType.GROUP
+                type = WebSocketType.GROUP
             )
         )
     }

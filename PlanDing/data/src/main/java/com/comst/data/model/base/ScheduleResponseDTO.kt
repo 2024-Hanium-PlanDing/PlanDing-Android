@@ -1,7 +1,7 @@
 package com.comst.data.model.base
 
 import com.comst.domain.model.base.Schedule
-import com.comst.domain.model.base.ScheduleType
+import com.comst.domain.model.base.WebSocketType
 import com.comst.domain.util.DateUtils
 
 data class ScheduleResponseDTO(
@@ -26,10 +26,10 @@ fun ScheduleResponseDTO.toDomainModel(): Schedule {
         endTime = endTime,
         day = DateUtils.getDayOfWeekUIFormat(localDate),
         complete = complete,
-        groupName = if (type == ScheduleType.GROUP.type) groupName else null,
+        groupName = if (type == WebSocketType.GROUP.type) groupName else null,
         type = when(type){
-            ScheduleType.GROUP.type -> ScheduleType.GROUP
-            ScheduleType.PERSONAL.type -> ScheduleType.PERSONAL
+            WebSocketType.GROUP.type -> WebSocketType.GROUP
+            WebSocketType.PERSONAL.type -> WebSocketType.PERSONAL
             else -> throw IllegalArgumentException("Unknown schedule type: $type")
         }
     )

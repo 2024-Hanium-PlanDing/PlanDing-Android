@@ -3,6 +3,7 @@ package com.comst.presentation.main.group.detail
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.comst.domain.model.base.Schedule
+import com.comst.domain.model.base.WebSocketType
 import com.comst.domain.usecase.chat.GetChatMessageListUseCase
 import com.comst.domain.usecase.chat.PostChatMessageUseCase
 import com.comst.domain.usecase.group.GetGroupInformationUseCase
@@ -18,7 +19,7 @@ import com.comst.presentation.common.base.BaseViewModel
 import com.comst.presentation.common.util.UniqueList
 import com.comst.presentation.main.group.detail.GroupDetailContract.*
 import com.comst.presentation.model.group.socket.ReceiveChatDTO
-import com.comst.presentation.model.group.socket.ReceiveScheduleDTO
+import com.comst.presentation.model.group.socket.ReceiveScheduleOrPlannerDTO
 import com.comst.presentation.model.group.socket.SendCreateScheduleDTO
 import com.comst.presentation.model.group.socket.WebSocketAction
 import com.comst.presentation.model.group.socket.WebSocketResponse
@@ -46,7 +47,7 @@ import java.time.LocalDate
 import java.util.Date
 import javax.inject.Inject
 
-private const val TAG = "소켓"
+private const val TAG = "그룹 디테일 소켓"
 @HiltViewModel
 class GroupDetailViewModel @Inject constructor(
     private val getTokenUseCase: GetTokenUseCase,
@@ -243,12 +244,14 @@ class GroupDetailViewModel @Inject constructor(
                 val scheduleJson = message.bodyAsText
                 Log.d(TAG, "Received schedule: $scheduleJson")
 
-                val type = Types.newParameterizedType(WebSocketResponse::class.java, ReceiveScheduleDTO::class.java)
-                val adapter = moshi.adapter<WebSocketResponse<ReceiveScheduleDTO>>(type)
+                val type = Types.newParameterizedType(WebSocketResponse::class.java, ReceiveScheduleOrPlannerDTO::class.java)
+                val adapter = moshi.adapter<WebSocketResponse<ReceiveScheduleOrPlannerDTO>>(type)
                 val response = adapter.fromJson(scheduleJson)
 
                 if (response != null) {
-                    handleReceiveSchedule(response)
+                    if (response.data?.type == WebSocketType.GROUP.type){
+                        handleReceiveSchedule(response)
+                    }
                 } else {
                     Log.e(TAG, "Failed to parse response")
                 }
@@ -335,7 +338,7 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
-    private fun handleReceiveSchedule(response: WebSocketResponse<ReceiveScheduleDTO>) {
+    private fun handleReceiveSchedule(response: WebSocketResponse<ReceiveScheduleOrPlannerDTO>) {
         if (response.data != null) {
             val newSchedule = response.data.toDomainModel()
             Log.d(TAG, "Parsed schedule: $newSchedule")
