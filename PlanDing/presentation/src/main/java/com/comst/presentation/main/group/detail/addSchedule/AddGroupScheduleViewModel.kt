@@ -1,11 +1,8 @@
 package com.comst.presentation.main.group.detail.addSchedule
 
 import androidx.lifecycle.viewModelScope
-import com.comst.domain.model.base.ScheduleModel
 import com.comst.domain.usecase.local.GetUserCodeUseCase
 import com.comst.domain.util.DateUtils
-import com.comst.domain.util.onFailure
-import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
 import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract.*
 import com.comst.presentation.model.group.GroupProfileUIModel
@@ -86,6 +83,8 @@ class AddGroupScheduleViewModel @Inject constructor(
             return@launch
         }
 
+        if (!canHandleClick(CREATE_GROUP_SCHEDULE)) return@launch
+
         setState {
             copy(isLoading = true)
         }
@@ -117,6 +116,10 @@ class AddGroupScheduleViewModel @Inject constructor(
 
     private fun onCreationFailure(message: String) {
         setToastEffect(message)
+    }
+
+    companion object {
+        private const val CREATE_GROUP_SCHEDULE = "createGroupScheduleClick"
     }
 
 }

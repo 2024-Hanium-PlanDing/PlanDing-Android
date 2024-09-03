@@ -2,16 +2,19 @@ package com.comst.presentation.main.schedule
 
 import androidx.lifecycle.viewModelScope
 import com.comst.domain.model.base.Schedule
-import com.comst.domain.util.DateUtils
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleTodayListUseCase
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleWeekListUseCase
 import com.comst.domain.usecase.local.ClearUserDataUseCase
 import com.comst.domain.usecase.personalSchedule.GetPersonalScheduleListUseCase
+import com.comst.domain.util.DateUtils
 import com.comst.domain.util.onException
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
-import com.comst.presentation.main.schedule.ScheduleContract.*
+import com.comst.presentation.main.schedule.ScheduleContract.ScheduleEvent
+import com.comst.presentation.main.schedule.ScheduleContract.ScheduleIntent
+import com.comst.presentation.main.schedule.ScheduleContract.ScheduleSideEffect
+import com.comst.presentation.main.schedule.ScheduleContract.ScheduleUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -102,6 +105,7 @@ class ScheduleViewModel @Inject constructor(
     }
 
     private fun onSelectDate(date: Date) {
+        if (!canHandleClick(SELECT_DATE)) return
         val selectedLocalDate = DateUtils.dateToLocalDate(date)
         setState {
             copy(
@@ -171,4 +175,7 @@ class ScheduleViewModel @Inject constructor(
         }
     }
 
+    companion object{
+        const val SELECT_DATE = "selectDate"
+    }
 }

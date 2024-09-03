@@ -8,7 +8,10 @@ import com.comst.domain.util.onException
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
-import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.*
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleEvent
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleIntent
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleSideEffect
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -85,6 +88,8 @@ class AddPersonalScheduleViewModel @Inject constructor(
             return@launch
         }
 
+        if (!canHandleClick(CREATE_PERSONAL_SCHEDULE)) return@launch
+
         setState {
             copy(isLoading = true)
         }
@@ -112,6 +117,10 @@ class AddPersonalScheduleViewModel @Inject constructor(
 
     private fun onCreationFailure(message: String) {
         setToastEffect(message)
+    }
+
+    companion object {
+        private const val CREATE_PERSONAL_SCHEDULE = "createPersonalScheduleClick"
     }
 
 }

@@ -51,6 +51,8 @@ class AddGroupMemberViewModel @Inject constructor(
             setToastEffect("유저 코드를 입력해주세요.")
             return@launch
         }
+        if (!canHandleClick(INVITE_GROUP_MEMBER_CLICK)) return@launch
+
         postGroupInviteUseCase(
             GroupInviteModel(
                 groupCode = currentState.groupCode,
@@ -64,6 +66,10 @@ class AddGroupMemberViewModel @Inject constructor(
         }.onException { exception ->
             throw exception
         }
+    }
+
+    companion object {
+        private const val INVITE_GROUP_MEMBER_CLICK = "inviteGroupMemberClick"
     }
 
 }

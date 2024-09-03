@@ -9,6 +9,7 @@ import com.comst.domain.util.InternalServerErrorException
 import com.comst.domain.util.ReAuthenticationRequiredException
 import com.comst.domain.util.Resources
 import com.comst.domain.util.ServerNotFoundException
+import com.comst.presentation.common.util.ThrottleClickHandler
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -37,6 +38,12 @@ abstract class BaseViewModel<S : UIState, A : BaseSideEffect, I : BaseIntent, E 
 
     protected val apiExceptionHandler = CoroutineExceptionHandler { _, exception ->
         apiHandleException(exception)
+    }
+
+    private val throttleHandlers = mutableMapOf<String, ThrottleClickHandler>()
+    protected fun canHandleClick(key: String, delayMillis: Long = 3000): Boolean {
+        val handler = throttleHandlers.getOrPut(key) { ThrottleClickHandler(delayMillis) }
+        return handler.canHandleClick()
     }
 
     init {

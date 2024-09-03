@@ -309,20 +309,20 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
-    private fun onSendChat() {
-        viewModelScope.launch {
-            postChatMessageUseCase(
-                groupCode = currentState.groupProfile.groupCode,
-                content = currentState.chat
-            ).onSuccess {
-                setState {
-                    copy(
-                        chat = ""
-                    )
-                }
-            }.onFailure {
+    private fun onSendChat() = viewModelScope.launch(apiExceptionHandler){
+        if (!canHandleClick(SEND_CHAT)) return@launch
 
+        postChatMessageUseCase(
+            groupCode = currentState.groupProfile.groupCode,
+            content = currentState.chat
+        ).onSuccess {
+            setState {
+                copy(
+                    chat = ""
+                )
             }
+        }.onFailure {
+
         }
     }
     fun cancelStomp() {
@@ -408,6 +408,8 @@ class GroupDetailViewModel @Inject constructor(
     }
 
     private fun onSelectDate(date: Date) {
+        if (!canHandleClick(SELECT_DATE)) return
+
         val selectedLocalDate = DateUtils.dateToLocalDate(date)
         setState {
             copy(
@@ -554,5 +556,8 @@ class GroupDetailViewModel @Inject constructor(
 
         const val SUBSCRIBE_SCHEDULE_URL = "/sub/schedule/"
         const val SUBSCRIBE_CHAT_URL = "/sub/chat/"
+
+        const val SEND_CHAT = "sendChatClick"
+        const val SELECT_DATE = "selectDate"
     }
 }

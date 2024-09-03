@@ -54,6 +54,7 @@ class GroupRequestsReceivedViewModel @Inject constructor(
     }
 
     private fun onAcceptClick(groupRequestReceivedCardModel: GroupRequestReceivedCardModel) = viewModelScope.launch(apiExceptionHandler) {
+        if (!canHandleClick(GROUP_REQUEST_ACTION + groupRequestReceivedCardModel.inviteCode)) return@launch
         getAcceptGroupInviteUseCase(
             groupCode = groupRequestReceivedCardModel.groupCode,
             inviteCode = groupRequestReceivedCardModel.inviteCode
@@ -72,6 +73,7 @@ class GroupRequestsReceivedViewModel @Inject constructor(
     }
 
     private fun onDenyClick(groupRequestReceivedCardModel: GroupRequestReceivedCardModel)  = viewModelScope.launch(apiExceptionHandler){
+        if (!canHandleClick(GROUP_REQUEST_ACTION + groupRequestReceivedCardModel.inviteCode)) return@launch
         deleteDenyGroupInviteUseCase(
             inviteCode = groupRequestReceivedCardModel.inviteCode
         ).onSuccess {
@@ -86,6 +88,10 @@ class GroupRequestsReceivedViewModel @Inject constructor(
         }.onException { exception ->
             throw exception
         }
+    }
+
+    companion object {
+        private const val GROUP_REQUEST_ACTION = "groupRequestAction_"
     }
 
 }

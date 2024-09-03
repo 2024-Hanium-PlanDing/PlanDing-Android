@@ -84,6 +84,8 @@ class CreateGroupViewModel @Inject constructor(
             return@launch
         }
 
+        if (!canHandleClick(CREATE_GROUP_CLICK)) return@launch
+
         postGroupUseCase(
             GroupCreate(
                 currentState.groupName,
@@ -100,4 +102,7 @@ class CreateGroupViewModel @Inject constructor(
         setState { copy(isLoading = false) }
     }
 
+    companion object {
+        private const val CREATE_GROUP_CLICK = "createGroupClick"
+    }
 }
