@@ -2,7 +2,6 @@ package com.comst.presentation.main.group.detail
 
 import androidx.compose.runtime.Immutable
 import com.comst.domain.model.base.Schedule
-import com.comst.domain.model.base.WebSocketType
 import com.comst.domain.model.chat.ChatMessageModel
 import com.comst.domain.model.group.GroupUserInformationModel
 import com.comst.domain.util.DateUtils
@@ -59,7 +58,6 @@ class GroupDetailContract {
             day = "integer",
             complete = false,
             groupName = null,
-            type = WebSocketType.GROUP
         ),
         val isScheduleDetailDialogVisible: Boolean = false,
     ) : UIState

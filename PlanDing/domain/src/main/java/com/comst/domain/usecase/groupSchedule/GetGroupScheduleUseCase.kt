@@ -1,7 +1,7 @@
 package com.comst.domain.usecase.groupSchedule
 
-import com.comst.domain.model.base.Schedule
 import com.comst.domain.model.base.SchedulePeriodModel
+import com.comst.domain.model.base.CommonScheduleResponseModel
 import com.comst.domain.repository.GroupScheduleRepository
 import com.comst.domain.util.ApiResult
 import javax.inject.Inject
@@ -12,7 +12,7 @@ class GetGroupScheduleUseCase @Inject constructor(
     suspend operator fun invoke(
         groupCode: String,
         schedulePeriodModel: SchedulePeriodModel
-    ): ApiResult<List<Schedule>>{
+    ): ApiResult<List<CommonScheduleResponseModel>>{
         return groupScheduleRepository.getGroupSchedule(
             groupCode = groupCode,
             schedulePeriodModel = schedulePeriodModel

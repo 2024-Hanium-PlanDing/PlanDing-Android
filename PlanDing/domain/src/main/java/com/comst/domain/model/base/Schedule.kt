@@ -9,5 +9,4 @@ data class Schedule(
     val day: String,
     val complete: Boolean,
     val groupName: String? = null,
-    val type: WebSocketType
 )

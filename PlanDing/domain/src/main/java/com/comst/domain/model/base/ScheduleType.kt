@@ -1,7 +1,6 @@
 package com.comst.domain.model.base
 
-enum class WebSocketType(val type: String) {
+enum class ScheduleType(val type: String) {
     PERSONAL("PERSONAL"),
     GROUP("GROUP"),
-    PLANNER("PLANNER")
 }

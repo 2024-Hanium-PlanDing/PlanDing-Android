@@ -1,7 +1,7 @@
 package com.comst.data.model.personalSchedule
 
 import com.comst.domain.model.base.Schedule
-import com.comst.domain.model.base.WebSocketType
+import com.comst.domain.model.base.ScheduleType
 import com.comst.domain.util.DateUtils
 
 data class PersonalScheduleResponseDTO(
@@ -26,6 +26,5 @@ fun PersonalScheduleResponseDTO.toDomainModel(): Schedule {
         day = DateUtils.getDayOfWeekUIFormat(localDate),
         complete = complete,
         groupName = null,
-        type = WebSocketType.PERSONAL
     )
 }
