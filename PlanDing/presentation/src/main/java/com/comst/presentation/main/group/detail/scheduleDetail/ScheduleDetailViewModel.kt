@@ -3,22 +3,23 @@ package com.comst.presentation.main.group.detail.scheduleDetail
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.comst.domain.model.base.Schedule
+import com.comst.domain.model.base.ScheduleType
 import com.comst.domain.usecase.groupTask.GetTaskListOfScheduleUseCase
 import com.comst.domain.usecase.local.GetTokenUseCase
 import com.comst.domain.usecase.local.GetUserCodeUseCase
-import com.comst.domain.util.onError
 import com.comst.domain.util.onException
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.BuildConfig
 import com.comst.presentation.common.base.BaseViewModel
 import com.comst.presentation.common.util.UniqueList
-import com.comst.presentation.main.group.detail.GroupDetailViewModel
 import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailContract.ScheduleDetailEvent
 import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailContract.ScheduleDetailIntent
 import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailContract.ScheduleDetailSideEffect
 import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailContract.ScheduleDetailUIState
 import com.comst.presentation.model.group.socket.ReceiveScheduleDTO
+import com.comst.presentation.model.group.socket.ReceiveTaskDTO
+import com.comst.presentation.model.group.socket.SendCreateTaskDTO
 import com.comst.presentation.model.group.socket.WebSocketAction
 import com.comst.presentation.model.group.socket.WebSocketResponse
 import com.comst.presentation.model.group.toTaskUIModel
@@ -34,13 +35,15 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.stomp.StompSession
+import org.hildan.krossbow.stomp.conversions.convertAndSend
 import org.hildan.krossbow.stomp.conversions.moshi.withMoshi
 import org.hildan.krossbow.stomp.frame.StompFrame
+import org.hildan.krossbow.stomp.headers.StompSendHeaders
 import org.hildan.krossbow.stomp.headers.StompSubscribeHeaders
 import org.hildan.krossbow.websocket.okhttp.OkHttpWebSocketClient
 import javax.inject.Inject
 
-private const val TAG = "소켓"
+private const val TAG = "스케쥴 디테일 소켓"
 
 @HiltViewModel
 class ScheduleDetailViewModel @Inject constructor(
@@ -171,15 +174,15 @@ class ScheduleDetailViewModel @Inject constructor(
 
     private fun createStompHeaders(): Map<String, String> {
         return mapOf(
-            GroupDetailViewModel.HEADER_AUTHORIZATION to token,
-            GroupDetailViewModel.HEADER_GROUP_CODE to currentState.groupCode
+            HEADER_AUTHORIZATION to token,
+            HEADER_GROUP_CODE to currentState.groupCode
         )
     }
 
     private suspend fun subscribeToChannels() {
         newTask = stompSession.subscribe(
             StompSubscribeHeaders(
-                destination = "${GroupDetailViewModel.SUBSCRIBE_SCHEDULE_URL}${currentState.groupCode}",
+                destination = "${SUBSCRIBE_TASK_URL}${currentState.groupCode}",
                 customHeaders = createStompHeaders()
             )
         )
@@ -189,13 +192,13 @@ class ScheduleDetailViewModel @Inject constructor(
         newTask.collect { message ->
             try {
                 val taskJson = message.bodyAsText
-                Log.d(TAG, "Received schedule: $taskJson")
+                Log.d(TAG, "Received task: $taskJson")
 
                 val type = Types.newParameterizedType(
                     WebSocketResponse::class.java,
-                    ReceiveScheduleDTO::class.java
+                    ReceiveTaskDTO::class.java
                 )
-                val adapter = moshi.adapter<WebSocketResponse<ReceiveScheduleDTO>>(type)
+                val adapter = moshi.adapter<WebSocketResponse<ReceiveTaskDTO>>(type)
                 val response = adapter.fromJson(taskJson)
 
                 if (response != null) {
@@ -211,26 +214,58 @@ class ScheduleDetailViewModel @Inject constructor(
         }
     }
 
-    private fun handleReceiveTask(response: WebSocketResponse<ReceiveScheduleDTO>) {
+    private fun handleReceiveTask(response: WebSocketResponse<ReceiveTaskDTO>) {
         if (response.data != null) {
-
+            val newTask = response.data.planner
             when (response.data.action) {
                 WebSocketAction.CREATE.name -> {
-
+                    if (currentState.schedule.scheduleId == newTask.scheduleId){
+                        setState {
+                            copy(
+                                newTaskList = newTaskList.addOrUpdate(newTask)
+                            )
+                        }
+                    }
                 }
 
                 WebSocketAction.UPDATE.name -> {
-
+                    if (currentState.taskOriginalList.contains(newTask)) {
+                        setState {
+                            copy(
+                                taskOriginalList = taskOriginalList.addOrUpdate(newTask)
+                            )
+                        }
+                    } else {
+                        setState {
+                            copy(
+                                newTaskList = newTaskList.addOrUpdate(newTask)
+                            )
+                        }
+                    }
                 }
 
                 WebSocketAction.DELETE.name -> {
-
+                    if (currentState.taskOriginalList.contains(newTask)) {
+                        setState {
+                            copy(
+                                taskOriginalList = taskOriginalList.remove(newTask)
+                            )
+                        }
+                    } else {
+                        setState {
+                            copy(
+                                newTaskList = newTaskList.remove(newTask)
+                            )
+                        }
+                    }
                 }
             }
         } else {
             Log.e(TAG, "Received error response: ${response.errorResponse}")
         }
+
     }
+
 
 
     private fun onSelectTaskStatusOption(option: ScheduleDetailContract.TaskStatus) {

@@ -123,6 +123,7 @@ private fun TaskCardPreview() {
             userCode = "aa",
             task = TaskUIModel(
                 id = 4829,
+                scheduleId = 1,
                 plannerNumber = 6200,
                 title = "a",
                 content = "alterum",

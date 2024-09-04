@@ -2,7 +2,7 @@ package com.comst.presentation.main.group.detail.scheduleDetail
 
 import androidx.compose.runtime.Immutable
 import com.comst.domain.model.base.Schedule
-import com.comst.domain.model.base.WebSocketType
+import com.comst.domain.model.base.ScheduleType
 import com.comst.presentation.common.base.BaseEvent
 import com.comst.presentation.common.base.BaseIntent
 import com.comst.presentation.common.base.BaseSideEffect
@@ -25,11 +25,10 @@ class ScheduleDetailContract {
             day = "phasellus",
             complete = false,
             groupName = null,
-            type = WebSocketType.GROUP
         ),
         val taskOriginalList: UniqueList<TaskUIModel, Long> = UniqueList({ it.id }),
         val newTaskList: UniqueList<TaskUIModel, Long> = UniqueList({ it.id }),
-        val selectedOption: TaskStatus = TaskStatus.PENDING
+        val selectedOption: TaskStatus = TaskStatus.TODO
     ): UIState
 
     sealed class ScheduleDetailSideEffect : BaseSideEffect {
@@ -46,8 +45,8 @@ class ScheduleDetailContract {
     }
 
     enum class TaskStatus(val displayName: String) {
-        PENDING("대기"),
+        TODO("대기"),
         IN_PROGRESS("진행"),
-        COMPLETED("완료")
+        DONE("완료")
     }
 }

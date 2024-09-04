@@ -4,6 +4,7 @@ import com.comst.domain.model.groupTask.TaskResponseModel
 
 data class TaskResponseDTO(
     val id: Long,
+    val scheduleId: Long,
     val plannerNumber: Int,
     val title: String,
     val content: String,
@@ -16,6 +17,7 @@ data class TaskResponseDTO(
 fun TaskResponseDTO.toDomainModel(): TaskResponseModel {
     return TaskResponseModel(
         id = id,
+        scheduleId = scheduleId,
         plannerNumber = plannerNumber,
         title = title,
         content = content,

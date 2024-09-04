@@ -79,7 +79,7 @@ fun ScheduleDetailBottomSheet(
             ScheduleDetailBottomSheet(
                 uiState = uiState,
                 setIntent = viewModel::setIntent,
-                onCloseBottomSheet = onCloseBottomSheet
+                onCloseBottomSheet = onCloseBottomSheet,
             )
         }
     }
@@ -102,7 +102,7 @@ private fun ScheduleDetailBottomSheet(
     ){
         ScheduleDetailContent(
             uiState = uiState,
-            setIntent = setIntent
+            setIntent = setIntent,
         )
     }
 }
@@ -110,7 +110,7 @@ private fun ScheduleDetailBottomSheet(
 @Composable
 private fun ScheduleDetailContent(
     uiState: ScheduleDetailUIState,
-    setIntent: (ScheduleDetailIntent) -> Unit = {}
+    setIntent: (ScheduleDetailIntent) -> Unit = {},
 ){
     var isExpanded by remember { mutableStateOf(false) }
     val bottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -122,7 +122,8 @@ private fun ScheduleDetailContent(
             .padding(bottom = bottomPadding)
     ) {
         Text(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally),
             text = uiState.schedule.title,
             style = MaterialTheme.typography.titleLarge
         )
@@ -184,7 +185,7 @@ private fun TaskArea(
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.SpaceAround
             ) {
                 TaskStatus.values().forEach { status ->
                     Text(
