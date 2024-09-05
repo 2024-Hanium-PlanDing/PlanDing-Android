@@ -45,7 +45,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.comst.domain.model.base.Schedule
 import com.comst.presentation.R
 import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailContract.ScheduleDetailIntent
@@ -63,7 +62,7 @@ import com.comst.presentation.ui.theme.Primary100
 fun ScheduleDetailBottomSheet(
     viewModel: ScheduleDetailViewModel = hiltViewModel(),
     groupCode: String,
-    schedule: Schedule,
+    scheduleId: Long,
     onCloseBottomSheet:() -> Unit,
 ) {
 
@@ -72,7 +71,7 @@ fun ScheduleDetailBottomSheet(
     LaunchedEffect(Unit) {
         viewModel.initialize(
             groupCode = groupCode,
-            schedule = schedule
+            scheduleId = scheduleId
         )
     }
 

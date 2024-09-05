@@ -2,7 +2,7 @@ package com.comst.presentation.main.group.detail.scheduleDetail
 
 import androidx.compose.runtime.Immutable
 import com.comst.domain.model.base.Schedule
-import com.comst.domain.model.base.ScheduleType
+import com.comst.domain.model.groupSchedule.GroupScheduleResponseModel
 import com.comst.presentation.common.base.BaseEvent
 import com.comst.presentation.common.base.BaseIntent
 import com.comst.presentation.common.base.BaseSideEffect
@@ -16,15 +16,18 @@ class ScheduleDetailContract {
     data class ScheduleDetailUIState(
         val userCode: String = "",
         val groupCode: String = "",
-        val schedule: Schedule = Schedule(
-            scheduleId = 5852,
-            title = "affert",
-            content = "civibusaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\nadasddddddddddddddwadddddddddd\naaaaaaaaaaaaaaaaaaaaaaaaaaaaxxxxxxxxxxxwwwwwwww\nzzzzzzzzzzzzzzzzzzzzzzzzzzzzzwwwwwwwwwwwwwwwqqqqqqq\nzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
-            startTime = 4559,
-            endTime = 2723,
-            day = "phasellus",
-            complete = false,
-            groupName = null,
+        val scheduleId: Long = -1,
+        val schedule: GroupScheduleResponseModel = GroupScheduleResponseModel(
+            id = 4357,
+            title = "facilisi",
+            content = "dicat",
+            scheduleDate = "nihil",
+            startTime = 9738,
+            endTime = 4338,
+            day = "duis",
+            type = "mea",
+            groupName = "Christian Rowe",
+            userScheduleAttendances = listOf()
         ),
         val taskOriginalList: UniqueList<TaskUIModel, Long> = UniqueList({ it.id }),
         val newTaskList: UniqueList<TaskUIModel, Long> = UniqueList({ it.id }),
@@ -36,7 +39,7 @@ class ScheduleDetailContract {
     }
 
     sealed class ScheduleDetailIntent: BaseIntent {
-        data class Initialize(val groupCode: String, val schedule: Schedule): ScheduleDetailIntent()
+        data class Initialize(val groupCode: String, val scheduleId: Long): ScheduleDetailIntent()
         data class SelectTaskStatusOption(val option: TaskStatus) : ScheduleDetailIntent()
     }
 

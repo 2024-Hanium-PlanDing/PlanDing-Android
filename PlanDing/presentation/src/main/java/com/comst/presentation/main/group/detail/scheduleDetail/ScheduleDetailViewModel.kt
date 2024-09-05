@@ -2,8 +2,7 @@ package com.comst.presentation.main.group.detail.scheduleDetail
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.comst.domain.model.base.Schedule
-import com.comst.domain.model.base.ScheduleType
+import com.comst.domain.usecase.groupSchedule.GetGroupScheduleUseCase
 import com.comst.domain.usecase.groupTask.GetTaskListOfScheduleUseCase
 import com.comst.domain.usecase.local.GetTokenUseCase
 import com.comst.domain.usecase.local.GetUserCodeUseCase
@@ -17,9 +16,7 @@ import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailCon
 import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailContract.ScheduleDetailIntent
 import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailContract.ScheduleDetailSideEffect
 import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailContract.ScheduleDetailUIState
-import com.comst.presentation.model.group.socket.ReceiveScheduleDTO
 import com.comst.presentation.model.group.socket.ReceiveTaskDTO
-import com.comst.presentation.model.group.socket.SendCreateTaskDTO
 import com.comst.presentation.model.group.socket.WebSocketAction
 import com.comst.presentation.model.group.socket.WebSocketResponse
 import com.comst.presentation.model.group.toTaskUIModel
@@ -35,10 +32,8 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.stomp.StompSession
-import org.hildan.krossbow.stomp.conversions.convertAndSend
 import org.hildan.krossbow.stomp.conversions.moshi.withMoshi
 import org.hildan.krossbow.stomp.frame.StompFrame
-import org.hildan.krossbow.stomp.headers.StompSendHeaders
 import org.hildan.krossbow.stomp.headers.StompSubscribeHeaders
 import org.hildan.krossbow.websocket.okhttp.OkHttpWebSocketClient
 import javax.inject.Inject
@@ -49,7 +44,8 @@ private const val TAG = "스케쥴 디테일 소켓"
 class ScheduleDetailViewModel @Inject constructor(
     private val getTokenUseCase: GetTokenUseCase,
     private val getUserCodeUseCase: GetUserCodeUseCase,
-    private val getTaskListOfScheduleUseCase: GetTaskListOfScheduleUseCase
+    private val getTaskListOfScheduleUseCase: GetTaskListOfScheduleUseCase,
+    private val getGroupScheduleUseCase: GetGroupScheduleUseCase
 ) : BaseViewModel<ScheduleDetailUIState, ScheduleDetailSideEffect, ScheduleDetailIntent, ScheduleDetailEvent>(
     ScheduleDetailUIState()
 ) {
@@ -66,7 +62,7 @@ class ScheduleDetailViewModel @Inject constructor(
         when (intent) {
             is ScheduleDetailIntent.Initialize -> initialize(
                 groupCode = intent.groupCode,
-                schedule = intent.schedule
+                scheduleId = intent.scheduleId
             )
 
             is ScheduleDetailIntent.SelectTaskStatusOption -> onSelectTaskStatusOption(intent.option)
@@ -77,25 +73,30 @@ class ScheduleDetailViewModel @Inject constructor(
 
     }
 
-    fun initialize(groupCode: String, schedule: Schedule) = viewModelScope.launch {
+    fun initialize(groupCode: String, scheduleId: Long) = viewModelScope.launch(apiExceptionHandler) {
         setState {
             copy(
                 groupCode = groupCode,
-                schedule = schedule
+                scheduleId = scheduleId
             )
         }
 
         val tokenDeferred = async { getTokenUseCase() }
         val userCodeDeferred = async { getUserCodeUseCase() }
+        val scheduleDeferred = async { getGroupScheduleUseCase(
+            groupCode = currentState.groupCode,
+            scheduleId = currentState.scheduleId
+        ) }
         val taskListDeferred = async {
             getTaskListOfScheduleUseCase(
                 groupCode = currentState.groupCode,
-                scheduleId = schedule.scheduleId
+                scheduleId = scheduleId
             )
         }
 
         val tokenResult = tokenDeferred.await()
         val userCodeResult = userCodeDeferred.await()
+        val scheduleResult = scheduleDeferred.await()
         val taskListResult = taskListDeferred.await()
 
         var isSuccess = true
@@ -116,6 +117,19 @@ class ScheduleDetailViewModel @Inject constructor(
             }
         }.onFailure {
             isSuccess = false
+        }
+
+        scheduleResult.onSuccess { groupSchedule ->
+            setState {
+                copy(
+                    schedule = groupSchedule
+                )
+            }
+        }.onFailure {
+            isSuccess = false
+        }.onException { exception ->
+            isSuccess = false
+            throw exception
         }
 
         taskListResult.onSuccess { groupTaskResponseModel ->
@@ -219,7 +233,7 @@ class ScheduleDetailViewModel @Inject constructor(
             val newTask = response.data.planner
             when (response.data.action) {
                 WebSocketAction.CREATE.name -> {
-                    if (currentState.schedule.scheduleId == newTask.scheduleId){
+                    if (currentState.schedule.id == newTask.scheduleId){
                         setState {
                             copy(
                                 newTaskList = newTaskList.addOrUpdate(newTask)

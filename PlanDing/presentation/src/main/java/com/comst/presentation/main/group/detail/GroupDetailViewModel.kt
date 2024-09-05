@@ -6,7 +6,7 @@ import com.comst.domain.model.base.Schedule
 import com.comst.domain.usecase.chat.GetChatMessageListUseCase
 import com.comst.domain.usecase.chat.PostChatMessageUseCase
 import com.comst.domain.usecase.group.GetGroupInformationUseCase
-import com.comst.domain.usecase.groupSchedule.GetGroupScheduleUseCase
+import com.comst.domain.usecase.groupSchedule.GetGroupScheduleListUseCase
 import com.comst.domain.usecase.local.GetTokenUseCase
 import com.comst.domain.usecase.local.GetUserCodeUseCase
 import com.comst.domain.util.DateUtils
@@ -55,7 +55,7 @@ class GroupDetailViewModel @Inject constructor(
     private val getTokenUseCase: GetTokenUseCase,
     private val getUserCodeUseCase: GetUserCodeUseCase,
     private val getGroupInformationUseCase: GetGroupInformationUseCase,
-    private val getGroupScheduleUseCase: GetGroupScheduleUseCase,
+    private val getGroupScheduleListUseCase: GetGroupScheduleListUseCase,
     private val getChatMessageListUseCase: GetChatMessageListUseCase,
     private val postChatMessageUseCase: PostChatMessageUseCase
 ) : BaseViewModel<GroupDetailUIState, GroupDetailSideEffect, GroupDetailIntent, GroupDetailEvent>(GroupDetailUIState()) {
@@ -104,7 +104,7 @@ class GroupDetailViewModel @Inject constructor(
         val userCodeDeferred = async { getUserCodeUseCase() }
         val groupInfoDeferred = async { getGroupInformationUseCase(groupCode) }
         val groupScheduleDeferred = async {
-            getGroupScheduleUseCase(
+            getGroupScheduleListUseCase(
                 groupCode = groupCode,
                 schedulePeriodModel = DateUtils.getWeekStartAndEnd(currentState.selectLocalDate)
             )
@@ -430,7 +430,7 @@ class GroupDetailViewModel @Inject constructor(
         if (currentState.selectedWeekdays != newSelectedWeekdays) {
             val weeklySchedulePeriod = DateUtils.getWeekStartAndEnd(date)
 
-            getGroupScheduleUseCase(
+            getGroupScheduleListUseCase(
                 groupCode = currentState.groupProfile.groupCode,
                 schedulePeriodModel = weeklySchedulePeriod
             ).onSuccess { scheduleList ->

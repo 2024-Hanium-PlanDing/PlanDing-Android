@@ -96,7 +96,6 @@ import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailBot
 import com.comst.presentation.model.group.GroupProfileUIModel
 import com.comst.presentation.ui.theme.Background0
 import com.comst.presentation.ui.theme.Background20
-import com.comst.presentation.ui.theme.Background60
 import com.comst.presentation.ui.theme.PlanDingTheme
 import com.comst.presentation.ui.theme.Primary100
 import com.comst.presentation.ui.theme.Primary300
@@ -282,7 +281,7 @@ private fun GroupDetailScreen(
     if (uiState.isScheduleDetailDialogVisible){
         ScheduleDetailBottomSheet(
             groupCode = uiState.groupProfile.groupCode,
-            schedule = uiState.selectSchedule,
+            scheduleId = uiState.selectSchedule.scheduleId,
             onCloseBottomSheet = {
                 setIntent(GroupDetailIntent.CloseScheduleDetailBottomSheet)
             }

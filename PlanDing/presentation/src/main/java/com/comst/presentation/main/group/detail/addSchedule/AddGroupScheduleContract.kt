@@ -1,7 +1,6 @@
 package com.comst.presentation.main.group.detail.addSchedule
 
 import androidx.compose.runtime.Immutable
-import com.comst.domain.model.base.Schedule
 import com.comst.presentation.common.base.BaseEvent
 import com.comst.presentation.common.base.BaseIntent
 import com.comst.presentation.common.base.BaseSideEffect

@@ -1,7 +1,6 @@
 package com.comst.presentation.model.group.socket
 
 import com.comst.domain.model.base.Schedule
-import com.comst.domain.model.base.ScheduleType
 import com.comst.domain.util.DateUtils
 import com.squareup.moshi.JsonClass
 
