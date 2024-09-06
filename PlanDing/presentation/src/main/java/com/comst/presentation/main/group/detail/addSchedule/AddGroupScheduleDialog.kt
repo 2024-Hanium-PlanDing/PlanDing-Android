@@ -147,6 +147,7 @@ private fun AddGroupScheduleDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     PDTimeDropdownMenu(
+                        modifier = Modifier.width(100.dp),
                         selectedTime = uiState.startTime,
                         onConfirm = {
                             setIntent(AddGroupScheduleIntent.SelectedStartTime(it))
@@ -156,6 +157,7 @@ private fun AddGroupScheduleDialog(
                     Text(text = "부터")
                     Spacer(modifier = Modifier.weight(1f))
                     PDTimeDropdownMenu(
+                        modifier = Modifier.width(100.dp),
                         selectedTime = uiState.endTime,
                         onConfirm = {
                             setIntent(AddGroupScheduleIntent.SelectedEndTime(it))

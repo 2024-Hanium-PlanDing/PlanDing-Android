@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -112,6 +113,7 @@ private fun AddPersonalScheduleDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     PDTimeDropdownMenu(
+                        modifier = Modifier.width(100.dp),
                         selectedTime = uiState.startTime,
                         onConfirm = {
                             setIntent(AddPersonalScheduleIntent.SelectedStartTime(it))
@@ -121,6 +123,7 @@ private fun AddPersonalScheduleDialog(
                     Text(text = "부터")
                     Spacer(modifier = Modifier.weight(1f))
                     PDTimeDropdownMenu(
+                        modifier = Modifier.width(100.dp),
                         selectedTime = uiState.endTime,
                         onConfirm = {
                             setIntent(AddPersonalScheduleIntent.SelectedEndTime(it))
