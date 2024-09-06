@@ -8,6 +8,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
 import java.util.Date
 import java.util.Locale
 
@@ -176,6 +177,11 @@ object DateUtils {
         val dateTime = LocalDateTime.parse(input, inputFormatter)
         val outputFormatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일 H시", Locale.getDefault())
         return dateTime.format(outputFormatter)
+    }
+
+    fun serverDateToUIDate(input: String): String {
+        val date = LocalDate.parse(input, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        return date.format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일"))
     }
 
 }
