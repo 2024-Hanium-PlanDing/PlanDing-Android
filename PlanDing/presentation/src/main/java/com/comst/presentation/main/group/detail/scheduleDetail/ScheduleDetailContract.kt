@@ -29,6 +29,7 @@ class ScheduleDetailContract {
             groupName = "Christian Rowe",
             userScheduleAttendances = listOf()
         ),
+        val isAddTaskDialogVisible: Boolean = false,
         val taskOriginalList: UniqueList<TaskUIModel, Long> = UniqueList({ it.id }),
         val newTaskList: UniqueList<TaskUIModel, Long> = UniqueList({ it.id }),
         val selectedOption: TaskStatus = TaskStatus.TODO
@@ -41,6 +42,8 @@ class ScheduleDetailContract {
     sealed class ScheduleDetailIntent: BaseIntent {
         data class Initialize(val groupCode: String, val scheduleId: Long): ScheduleDetailIntent()
         data class SelectTaskStatusOption(val option: TaskStatus) : ScheduleDetailIntent()
+        object ShowAddTaskDialog: ScheduleDetailIntent()
+        object HideAddTaskDialog: ScheduleDetailIntent()
     }
 
     sealed class ScheduleDetailEvent : BaseEvent {

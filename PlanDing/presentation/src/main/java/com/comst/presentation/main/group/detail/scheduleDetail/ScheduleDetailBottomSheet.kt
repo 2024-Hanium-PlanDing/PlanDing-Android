@@ -51,6 +51,8 @@ import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailCon
 import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailContract.ScheduleDetailSideEffect
 import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailContract.ScheduleDetailUIState
 import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailContract.TaskStatus
+import com.comst.presentation.main.group.detail.scheduleDetail.addTask.AddTaskDialog
+import com.comst.presentation.main.group.detail.scheduleDetail.addTask.AddTaskViewModel
 import com.comst.presentation.model.group.TaskUIModel
 import com.comst.presentation.ui.theme.Background0
 import com.comst.presentation.ui.theme.Background20
@@ -115,6 +117,19 @@ private fun ScheduleDetailBottomSheet(
             setIntent = setIntent,
         )
     }
+
+    if (uiState.isAddTaskDialogVisible){
+        AddTaskDialog(
+            groupCode = uiState.groupCode,
+            scheduleId = uiState.scheduleId,
+            onDismiss = {
+                setIntent(ScheduleDetailIntent.HideAddTaskDialog)
+            },
+            onConfirm = {
+
+            }
+        )
+    }
 }
 
 @Composable
@@ -165,7 +180,7 @@ private fun ScheduleDetailContent(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "해야 할 일",
+                text = "할 일",
                 style = MaterialTheme.typography.labelLarge
             )
 
@@ -184,7 +199,9 @@ private fun ScheduleDetailContent(
             containerColor = Primary100,
             contentColor = Background0,
             shape = RoundedCornerShape(60.dp),
-            onClick = {  },
+            onClick = {
+                setIntent(ScheduleDetailIntent.ShowAddTaskDialog)
+            },
         ) {
             Icon(
                 modifier = Modifier.size(40.dp),
@@ -286,12 +303,12 @@ private fun NoTaskContent(){
             Image(
                 modifier = Modifier.size(80.dp),
                 painter = painterResource(id = R.drawable.ic_main_schedule),
-                contentDescription = "해야할 일이 없을 때 이미지"
+                contentDescription = "할 일이 없을 때 이미지"
             )
         }
         Spacer(modifier = Modifier.height(20.dp))
         Text(
-            text = "해야할 일이 없습니다.",
+            text = "할 일이 없습니다.",
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold
         )

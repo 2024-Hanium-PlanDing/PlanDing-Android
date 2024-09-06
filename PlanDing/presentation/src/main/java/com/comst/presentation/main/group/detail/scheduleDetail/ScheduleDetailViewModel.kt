@@ -64,8 +64,9 @@ class ScheduleDetailViewModel @Inject constructor(
                 groupCode = intent.groupCode,
                 scheduleId = intent.scheduleId
             )
-
             is ScheduleDetailIntent.SelectTaskStatusOption -> onSelectTaskStatusOption(intent.option)
+            is ScheduleDetailIntent.ShowAddTaskDialog -> onShowAddTaskDialog()
+            is ScheduleDetailIntent.HideAddTaskDialog -> onHideAddTaskDialog()
         }
     }
 
@@ -286,6 +287,22 @@ class ScheduleDetailViewModel @Inject constructor(
         setState {
             copy(
                 selectedOption = option
+            )
+        }
+    }
+
+    private fun onShowAddTaskDialog(){
+        setState {
+            copy(
+                isAddTaskDialogVisible = true
+            )
+        }
+    }
+
+    private fun onHideAddTaskDialog(){
+        setState {
+            copy(
+                isAddTaskDialogVisible = false
             )
         }
     }
