@@ -39,6 +39,7 @@ import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDTextFieldOutLine
 import com.comst.presentation.component.PDTimeDropdownMenu
+import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract
 import com.comst.presentation.main.group.detail.scheduleDetail.addTask.AddTaskContract.AddTaskIntent
 import com.comst.presentation.main.group.detail.scheduleDetail.addTask.AddTaskContract.AddTaskSideEffect
 import com.comst.presentation.main.group.detail.scheduleDetail.addTask.AddTaskContract.AddTaskUIState
@@ -65,7 +66,15 @@ fun AddTaskDialog(
     }
 
     val handleEffect: (AddTaskSideEffect) -> Unit = { effect ->
-
+        when(effect) {
+            is AddTaskSideEffect.SuccessCreateTask -> {
+                onConfirm(effect.task)
+                viewModel.initialize(
+                    groupCode = groupCode,
+                    scheduleId = scheduleId
+                )
+            }
+        }
     }
 
     BaseScreen(viewModel = viewModel, handleEffect = handleEffect) { uiState ->
@@ -77,8 +86,6 @@ fun AddTaskDialog(
 
     }
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTaskDialog(
     uiState: AddTaskUIState,
@@ -121,7 +128,7 @@ fun AddTaskDialog(
                             .height(50.dp),
                         selectedTime = uiState.dueTime,
                         onConfirm = {
-
+                            setIntent(AddTaskIntent.SelectedDueTime(it))
                         }
                     )
                 }
@@ -132,8 +139,8 @@ fun AddTaskDialog(
                         .padding(top = 8.dp),
                     label = "제목을 입력해주세요",
                     value = uiState.taskTitle,
-                    onValueChange = {
-
+                    onValueChange = { taskTitle ->
+                        setIntent(AddTaskIntent.TaskTitleChange(taskTitle))
                     }
                 )
                 PDTextFieldOutLine(
@@ -142,8 +149,8 @@ fun AddTaskDialog(
                         .heightIn(min = 120.dp, max = 160.dp),
                     label = "일정 내용을 입력해주세요",
                     value = uiState.taskContent,
-                    onValueChange = {
-
+                    onValueChange = { taskContent ->
+                        setIntent(AddTaskIntent.TaskContentChange(taskContent))
                     }
                 )
 
@@ -159,7 +166,7 @@ fun AddTaskDialog(
         confirmButton = {
             PDButton(
                 onClick = {
-
+                    setIntent(AddTaskIntent.CreateTask)
                 },
                 text = "생성",
                 modifier = Modifier.fillMaxWidth()
@@ -168,7 +175,10 @@ fun AddTaskDialog(
         dismissButton = {
             Button(
                 onClick = {
-
+                    setIntent(AddTaskIntent.Initialize(
+                        groupCode = uiState.groupCode,
+                        scheduleId = uiState.scheduleId
+                    ))
                     onDismiss()
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -267,7 +277,12 @@ private fun ParticipantSelection(
                     count = groupMember.size,
                     key = { index ->  groupMember[index].userCode }
                 ){ index ->
-                    ParticipantCard(groupMember[index])
+                    ParticipantCard(
+                        groupMember = groupMember[index],
+                        checkBoxClick = {  member ->
+                            setIntent(AddTaskIntent.MemberCheckBoxClick(member))
+                        }
+                    )
                 }
             }
         }

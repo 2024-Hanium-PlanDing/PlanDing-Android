@@ -9,6 +9,7 @@ import com.comst.presentation.common.base.BaseSideEffect
 import com.comst.presentation.common.base.UIState
 import com.comst.presentation.common.util.UniqueList
 import com.comst.presentation.model.group.TaskUIModel
+import com.comst.presentation.model.group.socket.SendCreateTaskDTO
 
 class ScheduleDetailContract {
 
@@ -42,6 +43,7 @@ class ScheduleDetailContract {
     sealed class ScheduleDetailIntent: BaseIntent {
         data class Initialize(val groupCode: String, val scheduleId: Long): ScheduleDetailIntent()
         data class SelectTaskStatusOption(val option: TaskStatus) : ScheduleDetailIntent()
+        data class CreateTask(val newTask: SendCreateTaskDTO): ScheduleDetailIntent()
         object ShowAddTaskDialog: ScheduleDetailIntent()
         object HideAddTaskDialog: ScheduleDetailIntent()
     }

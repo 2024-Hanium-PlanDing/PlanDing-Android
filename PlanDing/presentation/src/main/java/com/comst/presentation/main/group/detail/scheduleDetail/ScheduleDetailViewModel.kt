@@ -17,6 +17,7 @@ import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailCon
 import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailContract.ScheduleDetailSideEffect
 import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailContract.ScheduleDetailUIState
 import com.comst.presentation.model.group.socket.ReceiveTaskDTO
+import com.comst.presentation.model.group.socket.SendCreateTaskDTO
 import com.comst.presentation.model.group.socket.WebSocketAction
 import com.comst.presentation.model.group.socket.WebSocketResponse
 import com.comst.presentation.model.group.toTaskUIModel
@@ -32,8 +33,10 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.stomp.StompSession
+import org.hildan.krossbow.stomp.conversions.convertAndSend
 import org.hildan.krossbow.stomp.conversions.moshi.withMoshi
 import org.hildan.krossbow.stomp.frame.StompFrame
+import org.hildan.krossbow.stomp.headers.StompSendHeaders
 import org.hildan.krossbow.stomp.headers.StompSubscribeHeaders
 import org.hildan.krossbow.websocket.okhttp.OkHttpWebSocketClient
 import javax.inject.Inject
@@ -65,6 +68,7 @@ class ScheduleDetailViewModel @Inject constructor(
                 scheduleId = intent.scheduleId
             )
             is ScheduleDetailIntent.SelectTaskStatusOption -> onSelectTaskStatusOption(intent.option)
+            is ScheduleDetailIntent.CreateTask -> onCreateTaskClick(intent.newTask)
             is ScheduleDetailIntent.ShowAddTaskDialog -> onShowAddTaskDialog()
             is ScheduleDetailIntent.HideAddTaskDialog -> onHideAddTaskDialog()
         }
@@ -225,6 +229,29 @@ class ScheduleDetailViewModel @Inject constructor(
                 Log.e(TAG, "JSON parsing error", e)
             } catch (e: Exception) {
                 Log.e(TAG, "Error processing message", e)
+            }
+        }
+    }
+
+    private fun onCreateTaskClick(sendCreateTaskDTO: SendCreateTaskDTO) {
+        Log.d("하","$sendCreateTaskDTO")
+        viewModelScope.launch {
+            try {
+                val fullUrl = "$SEND_TASK_CREATE_URL${currentState.groupCode}"
+                Log.d(TAG, fullUrl)
+
+                val headers = StompSendHeaders(
+                    destination = fullUrl,
+                    customHeaders = createStompHeaders()
+                )
+
+                stompSession.withMoshi(moshi).convertAndSend(
+                    headers = headers,
+                    body = sendCreateTaskDTO
+                )
+                Log.d(TAG, "Message sent successfully")
+            }catch (e: Exception){
+                Log.e(TAG, "Error sending message", e)
             }
         }
     }

@@ -125,8 +125,9 @@ private fun ScheduleDetailBottomSheet(
             onDismiss = {
                 setIntent(ScheduleDetailIntent.HideAddTaskDialog)
             },
-            onConfirm = {
-
+            onConfirm = { task ->
+                setIntent(ScheduleDetailIntent.CreateTask(task))
+                setIntent(ScheduleDetailIntent.HideAddTaskDialog)
             }
         )
     }

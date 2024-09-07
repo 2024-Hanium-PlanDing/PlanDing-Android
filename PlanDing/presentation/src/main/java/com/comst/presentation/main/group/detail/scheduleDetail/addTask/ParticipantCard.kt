@@ -23,7 +23,8 @@ import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
 fun ParticipantCard(
-    groupMember: TaskUserUIModel
+    groupMember: TaskUserUIModel,
+    checkBoxClick: (TaskUserUIModel) -> Unit
 ) {
     var isChecked by remember { mutableStateOf(false) }
 
@@ -44,7 +45,10 @@ fun ParticipantCard(
 
         Checkbox(
             checked = isChecked,
-            onCheckedChange = { isChecked = it },
+            onCheckedChange = { checked ->
+                isChecked = checked
+                checkBoxClick(groupMember)
+            },
             modifier = Modifier.padding(start = 16.dp)
         )
     }
@@ -58,7 +62,8 @@ fun ParticipantCard(
                 userCode = "constituam",
                 username = "Candy Fischer",
                 profileImage = "velit"
-            )
+            ),
+            {}
         )
     }
 }

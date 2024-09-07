@@ -8,6 +8,7 @@ import com.comst.presentation.common.base.BaseIntent
 import com.comst.presentation.common.base.BaseSideEffect
 import com.comst.presentation.common.base.UIState
 import com.comst.presentation.model.group.TaskUserUIModel
+import com.comst.presentation.model.group.socket.SendCreateTaskDTO
 
 class AddTaskContract {
 
@@ -30,14 +31,14 @@ class AddTaskContract {
             userScheduleAttendances = listOf()
         ),
         val groupMember: List<TaskUserUIModel> = listOf(),
+        val participantMember: List<TaskUserUIModel> = listOf(),
         val taskTitle: String = "",
         val taskContent: String = "",
-        val deadline: String = "",
         val isGroupMemberListVisible: Boolean = false
     ): UIState
 
     sealed class AddTaskSideEffect: BaseSideEffect{
-
+        data class SuccessCreateTask(val task: SendCreateTaskDTO) : AddTaskSideEffect()
     }
 
     sealed class AddTaskIntent: BaseIntent{
@@ -45,6 +46,9 @@ class AddTaskContract {
         data class TaskTitleChange(val taskTitle: String): AddTaskIntent()
         data class TaskContentChange(val taskContent: String): AddTaskIntent()
         object ToggleGroupMemberListVisibility: AddTaskIntent()
+        data class SelectedDueTime(val dueTime: Int): AddTaskIntent()
+        data class MemberCheckBoxClick(val member: TaskUserUIModel): AddTaskIntent()
+        object CreateTask: AddTaskIntent()
     }
 
     sealed class AddTaskEvent: BaseEvent{
