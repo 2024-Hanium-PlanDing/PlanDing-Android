@@ -24,9 +24,10 @@ import com.comst.presentation.ui.theme.PlanDingTheme
 @Composable
 fun ParticipantCard(
     groupMember: TaskUserUIModel,
+    isChecked: Boolean,
     checkBoxClick: (TaskUserUIModel) -> Unit
 ) {
-    var isChecked by remember { mutableStateOf(false) }
+    var isChecked by remember { mutableStateOf(isChecked) }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -63,6 +64,7 @@ fun ParticipantCard(
                 username = "Candy Fischer",
                 profileImage = "velit"
             ),
+            false,
             {}
         )
     }

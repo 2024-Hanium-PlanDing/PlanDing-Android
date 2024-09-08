@@ -22,7 +22,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,7 +38,6 @@ import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDTextFieldOutLine
 import com.comst.presentation.component.PDTimeDropdownMenu
-import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract
 import com.comst.presentation.main.group.detail.scheduleDetail.addTask.AddTaskContract.AddTaskIntent
 import com.comst.presentation.main.group.detail.scheduleDetail.addTask.AddTaskContract.AddTaskSideEffect
 import com.comst.presentation.main.group.detail.scheduleDetail.addTask.AddTaskContract.AddTaskUIState
@@ -157,9 +155,10 @@ fun AddTaskDialog(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 ParticipantSelection(
-                    groupMember = uiState.groupMember,
+                    groupMembers = uiState.groupMember,
+                    participantMember = uiState.participantMember,
                     isGroupMemberListVisible = uiState.isGroupMemberListVisible,
-                    setIntent
+                    setIntent = setIntent
                 )
             }
         },
@@ -235,7 +234,8 @@ private fun DateSelectTab(
 
 @Composable
 private fun ParticipantSelection(
-    groupMember: List<TaskUserUIModel>,
+    groupMembers: List<TaskUserUIModel>,
+    participantMember: List<TaskUserUIModel>,
     isGroupMemberListVisible: Boolean,
     setIntent: (AddTaskIntent) -> Unit = {}
 ){
@@ -274,11 +274,14 @@ private fun ParticipantSelection(
                     .heightIn(max = 300.dp)
             ) {
                 items(
-                    count = groupMember.size,
-                    key = { index ->  groupMember[index].userCode }
+                    count = groupMembers.size,
+                    key = { index ->  groupMembers[index].userCode }
                 ){ index ->
+                    val member = groupMembers[index]
+                    val isChecked = participantMember.contains(member)
                     ParticipantCard(
-                        groupMember = groupMember[index],
+                        groupMember = member,
+                        isChecked = isChecked,
                         checkBoxClick = {  member ->
                             setIntent(AddTaskIntent.MemberCheckBoxClick(member))
                         }
