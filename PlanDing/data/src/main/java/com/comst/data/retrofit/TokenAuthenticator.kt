@@ -3,6 +3,7 @@ package com.comst.data.retrofit
 import android.content.Context
 import com.comst.data.BuildConfig.BASE_URL
 import com.comst.data.UserDataStore
+import com.comst.domain.util.ReAuthenticationRequiredException
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
 import okhttp3.Request
@@ -18,37 +19,38 @@ class TokenAuthenticator @Inject constructor(
     override fun authenticate(route: Route?, response: Response): Request? {
         val isPathRefresh = response.request.url.toString() == BASE_URL + "오호"
 
-        val refreshToken = runBlocking{ userDataStore.getRefreshToken() }
+        val refreshToken = runBlocking { userDataStore.getRefreshToken() }
 
-        if (refreshToken.isNullOrEmpty()) return null
+        if (refreshToken.isNullOrEmpty()) {
+            handleTokenExpiration(response)
+            return null
+        }
 
-        if (response.code == 401 && !isPathRefresh){
-            return if ( fetchUpdateToken() ){
+        if (response.code == 401 && !isPathRefresh) {
+            return if (fetchUpdateToken()) {
                 val newToken = runBlocking { userDataStore.getAccessToken() }
                 response.request.newBuilder().apply {
                     removeHeader("Authorization")
                     addHeader("Authorization", "Bearer $newToken")
                 }.build()
-            }else{
-                // 로그인으로 보내기
-                redirectToLogin()
-                null
+            } else {
+                handleTokenExpiration(response)
+                return null
             }
         }
         return null
     }
 
     private fun fetchUpdateToken(): Boolean = runBlocking {
-
+        // 토큰 갱신 로직을 추가합니다.
+        // 갱신에 실패할 경우 false를 반환합니다.
         return@runBlocking false
     }
 
-    private fun redirectToLogin(){
-        /*
-        val intent = Intent(context, AuthActivity::class.java)
-            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        context.startActivity(intent)
-        */
+    private fun handleTokenExpiration(response: Response) {
+        runBlocking {
+            userDataStore.clear()
+        }
+        throw ReAuthenticationRequiredException(Throwable("User needs to re-authenticate"), response.request.url.toString())
     }
-
 }

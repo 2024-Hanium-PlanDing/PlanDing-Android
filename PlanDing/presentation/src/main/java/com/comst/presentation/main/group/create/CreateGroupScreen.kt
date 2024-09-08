@@ -1,5 +1,6 @@
 package com.comst.presentation.main.group.create
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,22 +25,26 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.comst.domain.model.group.GroupCreateResponseModel
 import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDTextField
 import com.comst.presentation.main.group.create.CreateGroupContract.*
+import com.comst.presentation.model.group.GroupCardUIModel
+import com.comst.presentation.ui.theme.Background20
 import com.comst.presentation.ui.theme.PlanDingTheme
+import com.comst.presentation.ui.theme.Primary100
 
 @Composable
 fun CreateGroupScreen(
     viewModel: CreateGroupViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
-    onFinish: () -> Unit
+    onFinish: (GroupCardUIModel) -> Unit
 ) {
     val context = LocalContext.current
 
     val handleEffect: (CreateGroupSideEffect) -> Unit = { effect ->
         when (effect) {
-            is CreateGroupSideEffect.SuccessGroupCreation -> onFinish()
+            is CreateGroupSideEffect.SuccessGroupCreation -> onFinish(effect.groupCardUIModel)
         }
     }
 
@@ -84,7 +89,7 @@ private fun CreateGroupScreen(
                             Text(text = "생성", color = Color.Black)
                         }
                     },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Primary100)
                 )
             },
             content = { paddingValues ->

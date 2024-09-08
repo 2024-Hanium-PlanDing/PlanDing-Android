@@ -24,12 +24,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.comst.domain.model.base.Schedule
-import com.comst.domain.model.base.ScheduleType
-import com.comst.presentation.ui.theme.BackgroundColor2
+import com.comst.presentation.ui.theme.Background0
+import com.comst.presentation.ui.theme.Background20
+import com.comst.presentation.ui.theme.Background300
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
@@ -42,9 +42,9 @@ fun PersonalScheduleCard(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = BackgroundColor2),
+            .background(color = Background20),
         colors = CardDefaults.cardColors(
-            containerColor = BackgroundColor2,
+            containerColor = Background20,
         )
     ) {
         Column(
@@ -66,7 +66,7 @@ fun PersonalScheduleCard(
                 Text(
                     text = "Complete: ",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                    color = Background300
                 )
 
                 Checkbox(
@@ -74,7 +74,7 @@ fun PersonalScheduleCard(
                     onCheckedChange = null,
                     colors = CheckboxDefaults.colors(
                         checkedColor = MaterialTheme.colorScheme.primary,
-                        uncheckedColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                        uncheckedColor = Background300
                     )
                 )
             }
@@ -82,7 +82,7 @@ fun PersonalScheduleCard(
             Text(
                 text = "시간: ${schedule.startTime}:00 ~ ${schedule.endTime}:00",
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                color = Background300,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
@@ -94,13 +94,13 @@ fun PersonalScheduleCard(
                     .clickable { isContentVisible = !isContentVisible }
             ) {
                 Text(
-                    text = if (isContentVisible) "Hide Details" else "Show Details",
+                    text = if (isContentVisible) "Hide Content" else "Show Content",
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.padding(end = 8.dp)
                 )
                 Icon(
                     imageVector = if (isContentVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = if (isContentVisible) "Hide Details" else "Show Details"
+                    contentDescription = if (isContentVisible) "Hide Content" else "Show Content"
                 )
             }
 
@@ -110,7 +110,7 @@ fun PersonalScheduleCard(
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier
                         .padding(bottom = 8.dp)
-                        .background(Color(0xFFEEEEEE), shape = RoundedCornerShape(8.dp))
+                        .background(Background0, shape = RoundedCornerShape(8.dp))
                         .padding(8.dp)
                 )
             }
@@ -132,7 +132,6 @@ private fun PersonalScheduleCardPreview() {
                 day = "nibh",
                 complete = false,
                 groupName = null,
-                type = ScheduleType.GROUP
             )
         )
     }

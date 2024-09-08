@@ -2,6 +2,7 @@ package com.comst.presentation.main.mypage
 
 import androidx.lifecycle.viewModelScope
 import com.comst.domain.usecase.user.GetUserProfileUseCase
+import com.comst.domain.util.onException
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
@@ -20,8 +21,9 @@ class MyPageViewModel @Inject constructor(
     }
 
     override fun handleIntent(intent: MyPageIntent) {
-        when(intent){
+        when (intent) {
             is MyPageIntent.GroupRequestsReceivedClick -> setEffect(MyPageSideEffect.NavigateToGroupRequestsReceivedActivity)
+            is MyPageIntent.Refresh -> onRefresh()
         }
     }
 
@@ -31,7 +33,7 @@ class MyPageViewModel @Inject constructor(
         }
     }
 
-    private fun load() = viewModelScope.launch {
+    private fun load() = viewModelScope.launch(apiExceptionHandler) {
         setState { copy(isLoading = true) }
         getUserProfileUseCase()
             .onSuccess {
@@ -42,21 +44,29 @@ class MyPageViewModel @Inject constructor(
                         profileImageUrl = it.profileImage,
                         favoriteGroupsCount = it.groupFavorite,
                         receivedGroupRequestsCount = it.groupRequest,
-                        isLoading = false
+                        isLoading = false,
+                        isRefreshing = false
                     )
                 }
             }
             .onFailure {
+            }.onException { exception ->
+                throw exception
             }
-        setState { copy(isLoading = false) }
+        setState {
+            copy(
+                isLoading = false,
+                isRefreshing = false
+            )
+        }
     }
 
     private fun onLoadFailure(message: String) {
         setToastEffect(message)
     }
 
-    override fun handleError(exception: Exception) {
-        super.handleError(exception)
-        setToastEffect(exception.message.orEmpty())
+    private fun onRefresh() {
+        setState { copy(isRefreshing = true) }
+        load()
     }
 }

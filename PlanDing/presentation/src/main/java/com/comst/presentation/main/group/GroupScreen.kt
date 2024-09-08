@@ -1,7 +1,6 @@
 package com.comst.presentation.main.group
 
 import android.Manifest
-import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.widget.Toast
@@ -16,15 +15,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,18 +37,35 @@ import com.comst.presentation.component.PDScreenHeader
 import com.comst.presentation.main.group.GroupContract.*
 import com.comst.presentation.main.group.create.CreateGroupActivity
 import com.comst.presentation.main.group.detail.GroupDetailActivity
+import com.comst.presentation.main.mypage.MyPageContract
+import com.comst.presentation.ui.theme.Background0
 import com.comst.presentation.ui.theme.PlanDingTheme
+import com.comst.presentation.ui.theme.Primary100
 
 @Composable
 fun GroupScreen(
     viewModel: GroupViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+
+    val resultLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        when (result.resultCode) {
+            CreateGroupActivity.CREATE_GROUP -> {
+                val groupResponse = CreateGroupActivity.getGroupResponseFromIntent(result.data ?: return@rememberLauncherForActivityResult)
+                groupResponse?.let {
+                    viewModel.setEvent(GroupEvent.GroupCreated(it))
+                }
+            }
+        }
+    }
+
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         if (permissions.all { it.value }) {
-            context.startActivity(
+            resultLauncher.launch(
                 CreateGroupActivity.createGroupIntent(context)
             )
         } else {
@@ -67,7 +87,7 @@ fun GroupScreen(
             }
 
             is GroupSideEffect.NavigateToGroupDetailActivity -> {
-                context.startActivity(
+                resultLauncher.launch(
                     GroupDetailActivity.groupDetailIntent(
                         context,
                         effect.groupCode
@@ -86,13 +106,21 @@ fun GroupScreen(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun GroupScreen(
     uiState: GroupUIState,
     setIntent: (GroupIntent) -> Unit = {}
 ){
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = uiState.isRefreshing,
+        onRefresh = {
+            setIntent(GroupIntent.Refresh)
+        }
+    )
+
     Surface {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -105,12 +133,10 @@ private fun GroupScreen(
                         count = uiState.groupCardModels.size,
                         key = { index -> uiState.groupCardModels[index].groupId }
                     ) { index ->
-                        uiState.groupCardModels[index].let { groupRoomCardModel ->
+                        uiState.groupCardModels[index].let { groupCardUIModel ->
                             GroupCard(
-                                groupName = groupRoomCardModel.groupName,
-                                groupDescription = groupRoomCardModel.groupDescription,
-                                groupImageUrl = groupRoomCardModel.groupImageUrl,
-                                goGroupDetail = { setIntent(GroupIntent.GroupCardClick(groupRoomCardModel.groupCode)) }
+                                groupCardUIModel = groupCardUIModel,
+                                goGroupDetail = { setIntent(GroupIntent.GroupCardClick(groupCardUIModel.groupCode)) }
                             )
 
                             Spacer(modifier = Modifier.height(12.dp))
@@ -119,12 +145,20 @@ private fun GroupScreen(
                 }
             }
 
+            PullRefreshIndicator(
+                refreshing = uiState.isRefreshing,
+                state = pullRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter),
+                backgroundColor = Color.LightGray,
+            )
+
             FloatingActionButton(
                 modifier = Modifier
                     .size(100.dp)
                     .align(Alignment.BottomEnd)
                     .padding(16.dp),
-                containerColor = MaterialTheme.colorScheme.primary,
+                containerColor = Primary100,
+                contentColor = Background0,
                 shape = RoundedCornerShape(60.dp),
                 onClick = { setIntent(GroupIntent.GroupCreateClick) },
             ) {

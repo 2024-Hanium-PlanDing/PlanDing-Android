@@ -6,10 +6,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.comst.presentation.model.group.GroupCardUIModel
 
 @Composable
 fun CreateGroupNavHost(
-    onFinish:()->Unit
+    onGroupCreated: (GroupCardUIModel) -> Unit,
+    onCancel: () -> Unit
 ) {
     val context = LocalContext.current
     val navController = rememberNavController()
@@ -25,7 +27,7 @@ fun CreateGroupNavHost(
         ){
             ImageSelectScreen(
                 viewModel = sharedViewModel,
-                onBackClick = onFinish,
+                onBackClick = onCancel,
                 onNextClick = {
                     navController.navigate(CreateGroupRoute.GROUP_DATA_SCREEN.route)
                 }
@@ -40,7 +42,9 @@ fun CreateGroupNavHost(
                 onBackClick = {
                     navController.navigateUp()
                 },
-                onFinish = onFinish
+                onFinish = { groupCardUIModel ->
+                    onGroupCreated(groupCardUIModel)
+                }
             )
         }
     }

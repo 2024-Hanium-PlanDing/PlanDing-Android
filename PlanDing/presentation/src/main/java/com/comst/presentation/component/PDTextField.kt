@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.comst.presentation.ui.theme.Background0
 
 @Composable
 fun PDTextField(
@@ -26,6 +27,7 @@ fun PDTextField(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
+            unfocusedContainerColor = Background0,
         ),
         placeholder =  { Text(text = hint)},
         shape = RoundedCornerShape(8.dp),

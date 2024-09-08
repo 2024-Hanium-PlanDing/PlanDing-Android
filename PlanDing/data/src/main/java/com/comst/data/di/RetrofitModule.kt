@@ -1,6 +1,7 @@
 package com.comst.data.di
 
 import com.comst.data.BuildConfig.BASE_URL
+import com.comst.data.retrofit.ErrorResponseInterceptor
 import com.comst.data.retrofit.NetworkConnectionInterceptor
 import com.comst.data.retrofit.TokenAuthenticator
 import com.comst.data.retrofit.TokenInterceptor
@@ -66,7 +67,8 @@ object RetrofitModule {
     @Singleton
     @UnAuthenticatedOkHttpClient
     fun providesUnAuthenticatedOkHttpClient(
-        networkConnectionInterceptor: NetworkConnectionInterceptor
+        networkConnectionInterceptor: NetworkConnectionInterceptor,
+        errorResponseInterceptor: ErrorResponseInterceptor
     ): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
@@ -78,6 +80,7 @@ object RetrofitModule {
             .writeTimeout(5, TimeUnit.SECONDS)
             .addInterceptor(networkConnectionInterceptor)
             .addInterceptor(loggingInterceptor)
+            .addInterceptor(errorResponseInterceptor)
             .retryOnConnectionFailure(false)
             .build()
     }
@@ -86,7 +89,7 @@ object RetrofitModule {
     @Singleton
     @UnAuthenticatedRetrofit
     fun providesUnAuthenticatedRetrofit(
-        @AuthenticatedOkHttpClient client: OkHttpClient
+        @UnAuthenticatedOkHttpClient client: OkHttpClient
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl("${BASE_URL}/api/")
@@ -103,7 +106,8 @@ object RetrofitModule {
     fun providesAuthenticatedOkHttpClient(
         interceptor: TokenInterceptor,
         authenticator: TokenAuthenticator,
-        networkConnectionInterceptor: NetworkConnectionInterceptor
+        networkConnectionInterceptor: NetworkConnectionInterceptor,
+        errorResponseInterceptor: ErrorResponseInterceptor
     ): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
@@ -117,6 +121,7 @@ object RetrofitModule {
             .addInterceptor(loggingInterceptor)
             .addInterceptor(interceptor)
             .authenticator(authenticator)
+            .addInterceptor(errorResponseInterceptor)
             .retryOnConnectionFailure(false)
             .build()
     }

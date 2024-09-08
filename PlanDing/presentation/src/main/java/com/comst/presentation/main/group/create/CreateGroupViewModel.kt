@@ -5,10 +5,12 @@ import com.comst.domain.model.file.MediaImage
 import com.comst.domain.model.group.GroupCreate
 import com.comst.domain.usecase.file.GetImageListUseCase
 import com.comst.domain.usecase.group.PostGroupUseCase
+import com.comst.domain.util.onException
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
 import com.comst.presentation.main.group.create.CreateGroupContract.*
+import com.comst.presentation.model.group.toGroupCardUIModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,7 +36,7 @@ class CreateGroupViewModel @Inject constructor(
 
     override fun handleEvent(event: CreateGroupEvent) {
         when (event) {
-            is CreateGroupEvent.LoadFailure -> onLoadFailure(event.message)
+            is CreateGroupEvent.LoadFailure -> setToastEffect(event.message)
         }
     }
 
@@ -48,6 +50,7 @@ class CreateGroupViewModel @Inject constructor(
                 )
             }
         }.onFailure {
+
         }
         setState { copy(isLoading = false) }
 
@@ -75,11 +78,13 @@ class CreateGroupViewModel @Inject constructor(
         }
     }
 
-    private fun onCreateGroupClick() = viewModelScope.launch {
+    private fun onCreateGroupClick() = viewModelScope.launch(apiExceptionHandler) {
         if (currentState.selectedImage == null) {
             setToastEffect("그룹 이미지는 필수입니다.")
             return@launch
         }
+
+        if (!canHandleClick(CREATE_GROUP_CLICK)) return@launch
 
         postGroupUseCase(
             GroupCreate(
@@ -89,18 +94,15 @@ class CreateGroupViewModel @Inject constructor(
             currentState.selectedImage!!
         ).onSuccess {
             setToastEffect("그룹 생성을 성공했습니다.")
-            setEffect(CreateGroupSideEffect.SuccessGroupCreation)
+            setEffect(CreateGroupSideEffect.SuccessGroupCreation(it.toGroupCardUIModel()))
         }.onFailure {
+        }.onException { exception ->
+            throw exception
         }
         setState { copy(isLoading = false) }
     }
 
-    private fun onLoadFailure(message: String) {
-        setToastEffect(message)
-    }
-
-    override fun handleError(exception: Exception) {
-        super.handleError(exception)
-        setToastEffect(exception.message.orEmpty())
+    companion object {
+        private const val CREATE_GROUP_CLICK = "createGroupClick"
     }
 }

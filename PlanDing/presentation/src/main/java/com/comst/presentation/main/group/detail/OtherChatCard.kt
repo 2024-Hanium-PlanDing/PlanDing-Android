@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -23,9 +21,8 @@ import androidx.compose.ui.unit.dp
 import com.comst.domain.model.chat.ChatMessageModel
 import com.comst.domain.util.DateUtils
 import com.comst.presentation.component.PDProfileImage
-import com.comst.presentation.model.group.socket.ReceiveChatDTO
-import com.comst.presentation.ui.theme.BackgroundColor3
-import com.comst.presentation.ui.theme.MainPurple600
+import com.comst.presentation.ui.theme.Background0
+import com.comst.presentation.ui.theme.Background60
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
@@ -68,7 +65,7 @@ fun OtherChatCard(
                             .padding(end = 8.dp)
                             .widthIn(max = maxWidth * 0.6f)
                             .background(
-                                color = BackgroundColor3,
+                                color = Background0,
                                 shape = RoundedCornerShape(8.dp)
                             )
                             .padding(8.dp)

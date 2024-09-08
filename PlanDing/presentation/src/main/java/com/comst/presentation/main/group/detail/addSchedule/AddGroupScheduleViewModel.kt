@@ -1,11 +1,8 @@
 package com.comst.presentation.main.group.detail.addSchedule
 
 import androidx.lifecycle.viewModelScope
-import com.comst.domain.model.base.ScheduleModel
 import com.comst.domain.usecase.local.GetUserCodeUseCase
 import com.comst.domain.util.DateUtils
-import com.comst.domain.util.onFailure
-import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
 import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract.*
 import com.comst.presentation.model.group.GroupProfileUIModel
@@ -75,7 +72,7 @@ class AddGroupScheduleViewModel @Inject constructor(
         }
     }
 
-    private fun onCreateScheduleClick() = viewModelScope.launch {
+    private fun onCreateScheduleClick() = viewModelScope.launch(apiExceptionHandler) {
         if (currentState.title.isEmpty() || currentState.content.isEmpty()) {
             setToastEffect("일정의 제목과 내용은 필수입니다.")
             return@launch
@@ -85,6 +82,8 @@ class AddGroupScheduleViewModel @Inject constructor(
             setToastEffect("일정의 시작 시간은 끝 시간보다 크거나 같을 수 없습니다.")
             return@launch
         }
+
+        if (!canHandleClick(CREATE_GROUP_SCHEDULE)) return@launch
 
         setState {
             copy(isLoading = true)
@@ -110,7 +109,6 @@ class AddGroupScheduleViewModel @Inject constructor(
 
         }
 
-
         setState {
             copy(isLoading = false)
         }
@@ -120,8 +118,8 @@ class AddGroupScheduleViewModel @Inject constructor(
         setToastEffect(message)
     }
 
-    override fun handleError(exception: Exception) {
-        super.handleError(exception)
-        setToastEffect(exception.message.orEmpty())
+    companion object {
+        private const val CREATE_GROUP_SCHEDULE = "createGroupScheduleClick"
     }
+
 }

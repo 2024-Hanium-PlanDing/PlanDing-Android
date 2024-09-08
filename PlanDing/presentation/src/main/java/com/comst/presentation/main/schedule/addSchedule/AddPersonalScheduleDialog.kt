@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -26,8 +27,10 @@ import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDTextFieldOutLine
 import com.comst.presentation.component.PDTimeDropdownMenu
-import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.*
-import com.comst.presentation.ui.theme.BackgroundColor3
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleIntent
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleSideEffect
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleUIState
+import com.comst.presentation.ui.theme.Background0
 import com.comst.presentation.ui.theme.PlanDingTheme
 import java.time.LocalDate
 
@@ -110,6 +113,7 @@ private fun AddPersonalScheduleDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     PDTimeDropdownMenu(
+                        modifier = Modifier.width(100.dp),
                         selectedTime = uiState.startTime,
                         onConfirm = {
                             setIntent(AddPersonalScheduleIntent.SelectedStartTime(it))
@@ -119,6 +123,7 @@ private fun AddPersonalScheduleDialog(
                     Text(text = "부터")
                     Spacer(modifier = Modifier.weight(1f))
                     PDTimeDropdownMenu(
+                        modifier = Modifier.width(100.dp),
                         selectedTime = uiState.endTime,
                         onConfirm = {
                             setIntent(AddPersonalScheduleIntent.SelectedEndTime(it))
@@ -147,7 +152,7 @@ private fun AddPersonalScheduleDialog(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = BackgroundColor3,
+                    containerColor = Background0,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {

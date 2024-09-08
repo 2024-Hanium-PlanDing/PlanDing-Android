@@ -12,9 +12,12 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -84,18 +87,23 @@ import com.comst.presentation.component.PDButton
 import com.comst.presentation.component.PDCalendarBottomSheet
 import com.comst.presentation.component.PDGroupScheduleCard
 import com.comst.presentation.component.PDScheduleBarChart
-import com.comst.presentation.main.group.detail.GroupDetailContract.*
+import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailIntent
+import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailSideEffect
+import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailUIState
 import com.comst.presentation.main.group.detail.addGroupMember.AddGroupMemberDialog
 import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleDialog
+import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailBottomSheet
 import com.comst.presentation.model.group.GroupProfileUIModel
-import com.comst.presentation.ui.theme.BackgroundColor3
-import com.comst.presentation.ui.theme.Blue400
-import com.comst.presentation.ui.theme.MainPurple400
+import com.comst.presentation.ui.theme.Background0
+import com.comst.presentation.ui.theme.Background20
 import com.comst.presentation.ui.theme.PlanDingTheme
+import com.comst.presentation.ui.theme.Primary100
+import com.comst.presentation.ui.theme.Primary300
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
+
 @Composable
 fun GroupDetailScreen(
     groupCode: String,
@@ -234,11 +242,11 @@ private fun GroupDetailScreen(
         }
     }
 
-    if (uiState.isBottomSheetVisible) {
+    if (uiState.isCalendarBottomSheetVisible) {
         PDCalendarBottomSheet(
             date = DateUtils.uiDateToDate(uiState.selectUIDate),
             onCloseBottomSheet = {
-                setIntent(GroupDetailIntent.CloseBottomSheetClick)
+                setIntent(GroupDetailIntent.CloseCalendarBottomSheet)
             },
             onDateSelected = { date ->
                 setIntent(GroupDetailIntent.SelectDate(date))
@@ -268,6 +276,17 @@ private fun GroupDetailScreen(
             }
         )
     }
+
+
+    if (uiState.isScheduleDetailDialogVisible){
+        ScheduleDetailBottomSheet(
+            groupCode = uiState.groupProfile.groupCode,
+            scheduleId = uiState.selectSchedule.scheduleId,
+            onCloseBottomSheet = {
+                setIntent(GroupDetailIntent.CloseScheduleDetailBottomSheet)
+            }
+        )
+    }
 }
 
 @Composable
@@ -276,11 +295,14 @@ fun MessageInputBar(
     setIntent: (GroupDetailIntent) -> Unit
 ) {
     val componentHeight = 56.dp
+    val bottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(bottom = bottomPadding)
             .height(componentHeight)
-            .background(BackgroundColor3),
+            .background(Background0),
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextField(
@@ -295,8 +317,8 @@ fun MessageInputBar(
                 .height(componentHeight),
             placeholder = { Text("Type a message") },
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = BackgroundColor3,
-                unfocusedContainerColor = BackgroundColor3,
+                focusedContainerColor = Background0,
+                unfocusedContainerColor = Background0,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent
@@ -439,6 +461,7 @@ private fun GroupTabs(
             ) {
                 pages.forEachIndexed { index, title ->
                     Tab(
+                        modifier = Modifier.background(Background20),
                         selected = currentPage == index,
                         onClick = {
                             coroutineScope.launch {
@@ -559,7 +582,7 @@ fun ScheduleHeaderRow(
         Box(
             modifier = Modifier
                 .size(40.dp)
-                .border(1.dp, MainPurple400, shape = RoundedCornerShape(8.dp))
+                .border(1.dp, Primary300, shape = RoundedCornerShape(8.dp))
                 .clickable { setIntent(GroupDetailIntent.ToggleView) },
             contentAlignment = Alignment.Center
         ) {
@@ -575,7 +598,7 @@ fun ScheduleHeaderRow(
         Box(
             modifier = Modifier
                 .size(40.dp)
-                .border(1.dp, MainPurple400, shape = RoundedCornerShape(8.dp))
+                .border(1.dp, Primary300, shape = RoundedCornerShape(8.dp))
                 .clickable { setIntent(GroupDetailIntent.ShowAddScheduleDialog) },
             contentAlignment = Alignment.Center
         ) {
@@ -633,7 +656,9 @@ fun GroupScheduleList(
                     selectWeekGroupScheduleList.filter { it.day == selectedWeekdays[selectedDayIndex] }[index]
                 PDGroupScheduleCard(
                     schedule = schedule,
-                    tasks = emptyList()
+                    onShowScheduleDetail = { schedule ->
+                        setIntent(GroupDetailIntent.OpenScheduleDetailBottomSheet(schedule))
+                    }
                 )
                 HorizontalDivider()
             }
@@ -653,10 +678,10 @@ private fun DateSelectTab(
             .height(40.dp)
             .background(
                 shape = RoundedCornerShape(8.dp),
-                color = BackgroundColor3
+                color = Background0
             )
             .padding(vertical = 8.dp, horizontal = 16.dp)
-            .clickable { setIntent(GroupDetailIntent.OpenBottomSheetClick) },
+            .clickable { setIntent(GroupDetailIntent.OpenCalendarBottomSheet) },
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -785,7 +810,7 @@ fun AddGroupMember(
                     .padding(4.dp)
                     .clip(CircleShape),
                 painter = painterResource(id = R.drawable.ic_add_24),
-                colorFilter = ColorFilter.tint(Blue400),
+                colorFilter = ColorFilter.tint(Primary100),
                 contentDescription = "그룹원 추가",
                 contentScale = ContentScale.Crop,
                 )
@@ -793,7 +818,7 @@ fun AddGroupMember(
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = "그룹원 초대",
-            color = Blue400
+            color = Primary100
         )
     }
 }

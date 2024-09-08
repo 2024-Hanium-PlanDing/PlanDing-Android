@@ -23,14 +23,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import com.comst.presentation.ui.theme.BackgroundColor3
+import com.comst.presentation.model.group.GroupCardUIModel
+import com.comst.presentation.ui.theme.Background0
 import com.comst.presentation.ui.theme.PlanDingTheme
 
 @Composable
 fun GroupCard(
-    groupName: String,
-    groupDescription: String,
-    groupImageUrl: String,
+    groupCardUIModel: GroupCardUIModel,
     goGroupDetail: () -> Unit
 ) {
     Row(
@@ -38,7 +37,7 @@ fun GroupCard(
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
             .background(
-                color = BackgroundColor3,
+                color = Background0,
                 shape = RoundedCornerShape(16.dp)
             ).clickable {
                 goGroupDetail()
@@ -47,7 +46,7 @@ fun GroupCard(
     ) {
 
         Image(
-            painter = rememberAsyncImagePainter(model = groupImageUrl),
+            painter = rememberAsyncImagePainter(model = groupCardUIModel.groupImageUrl),
             contentDescription = "그룹 이미지",
             modifier = Modifier
                 .padding(start = 8.dp, top = 8.dp, bottom = 8.dp)
@@ -65,7 +64,7 @@ fun GroupCard(
         ) {
             Text(
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp, end = 8.dp),
-                text = groupName,
+                text = groupCardUIModel.groupName,
                 style =  MaterialTheme.typography.bodyLarge,
                 color = Color.Black,
                 fontWeight = FontWeight.Bold
@@ -73,7 +72,7 @@ fun GroupCard(
 
             Text(
                 modifier = Modifier.fillMaxWidth().padding(end = 8.dp),
-                text = groupDescription,
+                text = groupCardUIModel.groupDescription,
                 maxLines = 4,
                 overflow = TextOverflow.Ellipsis,
                 style =  MaterialTheme.typography.bodyMedium,
@@ -88,9 +87,14 @@ fun GroupCard(
 private fun GroupCardPreview(){
     PlanDingTheme {
         GroupCard(
-            groupName = "Wyatt Alston",
-            groupDescription = "amet",
-            groupImageUrl = "null",
+            groupCardUIModel = GroupCardUIModel(
+                groupId = 9203,
+                groupCode = "erat",
+                groupOwnerCode = "ridiculus",
+                groupName = "Rafael Townsend",
+                groupImageUrl = "https://www.google.com/#q=inimicus",
+                groupDescription = "massa"
+            ),
             goGroupDetail = {
 
             }

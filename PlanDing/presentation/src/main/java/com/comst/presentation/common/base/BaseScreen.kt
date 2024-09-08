@@ -7,6 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import com.comst.presentation.auth.AuthActivity
 
 @Composable
 fun <S : UIState, A : BaseSideEffect, I : BaseIntent, E : BaseEvent> BaseScreen(
@@ -22,6 +23,11 @@ fun <S : UIState, A : BaseSideEffect, I : BaseIntent, E : BaseEvent> BaseScreen(
             when (effect) {
                 is BaseSideEffect.ShowToast -> {
                     Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                }
+                is BaseSideEffect.NavigateToLogin -> {
+                    context.startActivity(
+                        AuthActivity.authIntent(context)
+                    )
                 }
                 else -> handleEffect(effect)
             }

@@ -7,10 +7,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
@@ -46,12 +49,15 @@ fun PDCalendar(
     initialDate: Date,
     onDateSelected: (Date) -> Unit,
 ) {
+
+    val bottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+
     val calendar = remember { Calendar.getInstance().apply { time = initialDate } }
     var displayedMonth by remember { mutableIntStateOf(calendar.get(Calendar.MONTH)) }
     var displayedYear by remember { mutableIntStateOf(calendar.get(Calendar.YEAR)) }
     var selectedDate by remember { mutableIntStateOf(calendar.get(Calendar.DAY_OF_MONTH)) }
 
-    Column(modifier = modifier.padding(16.dp)) {
+    Column(modifier = modifier.padding(16.dp).padding(bottom = bottomPadding)) {
         CalendarHeader(
             displayedMonth,
             displayedYear,

@@ -8,6 +8,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
 import java.util.Date
 import java.util.Locale
 
@@ -157,4 +158,30 @@ object DateUtils {
         val outputFormatter = DateTimeFormatter.ofPattern("HH:mm")
         return dateTime.format(outputFormatter)
     }
+
+    fun formatDateAndTime(date: String?, time: String?): String {
+        val formattedDate = date?.let {
+            LocalDate.parse(it, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                .format(DateTimeFormatter.ofPattern("yyyy년 M월 d일"))
+        } ?: "날짜"
+
+        val formattedTime = time?.let {
+            "${it.padStart(2, '0')}:00"
+        } ?: "시간"
+
+        return "$formattedDate $formattedTime"
+    }
+
+    fun formatDateTime(input: String): String {
+        val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+        val dateTime = LocalDateTime.parse(input, inputFormatter)
+        val outputFormatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일 H시", Locale.getDefault())
+        return dateTime.format(outputFormatter)
+    }
+
+    fun serverDateToUIDate(input: String): String {
+        val date = LocalDate.parse(input, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        return date.format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일"))
+    }
+
 }

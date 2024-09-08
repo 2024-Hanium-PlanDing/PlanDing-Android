@@ -1,35 +1,36 @@
 package com.comst.presentation.model.group.socket
 
 import com.comst.domain.model.base.Schedule
-import com.comst.domain.model.base.ScheduleType
 import com.comst.domain.util.DateUtils
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class ReceiveScheduleDTO(
-    val content: String? = null,
-    val endTime: Int? = null,
-    val groupName: String? = null,
-    val id: Long,
-    val scheduleDate: String? = null,
-    val startTime: Int? = null,
-    val title: String? = null,
-    val type: String? = null,
+    val scheduleCommonResponse: ScheduleDTO,
+    val type: String,
     val action: String
 )
 
+data class ScheduleDTO(
+    val id: Long,
+    val title: String,
+    val content: String,
+    val scheduleDate: String,
+    val startTime: Int,
+    val endTime: Int,
+    val groupName: String
+)
 
 fun ReceiveScheduleDTO.toDomainModel(): Schedule {
-    val localDate = scheduleDate?.let { DateUtils.uiDateToLocalDate(it, "yyyy-MM-dd") }
+    val localDate =  DateUtils.uiDateToLocalDate(scheduleCommonResponse.scheduleDate, "yyyy-MM-dd")
     return Schedule(
-        scheduleId = id,
-        title = title.orEmpty(),
-        content = content.orEmpty(),
-        startTime = startTime ?: 0,
-        endTime = endTime ?: 0,
-        day = localDate?.let { DateUtils.getDayOfWeekUIFormat(it) }.orEmpty(),
+        scheduleId = scheduleCommonResponse.id,
+        title = scheduleCommonResponse.title,
+        content = scheduleCommonResponse.content,
+        startTime = scheduleCommonResponse.startTime,
+        endTime = scheduleCommonResponse.endTime,
+        day = DateUtils.getDayOfWeekUIFormat(localDate),
         complete = false,
-        groupName = groupName.orEmpty(),
-        type = ScheduleType.GROUP
+        groupName = scheduleCommonResponse.groupName,
     )
 }

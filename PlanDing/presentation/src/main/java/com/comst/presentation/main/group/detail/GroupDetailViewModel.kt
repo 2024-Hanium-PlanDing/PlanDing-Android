@@ -6,16 +6,20 @@ import com.comst.domain.model.base.Schedule
 import com.comst.domain.usecase.chat.GetChatMessageListUseCase
 import com.comst.domain.usecase.chat.PostChatMessageUseCase
 import com.comst.domain.usecase.group.GetGroupInformationUseCase
-import com.comst.domain.usecase.groupSchedule.GetGroupScheduleUseCase
+import com.comst.domain.usecase.groupSchedule.GetGroupScheduleListUseCase
 import com.comst.domain.usecase.local.GetTokenUseCase
 import com.comst.domain.usecase.local.GetUserCodeUseCase
 import com.comst.domain.util.DateUtils
+import com.comst.domain.util.onException
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.BuildConfig.STOMP_ENDPOINT
 import com.comst.presentation.common.base.BaseViewModel
 import com.comst.presentation.common.util.UniqueList
-import com.comst.presentation.main.group.detail.GroupDetailContract.*
+import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailEvent
+import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailIntent
+import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailSideEffect
+import com.comst.presentation.main.group.detail.GroupDetailContract.GroupDetailUIState
 import com.comst.presentation.model.group.socket.ReceiveChatDTO
 import com.comst.presentation.model.group.socket.ReceiveScheduleDTO
 import com.comst.presentation.model.group.socket.SendCreateScheduleDTO
@@ -45,13 +49,13 @@ import java.time.LocalDate
 import java.util.Date
 import javax.inject.Inject
 
-private const val TAG = "소켓"
+private const val TAG = "그룹 디테일 소켓"
 @HiltViewModel
 class GroupDetailViewModel @Inject constructor(
     private val getTokenUseCase: GetTokenUseCase,
     private val getUserCodeUseCase: GetUserCodeUseCase,
     private val getGroupInformationUseCase: GetGroupInformationUseCase,
-    private val getGroupScheduleUseCase: GetGroupScheduleUseCase,
+    private val getGroupScheduleListUseCase: GetGroupScheduleListUseCase,
     private val getChatMessageListUseCase: GetChatMessageListUseCase,
     private val postChatMessageUseCase: PostChatMessageUseCase
 ) : BaseViewModel<GroupDetailUIState, GroupDetailSideEffect, GroupDetailIntent, GroupDetailEvent>(GroupDetailUIState()) {
@@ -68,8 +72,8 @@ class GroupDetailViewModel @Inject constructor(
 
     override fun handleIntent(intent: GroupDetailIntent) {
         when(intent){
-            is GroupDetailIntent.OpenBottomSheetClick -> onOpenBottomSheet()
-            is GroupDetailIntent.CloseBottomSheetClick -> onCloseBottomSheet()
+            is GroupDetailIntent.OpenCalendarBottomSheet -> onOpenCalendarBottomSheet()
+            is GroupDetailIntent.CloseCalendarBottomSheet -> onCloseCalendarBottomSheet()
             is GroupDetailIntent.SelectDate -> onSelectDate(intent.date)
             is GroupDetailIntent.ToggleView -> onToggleView()
             is GroupDetailIntent.SelectDay -> onSelectDay(intent.index)
@@ -81,6 +85,8 @@ class GroupDetailViewModel @Inject constructor(
             is GroupDetailIntent.SendChat -> onSendChat()
             is GroupDetailIntent.ChatChange -> onChatChange(intent.chat)
             is GroupDetailIntent.CreateSchedule -> onCreateSchedule(intent.newSchedule)
+            is GroupDetailIntent.OpenScheduleDetailBottomSheet -> onOpenScheduleDetailBottomSheet(intent.schedule)
+            is GroupDetailIntent.CloseScheduleDetailBottomSheet -> onCloseScheduleDetailBottomSheet()
         }
     }
 
@@ -91,14 +97,14 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
-    fun initialize(groupCode: String) = viewModelScope.launch {
+    fun initialize(groupCode: String) = viewModelScope.launch(apiExceptionHandler) {
         setState { copy(isLoading = true) }
 
         val tokenDeferred = async { getTokenUseCase() }
         val userCodeDeferred = async { getUserCodeUseCase() }
         val groupInfoDeferred = async { getGroupInformationUseCase(groupCode) }
         val groupScheduleDeferred = async {
-            getGroupScheduleUseCase(
+            getGroupScheduleListUseCase(
                 groupCode = groupCode,
                 schedulePeriodModel = DateUtils.getWeekStartAndEnd(currentState.selectLocalDate)
             )
@@ -141,14 +147,20 @@ class GroupDetailViewModel @Inject constructor(
             }
         }.onFailure {
             isSuccess = false
+        }.onException { exception ->
+            isSuccess = false
+            throw exception
         }
 
-        groupScheduleResult.onSuccess { groupSchedules ->
+        groupScheduleResult.onSuccess { scheduleList ->
             setState {
-                copy(selectWeekGroupScheduleOriginalList = UniqueList({ it.scheduleId }, groupSchedules))
+                copy(selectWeekGroupScheduleOriginalList = UniqueList({ it.scheduleId }, scheduleList.map { it.scheduleCommonResponse }))
             }
         }.onFailure {
             isSuccess = false
+        }.onException { exception ->
+            isSuccess = false
+            throw exception
         }
 
         groupChatMessageResult.onSuccess { chatList ->
@@ -157,8 +169,10 @@ class GroupDetailViewModel @Inject constructor(
             }
         }.onFailure {
             isSuccess = false
+        }.onException { exception ->
+            isSuccess = false
+            throw exception
         }
-
 
         if (isSuccess) {
             connectStomp()
@@ -277,7 +291,7 @@ class GroupDetailViewModel @Inject constructor(
 
     }
 
-    fun onCreateSchedule(sendCreateScheduleDTO: SendCreateScheduleDTO) {
+    private fun onCreateSchedule(sendCreateScheduleDTO: SendCreateScheduleDTO) {
         viewModelScope.launch {
             try {
                 val fullUrl = "$SEND_SCHEDULE_CREATE_URL${currentState.groupProfile.groupCode}"
@@ -298,20 +312,20 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
-    private fun onSendChat() {
-        viewModelScope.launch {
-            postChatMessageUseCase(
-                groupCode = currentState.groupProfile.groupCode,
-                content = currentState.chat
-            ).onSuccess {
-                setState {
-                    copy(
-                        chat = ""
-                    )
-                }
-            }.onFailure {
+    private fun onSendChat() = viewModelScope.launch(apiExceptionHandler){
+        if (!canHandleClick(SEND_CHAT)) return@launch
 
+        postChatMessageUseCase(
+            groupCode = currentState.groupProfile.groupCode,
+            content = currentState.chat
+        ).onSuccess {
+            setState {
+                copy(
+                    chat = ""
+                )
             }
+        }.onFailure {
+
         }
     }
     fun cancelStomp() {
@@ -384,29 +398,31 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
-    private fun onOpenBottomSheet() {
+    private fun onOpenCalendarBottomSheet() {
         setState {
-            copy(isBottomSheetVisible = true)
+            copy(isCalendarBottomSheetVisible = true)
         }
     }
 
-    private fun onCloseBottomSheet() {
+    private fun onCloseCalendarBottomSheet() {
         setState {
-            copy(isBottomSheetVisible = false)
+            copy(isCalendarBottomSheetVisible = false)
         }
     }
 
     private fun onSelectDate(date: Date) {
+        if (!canHandleClick(SELECT_DATE)) return
+
         val selectedLocalDate = DateUtils.dateToLocalDate(date)
         setState {
             copy(
                 selectLocalDate = selectedLocalDate,
-                isBottomSheetVisible = false
+                isCalendarBottomSheetVisible = false
             )
         }
         setEvent(GroupDetailEvent.DateSelected(selectedLocalDate))
     }
-    private fun onDateSelected(date: LocalDate) = viewModelScope.launch {
+    private fun onDateSelected(date: LocalDate) = viewModelScope.launch(apiExceptionHandler) {
         val newSelectedWeekdays = DateUtils.getWeekDays(date)
         val selectUIDate = DateUtils.localDateToUIDate(date)
         val selectDay = DateUtils.getDayOfWeek(date)
@@ -414,7 +430,7 @@ class GroupDetailViewModel @Inject constructor(
         if (currentState.selectedWeekdays != newSelectedWeekdays) {
             val weeklySchedulePeriod = DateUtils.getWeekStartAndEnd(date)
 
-            getGroupScheduleUseCase(
+            getGroupScheduleListUseCase(
                 groupCode = currentState.groupProfile.groupCode,
                 schedulePeriodModel = weeklySchedulePeriod
             ).onSuccess { scheduleList ->
@@ -424,7 +440,7 @@ class GroupDetailViewModel @Inject constructor(
                         selectUIDate = selectUIDate,
                         selectDay = selectDay,
                         selectedWeekdays = newSelectedWeekdays,
-                        selectWeekGroupScheduleOriginalList = UniqueList({ it.scheduleId }, scheduleList),
+                        selectWeekGroupScheduleOriginalList = UniqueList({ it.scheduleId }, scheduleList.map { it.scheduleCommonResponse }),
                         newScheduleList = UniqueList({ it.scheduleId }),
                         selectedDayIndex = newSelectedWeekdays.indexOfFirst {
                             it.firstOrNull() == selectDay.firstOrNull()
@@ -433,6 +449,8 @@ class GroupDetailViewModel @Inject constructor(
                 }
             }.onFailure {
                 // 실패 처리 로직 추가 가능
+            }.onException { exception ->
+                throw exception
             }
         } else {
             // 동일한 주라면 날짜와 요일만 업데이트
@@ -493,16 +511,26 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
-    override fun handleError(exception: Exception) {
-        super.handleError(exception)
-        setToastEffect(exception.message.orEmpty())
-    }
-
     private fun onAddGroupSchedule(schedule: Schedule) {
         setState {
             copy(
 
             )
+        }
+    }
+
+    private fun onOpenScheduleDetailBottomSheet(schedule: Schedule) {
+        setState {
+            copy(
+                selectSchedule = schedule,
+                isScheduleDetailDialogVisible = true
+            )
+        }
+    }
+
+    private fun onCloseScheduleDetailBottomSheet() {
+        setState {
+            copy(isScheduleDetailDialogVisible = false)
         }
     }
 
@@ -531,5 +559,8 @@ class GroupDetailViewModel @Inject constructor(
 
         const val SUBSCRIBE_SCHEDULE_URL = "/sub/schedule/"
         const val SUBSCRIBE_CHAT_URL = "/sub/chat/"
+
+        const val SEND_CHAT = "sendChatClick"
+        const val SELECT_DATE = "selectDate"
     }
 }

@@ -4,10 +4,14 @@ import androidx.lifecycle.viewModelScope
 import com.comst.domain.model.base.ScheduleModel
 import com.comst.domain.usecase.personalSchedule.PostPersonalScheduleUseCase
 import com.comst.domain.util.DateUtils
+import com.comst.domain.util.onException
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
-import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.*
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleEvent
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleIntent
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleSideEffect
+import com.comst.presentation.main.schedule.addSchedule.AddPersonalScheduleContract.AddPersonalScheduleUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -73,7 +77,7 @@ class AddPersonalScheduleViewModel @Inject constructor(
         }
     }
 
-    private fun onCreateScheduleClick() = viewModelScope.launch {
+    private fun onCreateScheduleClick() = viewModelScope.launch(apiExceptionHandler) {
         if (currentState.title.isEmpty() || currentState.content.isEmpty()) {
             setToastEffect("일정의 제목과 내용은 필수입니다.")
             return@launch
@@ -83,6 +87,8 @@ class AddPersonalScheduleViewModel @Inject constructor(
             setToastEffect("일정의 시작 시간은 끝 시간보다 크거나 같을 수 없습니다.")
             return@launch
         }
+
+        if (!canHandleClick(CREATE_PERSONAL_SCHEDULE)) return@launch
 
         setState {
             copy(isLoading = true)
@@ -100,6 +106,8 @@ class AddPersonalScheduleViewModel @Inject constructor(
             setEffect(AddPersonalScheduleSideEffect.SuccessCreatePersonalSchedule(it))
         }.onFailure {
 
+        }.onException { exception ->
+            throw exception
         }
 
         setState {
@@ -111,8 +119,8 @@ class AddPersonalScheduleViewModel @Inject constructor(
         setToastEffect(message)
     }
 
-    override fun handleError(exception: Exception) {
-        super.handleError(exception)
-        setToastEffect(exception.message.orEmpty())
+    companion object {
+        private const val CREATE_PERSONAL_SCHEDULE = "createPersonalScheduleClick"
     }
+
 }
