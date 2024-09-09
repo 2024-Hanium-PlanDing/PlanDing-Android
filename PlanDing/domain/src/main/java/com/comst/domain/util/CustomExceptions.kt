@@ -9,3 +9,4 @@ class BadRequestException(e: Throwable?, val url: String? = null) : IOException(
 class ReAuthenticationRequiredException(e: Throwable?, val url: String? = null) : IOException(e)
 
 class BadGatewayException(e: Throwable?, val url: String? = null) : IOException(e)
+class ServiceUnavailableException(e: Throwable?, val url: String? = null) : IOException(e)
