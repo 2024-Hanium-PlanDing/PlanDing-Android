@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.comst.domain.model.base.Schedule
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleTodayListUseCase
 import com.comst.domain.usecase.commonSchedule.GetCommonScheduleWeekListUseCase
+import com.comst.domain.usecase.groupSchedule.GetAllGroupScheduleListUseCase
 import com.comst.domain.usecase.local.ClearUserDataUseCase
 import com.comst.domain.usecase.personalSchedule.GetPersonalScheduleListUseCase
 import com.comst.domain.util.DateUtils
@@ -26,6 +27,7 @@ class ScheduleViewModel @Inject constructor(
     private val getCommonScheduleTodayListUseCase: GetCommonScheduleTodayListUseCase,
     private val getCommonScheduleWeekListUseCase: GetCommonScheduleWeekListUseCase,
     private val getPersonalScheduleListUseCase: GetPersonalScheduleListUseCase,
+    private val getAllGroupScheduleListUseCase: GetAllGroupScheduleListUseCase,
     private val clearUserDataUseCase: ClearUserDataUseCase
 ) : BaseViewModel<ScheduleUIState, ScheduleSideEffect, ScheduleIntent, ScheduleEvent>(ScheduleUIState()) {
 
@@ -53,10 +55,9 @@ class ScheduleViewModel @Inject constructor(
     }
 
     private fun load() {
-        viewModelScope.launch {
-            loadWeeklySchedule()
-            loadDailySchedule()
-        }
+        loadWeeklySchedule()
+        loadDailyPersonalSchedule()
+        loadDailyGroupSchedule()
     }
 
     private fun loadWeeklySchedule() = viewModelScope.launch(apiExceptionHandler) {
@@ -73,7 +74,21 @@ class ScheduleViewModel @Inject constructor(
             }
     }
 
-    private fun loadDailySchedule() = viewModelScope.launch(apiExceptionHandler) {
+    private fun loadDailyGroupSchedule() = viewModelScope.launch(apiExceptionHandler) {
+        val dailyPeriod = DateUtils.getDayStartAndEnd(currentState.selectLocalDate)
+        getAllGroupScheduleListUseCase(dailyPeriod)
+            .onSuccess {
+                setState {
+                    copy(todayGroupScheduleList = it)
+                }
+            }.onFailure {
+
+            }.onException { exception ->
+                throw exception
+            }
+    }
+
+    private fun loadDailyPersonalSchedule() = viewModelScope.launch(apiExceptionHandler) {
         val dailyPeriod = DateUtils.getDayStartAndEnd(currentState.selectLocalDate)
         getPersonalScheduleListUseCase(dailyPeriod)
             .onSuccess {
@@ -171,6 +186,19 @@ class ScheduleViewModel @Inject constructor(
 
                 }.onException { exception ->
                     throw exception
+                }
+        }
+        launch {
+            getAllGroupScheduleListUseCase(dailyPeriod)
+                .onSuccess {
+                    setState {
+                        copy(todayGroupScheduleList = it)
+                    }
+                }.onFailure {
+
+                }.onException { exception ->
+                    throw exception
+
                 }
         }
     }
