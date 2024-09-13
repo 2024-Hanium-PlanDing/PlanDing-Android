@@ -189,7 +189,9 @@ private fun GroupDetailScreen(
                                             contentDescription = "notification"
                                         )
                                     }
-                                    IconButton(onClick = {  }) {
+                                    IconButton(onClick = {
+                                        setIntent(GroupDetailIntent.GroupFavoriteIconClick)
+                                    }) {
                                         Icon(
                                             painterResource(
                                                 id = if (uiState.groupProfile.isFavorite) R.drawable.ic_favorite_on_24 else R.drawable.ic_favorite_off_24
@@ -344,7 +346,9 @@ fun MessageInputBar(
 }
 
 @Composable
-fun GroupProfile(groupProfile: GroupProfileUIModel) {
+fun GroupProfile(
+    groupProfile: GroupProfileUIModel
+) {
     var isDescriptionVisible by remember { mutableStateOf(false) }
 
     Box(
@@ -376,7 +380,9 @@ fun GroupProfile(groupProfile: GroupProfileUIModel) {
                 Column {
                     PDButton(
                         text = if (groupProfile.isGroupAdmin) "프로필 수정" else "그룹 탈퇴",
-                        onClick = {}
+                        onClick = {
+
+                        }
                     )
                 }
             }

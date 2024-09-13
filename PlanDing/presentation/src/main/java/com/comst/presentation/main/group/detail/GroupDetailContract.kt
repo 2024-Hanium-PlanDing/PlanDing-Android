@@ -82,6 +82,7 @@ class GroupDetailContract {
         data class CreateSchedule(val newSchedule: SendCreateScheduleDTO): GroupDetailIntent()
         data class OpenScheduleDetailBottomSheet(val schedule: Schedule): GroupDetailIntent()
         object CloseScheduleDetailBottomSheet: GroupDetailIntent()
+        object GroupFavoriteIconClick: GroupDetailIntent()
     }
 
 
