@@ -7,4 +7,8 @@ interface GroupFavoriteRepository {
     suspend fun postFavoriteGroup(
         groupCode: String
     ): ApiResult<GroupFavoriteAddResponseModel>
+
+    suspend fun deleteFavoriteGroup(
+        groupCode: String
+    ): ApiResult<String>
 }

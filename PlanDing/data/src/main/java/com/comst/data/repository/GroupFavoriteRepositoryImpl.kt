@@ -21,4 +21,13 @@ class GroupFavoriteRepositoryImpl @Inject constructor(
         )
     }
 
+    override suspend fun deleteFavoriteGroup(groupCode: String): ApiResult<String> {
+        return ApiHandler.handle(
+            execute = { groupFavoriteService.deleteFavoriteGroupApi(
+                groupCode = groupCode
+            ) },
+            mapper = { response -> response }
+        )
+    }
+
 }
