@@ -5,7 +5,7 @@ import com.comst.domain.repository.GroupFavoriteRepository
 import com.comst.domain.util.ApiResult
 import javax.inject.Inject
 
-class PostAddGroupFavoriteUseCase @Inject constructor(
+class PostGroupFavoriteUseCase @Inject constructor(
     private val groupFavoriteRepository: GroupFavoriteRepository
 ){
     suspend operator fun invoke(groupCode: String): ApiResult<GroupFavoriteAddResponseModel>{

@@ -7,7 +7,7 @@ import com.comst.domain.usecase.chat.GetChatMessageListUseCase
 import com.comst.domain.usecase.chat.PostChatMessageUseCase
 import com.comst.domain.usecase.group.GetGroupInformationUseCase
 import com.comst.domain.usecase.groupFavorite.DeleteGroupFavoriteUseCase
-import com.comst.domain.usecase.groupFavorite.PostAddGroupFavoriteUseCase
+import com.comst.domain.usecase.groupFavorite.PostGroupFavoriteUseCase
 import com.comst.domain.usecase.groupSchedule.GetGroupScheduleListUseCase
 import com.comst.domain.usecase.local.GetTokenUseCase
 import com.comst.domain.usecase.local.GetUserCodeUseCase
@@ -60,7 +60,7 @@ class GroupDetailViewModel @Inject constructor(
     private val getGroupScheduleListUseCase: GetGroupScheduleListUseCase,
     private val getChatMessageListUseCase: GetChatMessageListUseCase,
     private val postChatMessageUseCase: PostChatMessageUseCase,
-    private val postAddGroupFavoriteUseCase: PostAddGroupFavoriteUseCase,
+    private val postGroupFavoriteUseCase: PostGroupFavoriteUseCase,
     private val deleteGroupFavoriteUseCase: DeleteGroupFavoriteUseCase
 ) : BaseViewModel<GroupDetailUIState, GroupDetailSideEffect, GroupDetailIntent, GroupDetailEvent>(GroupDetailUIState()) {
 
@@ -571,7 +571,7 @@ class GroupDetailViewModel @Inject constructor(
                 throw exception
             }
         }else{
-            postAddGroupFavoriteUseCase(currentState.groupProfile.groupCode).onSuccess {
+            postGroupFavoriteUseCase(currentState.groupProfile.groupCode).onSuccess {
                 setToastEffect("즐겨찾는 그룹에 추가했습니다.")
                 setState {
                     copy(
