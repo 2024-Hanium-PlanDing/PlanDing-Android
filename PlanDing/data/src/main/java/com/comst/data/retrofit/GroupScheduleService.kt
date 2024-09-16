@@ -21,4 +21,10 @@ interface GroupScheduleService {
         @Path("endDate") endDate: String
     ): Response<BaseResponse<List<CommonScheduleResponseDTO>>>
 
+    @GET("v1/group-rooms/all/{startDate}/{endDate}")
+    suspend fun getAllGroupSchedulesApi(
+        @Path("startDate") startDate: String,
+        @Path("endDate") endDate: String
+    ): Response<BaseResponse<List<CommonScheduleResponseDTO>>>
+
 }

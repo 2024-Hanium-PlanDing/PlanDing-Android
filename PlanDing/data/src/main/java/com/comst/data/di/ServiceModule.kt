@@ -6,6 +6,7 @@ import com.comst.data.retrofit.GroupService
 import com.comst.data.retrofit.PersonalScheduleService
 import com.comst.data.retrofit.AuthenticatedUserService
 import com.comst.data.retrofit.ChatService
+import com.comst.data.retrofit.GroupFavoriteService
 import com.comst.data.retrofit.GroupInviteService
 import com.comst.data.retrofit.GroupTaskService
 import com.comst.data.retrofit.UnAuthenticatedUserService
@@ -64,4 +65,8 @@ object ServiceModule {
         return retrofit.create(GroupTaskService::class.java)
     }
 
+    @Provides
+    fun provideGroupFavoriteService(@RetrofitModule.AuthenticatedRetrofit retrofit: Retrofit): GroupFavoriteService{
+        return retrofit.create(GroupFavoriteService::class.java)
+    }
 }

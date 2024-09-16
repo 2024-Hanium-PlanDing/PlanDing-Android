@@ -3,6 +3,7 @@ package com.comst.data.di
 import com.comst.data.converter.MediaImageMultipartConverter
 import com.comst.data.repository.ChatRepositoryImpl
 import com.comst.data.repository.CommonScheduleRepositoryImpl
+import com.comst.data.repository.GroupFavoriteRepositoryImpl
 import com.comst.data.repository.GroupInviteRepositoryImpl
 import com.comst.data.repository.GroupRepositoryImpl
 import com.comst.data.repository.GroupScheduleRepositoryImpl
@@ -15,11 +16,13 @@ import com.comst.data.retrofit.GroupService
 import com.comst.data.retrofit.PersonalScheduleService
 import com.comst.data.retrofit.AuthenticatedUserService
 import com.comst.data.retrofit.ChatService
+import com.comst.data.retrofit.GroupFavoriteService
 import com.comst.data.retrofit.GroupInviteService
 import com.comst.data.retrofit.GroupTaskService
 import com.comst.data.retrofit.UnAuthenticatedUserService
 import com.comst.domain.repository.ChatRepository
 import com.comst.domain.repository.CommonScheduleRepository
+import com.comst.domain.repository.GroupFavoriteRepository
 import com.comst.domain.repository.GroupInviteRepository
 import com.comst.domain.repository.GroupRepository
 import com.comst.domain.repository.GroupScheduleRepository
@@ -91,5 +94,13 @@ object ViewModelRepositoryModule {
         groupTaskService: GroupTaskService
     ): GroupTaskRepository {
         return GroupTaskRepositoryImpl(groupTaskService)
+    }
+
+    @Provides
+    @ViewModelScoped
+    fun provideGroupFavoriteRepository(
+        groupFavoriteService: GroupFavoriteService
+    ): GroupFavoriteRepository {
+        return GroupFavoriteRepositoryImpl(groupFavoriteService)
     }
 }

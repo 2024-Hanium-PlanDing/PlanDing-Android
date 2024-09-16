@@ -9,6 +9,7 @@ import com.comst.domain.util.InternalServerErrorException
 import com.comst.domain.util.ReAuthenticationRequiredException
 import com.comst.domain.util.Resources
 import com.comst.domain.util.ServerNotFoundException
+import com.comst.domain.util.ServiceUnavailableException
 import com.comst.presentation.common.util.ThrottleClickHandler
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.channels.Channel
@@ -142,6 +143,7 @@ abstract class BaseViewModel<S : UIState, A : BaseSideEffect, I : BaseIntent, E 
             is ServerNotFoundException -> setToastEffect("서버를 찾을 수 없습니다.")
             is InternalServerErrorException -> setToastEffect("서버에 문제가 발생했습니다. 나중에 다시 시도해 주세요.")
             is BadGatewayException -> setToastEffect("서버 점검중")
+            is ServiceUnavailableException -> setToastEffect("게이트웨이 서버가 다운되었거나 과부하")
             else -> setToastEffect("알 수 없는 오류가 발생했습니다.")
         }
     }

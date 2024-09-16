@@ -6,6 +6,8 @@ import com.comst.domain.model.base.Schedule
 import com.comst.domain.usecase.chat.GetChatMessageListUseCase
 import com.comst.domain.usecase.chat.PostChatMessageUseCase
 import com.comst.domain.usecase.group.GetGroupInformationUseCase
+import com.comst.domain.usecase.groupFavorite.DeleteGroupFavoriteUseCase
+import com.comst.domain.usecase.groupFavorite.PostGroupFavoriteUseCase
 import com.comst.domain.usecase.groupSchedule.GetGroupScheduleListUseCase
 import com.comst.domain.usecase.local.GetTokenUseCase
 import com.comst.domain.usecase.local.GetUserCodeUseCase
@@ -57,7 +59,9 @@ class GroupDetailViewModel @Inject constructor(
     private val getGroupInformationUseCase: GetGroupInformationUseCase,
     private val getGroupScheduleListUseCase: GetGroupScheduleListUseCase,
     private val getChatMessageListUseCase: GetChatMessageListUseCase,
-    private val postChatMessageUseCase: PostChatMessageUseCase
+    private val postChatMessageUseCase: PostChatMessageUseCase,
+    private val postGroupFavoriteUseCase: PostGroupFavoriteUseCase,
+    private val deleteGroupFavoriteUseCase: DeleteGroupFavoriteUseCase
 ) : BaseViewModel<GroupDetailUIState, GroupDetailSideEffect, GroupDetailIntent, GroupDetailEvent>(GroupDetailUIState()) {
 
     private lateinit var token: String
@@ -87,6 +91,7 @@ class GroupDetailViewModel @Inject constructor(
             is GroupDetailIntent.CreateSchedule -> onCreateSchedule(intent.newSchedule)
             is GroupDetailIntent.OpenScheduleDetailBottomSheet -> onOpenScheduleDetailBottomSheet(intent.schedule)
             is GroupDetailIntent.CloseScheduleDetailBottomSheet -> onCloseScheduleDetailBottomSheet()
+            is GroupDetailIntent.GroupFavoriteIconClick -> onGroupFavoriteIconClick()
         }
     }
 
@@ -548,6 +553,41 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
+    private fun onGroupFavoriteIconClick() = viewModelScope.launch(apiExceptionHandler){
+        if (!canHandleClick(GROUP_FAVORITE)) return@launch
+        if (currentState.groupProfile.isFavorite){
+            deleteGroupFavoriteUseCase(currentState.groupProfile.groupCode).onSuccess {
+                setToastEffect("즐겨찾는 그룹에서 삭제했습니다.")
+                setState {
+                    copy(
+                        groupProfile = groupProfile.copy(
+                            isFavorite = false
+                        )
+                    )
+                }
+            }.onFailure {
+
+            }.onException { exception ->
+                throw exception
+            }
+        }else{
+            postGroupFavoriteUseCase(currentState.groupProfile.groupCode).onSuccess {
+                setToastEffect("즐겨찾는 그룹에 추가했습니다.")
+                setState {
+                    copy(
+                        groupProfile = groupProfile.copy(
+                            isFavorite = true
+                        )
+                    )
+                }
+            }.onFailure {
+
+            }.onException { exception ->
+                throw exception
+            }
+        }
+    }
+
     companion object{
         const val HEADER_AUTHORIZATION = "Authorization"
         const val HEADER_GROUP_CODE = "groupCode"
@@ -562,5 +602,6 @@ class GroupDetailViewModel @Inject constructor(
 
         const val SEND_CHAT = "sendChatClick"
         const val SELECT_DATE = "selectDate"
+        const val GROUP_FAVORITE = "groupFavoriteClick"
     }
 }

@@ -10,8 +10,9 @@ data class ScheduleResponseDTO(
     val scheduleDate : String,
     val startTime : Int,
     val endTime : Int,
-    val complete : Boolean,
     val groupName : String,
+    val groupCode: String,
+    val groupThumbnail: String
 )
 fun ScheduleResponseDTO.toDomainModel(): Schedule {
     val localDate = DateUtils.uiDateToLocalDate(scheduleDate,"yyyy-MM-dd")
@@ -22,7 +23,7 @@ fun ScheduleResponseDTO.toDomainModel(): Schedule {
         startTime = startTime,
         endTime = endTime,
         day = DateUtils.getDayOfWeekUIFormat(localDate),
-        complete = complete,
+        complete = false,
         groupName = groupName,
     )
 }

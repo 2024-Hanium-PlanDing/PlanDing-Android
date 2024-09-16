@@ -5,6 +5,7 @@ import com.comst.domain.util.AccountNotFoundException
 import com.comst.domain.util.BadRequestException
 import com.comst.domain.util.InternalServerErrorException
 import com.comst.domain.util.ServerNotFoundException
+import com.comst.domain.util.ServiceUnavailableException
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import okhttp3.Interceptor
@@ -46,11 +47,12 @@ class ErrorResponseInterceptor @Inject constructor() : Interceptor {
 
     private fun createErrorException(url: String?, httpCode: Int, errorResponse: ErrorResponse?): IOException? =
         when (httpCode) {
-            400, 403 -> BadRequestException(Throwable(errorResponse?.message), url)
+            400 -> BadRequestException(Throwable(errorResponse?.message), url)
             402 -> AccountNotFoundException(Throwable(errorResponse?.message), url)
             404 -> ServerNotFoundException(Throwable(errorResponse?.message), url)
             500 -> InternalServerErrorException(Throwable(errorResponse?.message), url)
             502 -> BadRequestException(Throwable(errorResponse?.message), url)
+            503 -> ServiceUnavailableException(Throwable(errorResponse?.message), url)
             else -> null
         }
 }
