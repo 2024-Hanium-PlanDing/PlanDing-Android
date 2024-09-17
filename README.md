@@ -8,6 +8,7 @@
 <div align="center"> 
   <img src="https://img.shields.io/badge/Android-3DDC84?style=flat-square&logo=android&logoColor=white" height="28px"/>
   <img src="https://img.shields.io/badge/Jetpack Compose-4285F4?style=flat-square&logo=android&logoColor=white" height="28px" />
+  
 </div>
 
 <br>
