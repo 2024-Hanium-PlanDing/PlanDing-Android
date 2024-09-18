@@ -49,6 +49,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.comst.presentation.main.mypage.groupRequestsReceived.GroupRequestsReceivedActivity" />
+        <activity android:name="com.comst.presentation.main.mypage.favoriteGroup.FavoriteGroupActivity" />
 
         <service
             android:name="com.comst.presentation.util.PDFirebaseMessagingService"
