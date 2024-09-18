@@ -44,6 +44,7 @@ import com.comst.presentation.common.base.BaseScreen
 import com.comst.presentation.component.PDProfileImage
 import com.comst.presentation.component.PDScreenHeader
 import com.comst.presentation.main.mypage.MyPageContract.*
+import com.comst.presentation.main.mypage.favoriteGroup.FavoriteGroupActivity
 import com.comst.presentation.main.mypage.groupRequestsReceived.GroupRequestsReceivedActivity
 import com.comst.presentation.ui.theme.PlanDingTheme
 
@@ -58,6 +59,13 @@ fun MyPageScreen(viewModel: MyPageViewModel = hiltViewModel()) {
                 context.startActivity(
                     GroupRequestsReceivedActivity.groupRequestsReceivedIntent(
                         context,
+                    )
+                )
+            }
+            is MyPageSideEffect.NavigateToFavoriteActivity -> {
+                context.startActivity(
+                    FavoriteGroupActivity.favoriteGroupIntent(
+                        context
                     )
                 )
             }
@@ -126,7 +134,11 @@ private fun MyPageScreen(
                     )
 
                     Column(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable {
+                                setIntent(MyPageIntent.FavoriteGroupClick)
+                            },
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(

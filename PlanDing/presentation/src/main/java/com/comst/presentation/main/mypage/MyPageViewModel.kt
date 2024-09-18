@@ -23,6 +23,7 @@ class MyPageViewModel @Inject constructor(
     override fun handleIntent(intent: MyPageIntent) {
         when (intent) {
             is MyPageIntent.GroupRequestsReceivedClick -> setEffect(MyPageSideEffect.NavigateToGroupRequestsReceivedActivity)
+            is MyPageIntent.FavoriteGroupClick -> setEffect(MyPageSideEffect.NavigateToFavoriteActivity)
             is MyPageIntent.Refresh -> onRefresh()
         }
     }

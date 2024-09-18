@@ -21,10 +21,13 @@ class MyPageContract {
 
     sealed class MyPageSideEffect : BaseSideEffect {
         object NavigateToGroupRequestsReceivedActivity: MyPageSideEffect()
+        object NavigateToFavoriteActivity: MyPageSideEffect()
     }
 
     sealed class MyPageIntent : BaseIntent {
         object GroupRequestsReceivedClick: MyPageIntent()
+
+        object FavoriteGroupClick: MyPageIntent()
         object Refresh : MyPageIntent()
     }
 
