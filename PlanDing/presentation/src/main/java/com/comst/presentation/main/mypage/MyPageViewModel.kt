@@ -34,7 +34,7 @@ class MyPageViewModel @Inject constructor(
         }
     }
 
-    private fun load() = viewModelScope.launch(apiExceptionHandler) {
+    private fun load() = viewModelScope.launch(coroutineExceptionHandler) {
         setState { copy(isLoading = true) }
         getUserProfileUseCase()
             .onSuccess {

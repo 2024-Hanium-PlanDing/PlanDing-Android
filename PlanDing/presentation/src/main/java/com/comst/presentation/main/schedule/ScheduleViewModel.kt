@@ -60,7 +60,7 @@ class ScheduleViewModel @Inject constructor(
         loadDailyGroupSchedule()
     }
 
-    private fun loadWeeklySchedule() = viewModelScope.launch(apiExceptionHandler) {
+    private fun loadWeeklySchedule() = viewModelScope.launch(coroutineExceptionHandler) {
         val weeklySchedulePeriod = DateUtils.getWeekStartAndEnd(currentState.selectLocalDate)
         getCommonScheduleWeekListUseCase(weeklySchedulePeriod)
             .onSuccess {
@@ -74,7 +74,7 @@ class ScheduleViewModel @Inject constructor(
             }
     }
 
-    private fun loadDailyGroupSchedule() = viewModelScope.launch(apiExceptionHandler) {
+    private fun loadDailyGroupSchedule() = viewModelScope.launch(coroutineExceptionHandler) {
         val dailyPeriod = DateUtils.getDayStartAndEnd(currentState.selectLocalDate)
         getAllGroupScheduleListUseCase(dailyPeriod)
             .onSuccess {
@@ -88,7 +88,7 @@ class ScheduleViewModel @Inject constructor(
             }
     }
 
-    private fun loadDailyPersonalSchedule() = viewModelScope.launch(apiExceptionHandler) {
+    private fun loadDailyPersonalSchedule() = viewModelScope.launch(coroutineExceptionHandler) {
         val dailyPeriod = DateUtils.getDayStartAndEnd(currentState.selectLocalDate)
         getPersonalScheduleListUseCase(dailyPeriod)
             .onSuccess {
@@ -152,7 +152,7 @@ class ScheduleViewModel @Inject constructor(
         }
     }
 
-    private fun onDateSelected(date: LocalDate) = viewModelScope.launch(apiExceptionHandler) {
+    private fun onDateSelected(date: LocalDate) = viewModelScope.launch(coroutineExceptionHandler) {
         val weeklySchedulePeriod = DateUtils.getWeekStartAndEnd(date)
         val dailyPeriod = DateUtils.getDayStartAndEnd(date)
 

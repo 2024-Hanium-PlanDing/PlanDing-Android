@@ -46,7 +46,7 @@ class AddGroupMemberViewModel @Inject constructor(
         }
     }
 
-    private fun onInviteGroupMember() = viewModelScope.launch(apiExceptionHandler) {
+    private fun onInviteGroupMember() = viewModelScope.launch(coroutineExceptionHandler) {
         if (currentState.userCode.isEmpty()){
             setToastEffect("유저 코드를 입력해주세요.")
             return@launch

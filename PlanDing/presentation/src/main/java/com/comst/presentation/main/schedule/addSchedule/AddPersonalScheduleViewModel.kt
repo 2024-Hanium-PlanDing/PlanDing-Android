@@ -77,7 +77,7 @@ class AddPersonalScheduleViewModel @Inject constructor(
         }
     }
 
-    private fun onCreateScheduleClick() = viewModelScope.launch(apiExceptionHandler) {
+    private fun onCreateScheduleClick() = viewModelScope.launch(coroutineExceptionHandler) {
         if (currentState.title.isEmpty() || currentState.content.isEmpty()) {
             setToastEffect("일정의 제목과 내용은 필수입니다.")
             return@launch

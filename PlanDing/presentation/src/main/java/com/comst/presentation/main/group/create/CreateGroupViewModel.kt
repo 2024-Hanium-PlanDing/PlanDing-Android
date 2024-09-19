@@ -78,7 +78,7 @@ class CreateGroupViewModel @Inject constructor(
         }
     }
 
-    private fun onCreateGroupClick() = viewModelScope.launch(apiExceptionHandler) {
+    private fun onCreateGroupClick() = viewModelScope.launch(coroutineExceptionHandler) {
         if (currentState.selectedImage == null) {
             setToastEffect("그룹 이미지는 필수입니다.")
             return@launch

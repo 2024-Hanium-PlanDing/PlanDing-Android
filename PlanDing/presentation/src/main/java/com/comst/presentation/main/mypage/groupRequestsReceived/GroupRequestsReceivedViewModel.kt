@@ -27,7 +27,7 @@ class GroupRequestsReceivedViewModel @Inject constructor(
         load()
     }
 
-    private fun load() = viewModelScope.launch(apiExceptionHandler) {
+    private fun load() = viewModelScope.launch(coroutineExceptionHandler) {
         getGroupRequestReceivedListUseCase().onSuccess { groupRequestReceivedResponseModel ->
             setState {
                 copy(
@@ -53,7 +53,7 @@ class GroupRequestsReceivedViewModel @Inject constructor(
 
     }
 
-    private fun onAcceptClick(groupRequestReceivedCardModel: GroupRequestReceivedCardModel) = viewModelScope.launch(apiExceptionHandler) {
+    private fun onAcceptClick(groupRequestReceivedCardModel: GroupRequestReceivedCardModel) = viewModelScope.launch(coroutineExceptionHandler) {
         if (!canHandleClick(GROUP_REQUEST_ACTION + groupRequestReceivedCardModel.inviteCode)) return@launch
         getAcceptGroupInviteUseCase(
             groupCode = groupRequestReceivedCardModel.groupCode,
@@ -72,7 +72,7 @@ class GroupRequestsReceivedViewModel @Inject constructor(
         }
     }
 
-    private fun onDenyClick(groupRequestReceivedCardModel: GroupRequestReceivedCardModel)  = viewModelScope.launch(apiExceptionHandler){
+    private fun onDenyClick(groupRequestReceivedCardModel: GroupRequestReceivedCardModel)  = viewModelScope.launch(coroutineExceptionHandler){
         if (!canHandleClick(GROUP_REQUEST_ACTION + groupRequestReceivedCardModel.inviteCode)) return@launch
         deleteDenyGroupInviteUseCase(
             inviteCode = groupRequestReceivedCardModel.inviteCode

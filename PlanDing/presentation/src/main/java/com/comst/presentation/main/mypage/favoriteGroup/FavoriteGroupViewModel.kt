@@ -21,7 +21,7 @@ class FavoriteGroupViewModel @Inject constructor(
         load()
     }
 
-    private fun load() = viewModelScope.launch(apiExceptionHandler) {
+    private fun load() = viewModelScope.launch(coroutineExceptionHandler) {
         setState { copy(isLoading = true) }
 
         groupFavoriteListUseCase().onSuccess {groupCardModels ->

@@ -78,7 +78,7 @@ class ScheduleDetailViewModel @Inject constructor(
 
     }
 
-    fun initialize(groupCode: String, scheduleId: Long) = viewModelScope.launch(apiExceptionHandler) {
+    fun initialize(groupCode: String, scheduleId: Long) = viewModelScope.launch(coroutineExceptionHandler) {
         setState {
             copy(
                 groupCode = groupCode,

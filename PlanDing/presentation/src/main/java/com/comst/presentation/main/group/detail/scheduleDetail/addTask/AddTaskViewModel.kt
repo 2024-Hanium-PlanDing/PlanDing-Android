@@ -10,14 +10,12 @@ import com.comst.domain.util.onException
 import com.comst.domain.util.onFailure
 import com.comst.domain.util.onSuccess
 import com.comst.presentation.common.base.BaseViewModel
-import com.comst.presentation.main.group.detail.addSchedule.AddGroupScheduleContract
 import com.comst.presentation.main.group.detail.scheduleDetail.ScheduleDetailContract
 import com.comst.presentation.main.group.detail.scheduleDetail.addTask.AddTaskContract.AddTaskEvent
 import com.comst.presentation.main.group.detail.scheduleDetail.addTask.AddTaskContract.AddTaskIntent
 import com.comst.presentation.main.group.detail.scheduleDetail.addTask.AddTaskContract.AddTaskSideEffect
 import com.comst.presentation.main.group.detail.scheduleDetail.addTask.AddTaskContract.AddTaskUIState
 import com.comst.presentation.model.group.TaskUserUIModel
-import com.comst.presentation.model.group.socket.SendCreateScheduleDTO
 import com.comst.presentation.model.group.socket.SendCreateTaskDTO
 import com.comst.presentation.model.group.toTaskUserUIModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,7 +44,7 @@ class AddTaskViewModel @Inject constructor(
         }
     }
 
-    fun initialize(groupCode: String, scheduleId: Long) = viewModelScope.launch(apiExceptionHandler) {
+    fun initialize(groupCode: String, scheduleId: Long) = viewModelScope.launch(coroutineExceptionHandler) {
         setState {
             copy(
                 groupCode = groupCode,
@@ -151,7 +149,7 @@ class AddTaskViewModel @Inject constructor(
         }
     }
 
-    private fun onCreateTaskClick() = viewModelScope.launch(apiExceptionHandler){
+    private fun onCreateTaskClick() = viewModelScope.launch(coroutineExceptionHandler){
         if (currentState.taskTitle.isEmpty() || currentState.taskContent.isEmpty()) {
             setToastEffect("할 일의 제목과 내용은 필수입니다.")
             return@launch

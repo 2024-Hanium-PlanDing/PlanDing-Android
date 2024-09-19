@@ -54,7 +54,7 @@ class LoginViewModel @Inject constructor(
         setState { copy(isLoading = false) }
     }
 
-    private fun onSocialLogin(accountInformation: SocialLoginInformation) = viewModelScope.launch(apiExceptionHandler) {
+    private fun onSocialLogin(accountInformation: SocialLoginInformation) = viewModelScope.launch(coroutineExceptionHandler) {
         setState { copy(isLoading = true) }
         postSocialLoginUseCase(accountInformation)
             .onSuccess {

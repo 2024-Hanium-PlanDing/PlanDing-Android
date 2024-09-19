@@ -102,7 +102,7 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
-    fun initialize(groupCode: String) = viewModelScope.launch(apiExceptionHandler) {
+    fun initialize(groupCode: String) = viewModelScope.launch(coroutineExceptionHandler) {
         setState { copy(isLoading = true) }
 
         val tokenDeferred = async { getTokenUseCase() }
@@ -317,7 +317,7 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
-    private fun onSendChat() = viewModelScope.launch(apiExceptionHandler){
+    private fun onSendChat() = viewModelScope.launch(coroutineExceptionHandler){
         if (!canHandleClick(SEND_CHAT)) return@launch
 
         postChatMessageUseCase(
@@ -427,7 +427,7 @@ class GroupDetailViewModel @Inject constructor(
         }
         setEvent(GroupDetailEvent.DateSelected(selectedLocalDate))
     }
-    private fun onDateSelected(date: LocalDate) = viewModelScope.launch(apiExceptionHandler) {
+    private fun onDateSelected(date: LocalDate) = viewModelScope.launch(coroutineExceptionHandler) {
         val newSelectedWeekdays = DateUtils.getWeekDays(date)
         val selectUIDate = DateUtils.localDateToUIDate(date)
         val selectDay = DateUtils.getDayOfWeek(date)
@@ -553,7 +553,7 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
-    private fun onGroupFavoriteIconClick() = viewModelScope.launch(apiExceptionHandler){
+    private fun onGroupFavoriteIconClick() = viewModelScope.launch(coroutineExceptionHandler){
         if (!canHandleClick(GROUP_FAVORITE)) return@launch
         if (currentState.groupProfile.isFavorite){
             deleteGroupFavoriteUseCase(currentState.groupProfile.groupCode).onSuccess {

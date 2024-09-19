@@ -37,8 +37,8 @@ abstract class BaseViewModel<S : UIState, A : BaseSideEffect, I : BaseIntent, E 
     private val _event: MutableSharedFlow<E> = MutableSharedFlow()
     val event = _event.asSharedFlow()
 
-    protected val apiExceptionHandler = CoroutineExceptionHandler { _, exception ->
-        apiHandleException(exception)
+    protected val coroutineExceptionHandler = CoroutineExceptionHandler { _, exception ->
+        handleException(exception)
     }
 
     private val throttleHandlers = mutableMapOf<String, ThrottleClickHandler>()
@@ -135,7 +135,7 @@ abstract class BaseViewModel<S : UIState, A : BaseSideEffect, I : BaseIntent, E 
         }
     }
 
-    private fun apiHandleException(exception: Throwable) {
+    private fun handleException(exception: Throwable) {
         when (exception) {
             is BadRequestException -> setToastEffect("잘못된 요청입니다.")
             is ReAuthenticationRequiredException -> onReAuthenticationRequired()
